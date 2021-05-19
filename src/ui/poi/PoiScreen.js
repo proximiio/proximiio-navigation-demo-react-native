@@ -14,6 +14,7 @@ import PreferenceHelper from '../../utils/PreferenceHelper';
 import {PROXIMIIO_TOKEN} from '../../utils/Constants';
 import {ProximiioMapboxRoute} from 'react-native-proximiio-mapbox/src/types';
 import {Feature} from 'react-native-proximiio-mapbox/src/feature';
+import {Trans} from 'react-i18next';
 
 /**
  * Length of a single step in meters.
@@ -123,7 +124,7 @@ export default class PoiScreen extends React.Component<Props, State> {
   __getDescription(feature: Feature) {
     let description = feature.getDescription();
     if (!description) {
-      return 'No description available.';
+      return <Trans>No description available.</Trans>;
     } else {
       return description;
     }

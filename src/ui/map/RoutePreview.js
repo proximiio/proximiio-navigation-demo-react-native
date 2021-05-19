@@ -149,8 +149,8 @@ export default class RoutePreview extends Component<Props, State> {
   __renderTripStep(item) {
     const instruction = item.index === 0 ? <Trans>Start navigation</Trans> : item.item.instruction;
     let distance = undefined;
-    if (item.index > 0 && item.item.distanceFromLastStep != undefined) {
-      distance = Math.round(item.item.distanceFromLastStep) + ' ' + <Trans>meter(s)</Trans>;
+    if (item.index > 0 && item.item.distanceFromLastStep !== undefined) {
+      distance = Math.round(item.item.distanceFromLastStep);
     }
 
     if (instruction === undefined) return <View />;
@@ -162,7 +162,7 @@ export default class RoutePreview extends Component<Props, State> {
         />
         <View style={styles.tripRowText}>
           <Text>{instruction}</Text>
-          {distance != null && (<Text style={styles.tripRowTextDistance}>{distance}</Text>)}
+          {distance != null && (<Text style={styles.tripRowTextDistance}>{distance} <Trans>meter(s)</Trans></Text>)}
         </View>
       </View>
     );

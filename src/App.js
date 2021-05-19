@@ -31,7 +31,7 @@ import {
   ProximiioMapboxEvents,
   ProximiioMapboxSyncStatus,
 } from 'react-native-proximiio-mapbox/src/instance';
-import { Trans } from 'react-i18next';
+import {Trans} from 'react-i18next';
 
 /**
  * Create UI stack to manage screens.
@@ -134,9 +134,14 @@ export default class App extends React.Component<Props, State> {
     );
     // Authorize libraries with token
     await Proximiio.authorize(PROXIMIIO_TOKEN);
-    // await Proximiio.setPdr(true, 4);
-    // await Proximiio.setSnapToRoute(true, 20);
+    Proximiio.setPdr(true, 4);
+    Proximiio.setSnapToRoute(true, 20);
     await ProximiioMapbox.authorize(PROXIMIIO_TOKEN);
+    ProximiioMapbox.setUserLocationToRouteSnappingEnabled(true);
+    ProximiioMapbox.setUserLocationToRouteSnappingThreshold(6.0);
+    ProximiioMapbox.setRouteFinishThreshold(2.5);
+    ProximiioMapbox.setStepImmediateThreshold(3.5);
+    ProximiioMapbox.setStepPreparationThreshold(3.0);
     // Apply user preferences, manageable in preference screen
     await PreferenceHelper.applyPreferences();
     // Request permissions needed for localization

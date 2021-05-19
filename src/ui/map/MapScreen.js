@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import {StyleSheet, View, Text, TouchableHighlight, TouchableNativeFeedback} from 'react-native';
+import {StyleSheet, View, Text, TouchableHighlight, Image, ActivityIndicator} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {
   ProximiioContextProvider,
@@ -20,9 +20,6 @@ import ProximiioMapbox, {
   AmenitySource,
   GeoJSONSource,
   RoutingSource,
-  ProximiioRoute,
-  ProximiioMapboxRouteUpdateEvent,
-  ProximiioFeature,
 } from 'react-native-proximiio-mapbox';
 import RoutePreview from './RoutePreview';
 import {FAB} from 'react-native-paper';
@@ -31,25 +28,27 @@ import CardView from '../../utils/CardView';
 import FloorPicker from './FloorPicker';
 import {Colors} from '../../Style';
 import {
+  ProximiioMapboxRoute,
+  ProximiioFeatureType,
   ProximiioRouteEvent,
   ProximiioRouteUpdateType,
 } from 'react-native-proximiio-mapbox/src/types';
 import {ProximiioFloor} from 'react-native-proximiio';
-import * as GeoJSON from 'react-native-proximiio-mapbox/src/feature';
-import {MAP_STARTING_BOUNDS} from "../../utils/Constants";
+import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
 import {Trans} from 'react-i18next';
+import importDirectionImage from "../../utils/DirectionImageImportUtil";
 
 interface Props {}
 
 interface State {
   followUser: boolean;
-  hazardFeature: ProximiioFeature;
+  hazardFeature: ProximiioFeatureType;
   location: ProximiioLocation | undefined;
   mapLoaded: boolean;
   mapLevel: number;
-  route: ProximiioRoute;
+  route: ProximiioMapboxRoute;
   routeStarted: Boolean;
-  routeUpdate: ProximiioMapboxRouteUpdateEvent;
+  routeUpdate: ProximiioRouteEvent;
   userLevel: number;
 }
 
@@ -125,57 +124,102 @@ export default class MapScreen extends React.Component<Props, State> {
           <FAB color={Colors.primary} icon="minus" style={styles.fab} onPress={() => this.__zoomOut()} />
           <FAB color={Colors.primary} icon="crosshairs-gps" style={styles.fab} onPress={() => this.__showAndFollowCurrentUserLocation()} />
         </View>
+        {/* Route preview */}
         {this.state.started === false && this.state.route !== null && (
           <RoutePreview
             style={{flex: 1, width: '100%'}}
             route={this.state.route}
           />
         )}
-        {this.state.started === false && !this.state.route && (
-          <View>
-            <CardView style={styles.searchCard}>
-              <TouchableHighlight
-                style={{borderRadius: 8}}
-                activeOpacity={0.9}
-                underlayColor="#eeeeee"
-                onPress={() => {
-                  this.props.navigation.navigate('SearchScreen');
-                }}>
-                <Text style={styles.searchText}><Trans>Where do you want to go?</Trans></Text>
-              </TouchableHighlight>
-            </CardView>
-          </View>
-        )}
-        {this.state.started === true && this.state.route && (
-          <RouteNavigation
-            route={this.state.route}
-            routeUpdate={this.state.routeUpdate}
-            hazard={this.state.hazard}
-          />
-        )}
-        {/* Floor selector */}
-        <View style={styles.floorPickerWrapper}>
-          <FloorPicker
-            mapLevel={this.state.mapLevel}
-            userLevel={this.state.userLevel}
-            onLevelChanged={this.__onLevelChanged.bind(this)}
-          />
+        {this.__renderRouteCalculation()}
+        {this.__renderNavigation()}
+        {this.__renderSearch()}
+        {this.__renderFloorSelector()}
+      </View>
+    );
+  }
+
+  /**
+   * Render UI when route is re/calculating.
+   */
+  __renderRouteCalculation() {
+    if (
+      this.state.started === false
+      || this.state.routeUpdate === null
+      || (
+        this.state.routeUpdate.eventType !== ProximiioRouteUpdateType.CALCULATING
+        && this.state.routeUpdate.eventType !== ProximiioRouteUpdateType.RECALCULATING
+      )
+    ) {
+      return null;
+    }
+    return (
+      <View style={styles.calculationRow}>
+        <ActivityIndicator size="large" color={Colors.primary} style={styles.calculationIndicator} animating />
+        <View style={styles.calculationRowText}>
+          <Text>{this.state.routeUpdate.text}</Text>
         </View>
+      </View>
+    );
+  }
+
+  __renderNavigation() {
+    if (this.state.started === false || this.state.route == null) {
+      return null;
+    }
+    return (
+      <RouteNavigation
+        route={this.state.route}
+        routeUpdate={this.state.routeUpdate}
+        hazard={this.state.hazard}
+      />
+    );
+  }
+
+  __renderSearch() {
+    if (this.state.started === true || this.state.route) {
+      return null;
+    }
+    return (
+      <View>
+        <CardView style={styles.searchCard}>
+          <TouchableHighlight
+            style={{borderRadius: 8}}
+            activeOpacity={0.9}
+            underlayColor="#eeeeee"
+            onPress={() => {
+              this.props.navigation.navigate('SearchScreen');
+            }}>
+            <Text style={styles.searchText}><Trans>Where do you want to go?</Trans></Text>
+          </TouchableHighlight>
+        </CardView>
+      </View>
+    );
+  }
+
+  __renderFloorSelector() {
+    return (
+      <View style={styles.floorPickerWrapper}>
+        <FloorPicker
+          mapLevel={this.state.mapLevel}
+          userLevel={this.state.userLevel}
+          onLevelChanged={this.__onLevelChanged.bind(this)}
+        />
       </View>
     );
   }
 
   /**
    * Find pressed POI on map.
-   * TODO: event not firing, seems known issue with mapbox?
    * @param event
    * @returns {Promise<void>}
    * @private
    */
-  __onMapPress(event: ProximiioFeature[]) {
+  __onMapPress(event: ProximiioFeatureType[]) {
     let pois = event.filter((it) => it.properties.type === 'poi');
     console.log('MAP ON PRESS', pois);
     if (pois.length > 0) {
+      ProximiioMapbox.route.cancel();
       this.props.navigation.navigate('ItemDetail', {item: pois[0]});
     }
   }
@@ -211,8 +255,8 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param event
    * @private
    */
-  __onRoute(event: ProximiioRoute) {
-    this.setState({route: event, routeUpdate: null, started: false});
+  __onRoute(event: ProximiioMapboxRoute) {
+    this.setState({route: event});
   }
 
   /**
@@ -231,8 +275,9 @@ export default class MapScreen extends React.Component<Props, State> {
     } else {
       if (event.eventType === ProximiioRouteUpdateType.CALCULATING) {
         this.__showAndFollowCurrentUserLocation();
+      }else {
+        this.setState({routeUpdate: event, started: true});
       }
-      this.setState({routeUpdate: event, started: true});
     }
   }
 
@@ -268,7 +313,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param hazard
    * @private
    */
-  __onHazard(hazard: ProximiioFeature) {
+  __onHazard(hazard: ProximiioFeatureType) {
     this.setState({hazard: hazard});
   }
 
@@ -366,5 +411,23 @@ const styles = StyleSheet.create({
     left: 24,
     right: 24,
     alignItems: 'center',
+  },
+  calculationRow: {
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    flexDirection: 'row',
+    padding: 8,
+    alignContent: 'center',
+    justifyContent: 'space-around',
+  },
+  calculationIndicator: {
+    padding: 8,
+    height: 24,
+    width: 24,
+  },
+  calculationRowText: {
+    flex: 1,
+    padding: 8,
+    alignItems: 'flex-start',
   },
 });

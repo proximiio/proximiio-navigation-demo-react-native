@@ -142,6 +142,9 @@ export default class App extends React.Component<Props, State> {
     ProximiioMapbox.setRouteFinishThreshold(2.5);
     ProximiioMapbox.setStepImmediateThreshold(3.5);
     ProximiioMapbox.setStepPreparationThreshold(3.0);
+    ProximiioMapbox.setRerouteEnabled(true);
+    ProximiioMapbox.setReRouteThreshold(15);
+    ProximiioMapbox.ttsHeadingCorrectionThresholds(8, 90);
     // Apply user preferences, manageable in preference screen
     await PreferenceHelper.applyPreferences();
     // Request permissions needed for localization

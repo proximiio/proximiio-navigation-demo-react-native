@@ -194,11 +194,6 @@ const resources = {
       'preferencescreen.accessibility_option_visual': 'visually impaired',
     },
   },
-  fr: {
-    translation: {
-      'Welcome to React': 'Bienvenue à React et react-i18next',
-    },
-  },
 };
 
 i18n

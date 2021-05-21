@@ -125,16 +125,6 @@ class PreferenceHelper {
     ProximiioMapbox.ttsReassuranceInstructionEnabled(preferences[Preference.REASSURANCE_ENABLED]);
     ProximiioMapbox.ttsReassuranceInstructionDistance(reassuranceDistanceOption);
     ProximiioMapbox.setUnitConversion(unitConversion);
-    ProximiioMapbox.setLevelOverrideMap({
-      '-1': 0,
-      '0': 1,
-      '1': 2,
-      '2': 3,
-      '3': 4,
-      '4': 5,
-      '5': 6,
-      '6': 7,
-    });
   }
 
   /**

@@ -17,6 +17,7 @@ const resources = {
       'common.floor_2': 'Second Floor',
       'common.floor_3': 'Third Floor',
       'common.floor_4': 'Fourth Floor',
+      'common.floor_5': 'Fifth Floor',
       'common.floor_n': '{{count}}nth Floor',
 
       'common.category.information': 'Information',

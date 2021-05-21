@@ -115,7 +115,7 @@ export default class MapScreen extends React.Component<Props, State> {
               <RoutingSource level={this.state.mapLevel} />
               {
                 this.state.mapLevel === this.state.userLevel
-                && <UserLocationSource />
+                && <UserLocationSource showHeading={true} />
               }
             </ProximiioContextProvider>
           )}
@@ -303,7 +303,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * @private
    */
   __onRegionWillChange(event) {
-    if (event.properties.isUserInteraction === true) {
+    if (this.state.followUser && event.properties.isUserInteraction === true) {
       this.setState({followUser: false});
     }
   }

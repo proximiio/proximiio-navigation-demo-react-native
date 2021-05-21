@@ -141,11 +141,21 @@ export default class App extends React.Component<Props, State> {
     ProximiioMapbox.setUserLocationToRouteSnappingEnabled(true);
     ProximiioMapbox.setUserLocationToRouteSnappingThreshold(6.0);
     ProximiioMapbox.setRouteFinishThreshold(2.5);
-    ProximiioMapbox.setStepImmediateThreshold(3.5);
+    ProximiioMapbox.setStepImmediateThreshold(3.0);
     ProximiioMapbox.setStepPreparationThreshold(3.0);
     ProximiioMapbox.setRerouteEnabled(true);
     ProximiioMapbox.setReRouteThreshold(15);
     ProximiioMapbox.ttsHeadingCorrectionThresholds(8, 90);
+    // ProximiioMapbox.setLevelOverrideMap({
+    //   '-1': 0,
+    //   '0': 1,
+    //   '1': 2,
+    //   '2': 3,
+    //   '3': 4,
+    //   '4': 5,
+    //   '5': 6,
+    //   '6': 7,
+    // });
     // Apply user preferences, manageable in preference screen
     await PreferenceHelper.applyPreferences();
     // Request permissions needed for localization

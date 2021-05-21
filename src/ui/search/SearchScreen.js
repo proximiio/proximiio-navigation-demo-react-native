@@ -21,7 +21,7 @@ import {TouchableHighlight} from 'react-native-gesture-handler';
 import SearchFooter from './SearchFooter';
 import {Colors} from '../../Style';
 import {PROXIMIIO_TOKEN} from '../../utils/Constants';
-import i18n from "i18next";
+import i18n from 'i18next';
 
 const numColumns = (Dimensions.get('window').width / 200).toFixed(0);
 const searchItemFlex = 1 / numColumns;
@@ -81,41 +81,41 @@ export default class SearchScreen extends Component<Props, State> {
 
   render() {
     return (
-        <View style={style.container}>
-          <CardView style={style.searchInputCard}>
-            <View style={style.searchInputCardContent}>
-              {this.state.featureCategoryFilter && (
-                  <TouchableHighlight
-                      activeOpacity={0.5}
-                      underlayColor="#fff"
-                      onPress={() => this.__updateCategoryFilter()}>
-                    <View style={style.categoryFilter}>
-                      <Text>{this.state.featureCategoryFilter.title}</Text>
-                      <IconButton icon="close" size={16} style={style.categoryFilterClose}/>
-                    </View>
-                  </TouchableHighlight>
-              )}
-              <View style={style.searchInput}>
-                <TextInput
-                    placeholder={i18n.t('common_search_hint')}
-                    onChangeText={(title) => this.__updateSearchFilter(title)}
-                    autoFocus
-                />
-              </View>
+      <View style={style.container}>
+        <CardView style={style.searchInputCard}>
+          <View style={style.searchInputCardContent}>
+            {this.state.featureCategoryFilter && (
+              <TouchableHighlight
+                activeOpacity={0.5}
+                underlayColor="#fff"
+                onPress={() => this.__updateCategoryFilter()}>
+                <View style={style.categoryFilter}>
+                  <Text>{this.state.featureCategoryFilter.title}</Text>
+                  <IconButton icon="close" size={16} style={style.categoryFilterClose}/>
+                </View>
+              </TouchableHighlight>
+            )}
+            <View style={style.searchInput}>
+              <TextInput
+                placeholder={i18n.t('common_search_hint')}
+                onChangeText={(title) => this.__updateSearchFilter(title)}
+                autoFocus
+              />
             </View>
-          </CardView>
-          <FlatList
-              contentContainerStyle={style.scrollviewContent}
-              data={this.state.filteredFeatureList}
-              numColumns={numColumns}
-              ListEmptyComponent={<SearchEmptyItem/>}
-              ListFooterComponent={this.state.currentItemCount > 0 && <SearchFooter/>}
-              ListHeaderComponent={this.state.featureListFilterTitle === '' && this.state.featureCategoryFilter == undefined && this.state.featureList.length > 0 &&
-              <SearchCategories onCategorySelected={this.__updateCategoryFilter.bind(this)}/>}
-              renderItem={({item}) => this.__renderSearchItem(item)}
-              style={style.searchItemList}
-          />
-        </View>
+          </View>
+        </CardView>
+        <FlatList
+          contentContainerStyle={style.scrollviewContent}
+          data={this.state.filteredFeatureList}
+          numColumns={numColumns}
+          ListEmptyComponent={<SearchEmptyItem/>}
+          ListFooterComponent={this.state.currentItemCount > 0 && <SearchFooter/>}
+          ListHeaderComponent={this.state.featureListFilterTitle === '' && this.state.featureCategoryFilter == undefined && this.state.featureList.length > 0 &&
+          <SearchCategories onCategorySelected={this.__updateCategoryFilter.bind(this)}/>}
+          renderItem={({item}) => this.__renderSearchItem(item)}
+          style={style.searchItemList}
+        />
+      </View>
     );
   }
 

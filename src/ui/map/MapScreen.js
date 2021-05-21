@@ -37,6 +37,7 @@ import {ProximiioFloor} from 'react-native-proximiio';
 import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
 import {Trans} from 'react-i18next';
 import importDirectionImage from "../../utils/DirectionImageImportUtil";
+import i18n from "i18next";
 
 interface Props {}
 
@@ -190,7 +191,7 @@ export default class MapScreen extends React.Component<Props, State> {
             onPress={() => {
               this.props.navigation.navigate('SearchScreen');
             }}>
-            <Text style={styles.searchText}><Trans>Where do you want to go?</Trans></Text>
+            <Text style={styles.searchText}>{i18n.t('common.search_hint')}</Text>
           </TouchableHighlight>
         </CardView>
       </View>
@@ -217,7 +218,6 @@ export default class MapScreen extends React.Component<Props, State> {
    */
   __onMapPress(event: ProximiioFeatureType[]) {
     let pois = event.filter((it) => it.properties.type === 'poi');
-    console.log('MAP ON PRESS', pois);
     if (pois.length > 0) {
       ProximiioMapbox.route.cancel();
       this.props.navigation.navigate('ItemDetail', {item: pois[0]});

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {TouchableHighlight} from 'react-native-gesture-handler';
+import i18n from 'i18next';
 
 interface Props {
   onCategorySelected: void;
@@ -48,7 +49,7 @@ export default class SearchCategories extends Component<Props, State> {
           <View style={style.categoryItemImageWrapper}>
             <Image source={item.image} style={style.categoryItemImage} />
           </View>
-          <Text style={style.categoryItemTitle}>{item.title}</Text>
+          <Text style={style.categoryItemTitle}>{i18n.t(item.title)}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -113,37 +114,37 @@ export class SearchCategory {
 const categoryList: SearchCategory[] = [
   {
     amenityCategoryId: 'cef3a774-27e3-4df3-b4ec-a72ee15bed55',
-    title: 'Cafeteria',
+    title: 'common.category.cafeteria',
     image: require('../../images/search_categories/cafeteria.png'),
   },
   {
     amenityCategoryId: '07bef616-619b-4a34-99ab-362dd4bc0075',
-    title: 'Lift',
+    title: 'common.category.lift',
     image: require('../../images/search_categories/lift.png'),
   },
   {
     amenityCategoryId: '16b509c5-aa6d-48f8-98bf-5a88b6c1e4fb',
-    title: 'Washrooms',
+    title: 'common.category.washroom',
     image: require('../../images/search_categories/washrooms.png'),
   },
   {
     amenityCategoryId: '0368ed37-9f49-45d4-8c30-0a4a03badf6e',
-    title: 'Reception',
+    title: 'common.category.reception',
     image: require('../../images/search_categories/reception.png'),
   },
   {
     amenityCategoryId: 'f6fd8bff-d04e-4e2a-8ea2-8980e1c9b326',
-    title: 'Offices',
+    title: 'common.category.offices',
     image: require('../../images/search_categories/offices.png'),
   },
   {
     amenityCategoryId: 'e23fd1da-de48-4dca-8038-1c9ef1ebdd1b',
-    title: 'Meeting room',
+    title: 'common.category.meeting_room',
     image: require('../../images/search_categories/meeting.png'),
   },
   {
     amenityCategoryId: 'c55b7222-153d-4afa-8824-8be2f0d92aa3',
-    title: 'Entrance',
+    title: 'common.category.entrance',
     image: require('../../images/search_categories/entrance.png'),
   },
 ];
@@ -153,7 +154,7 @@ const categoryList: SearchCategory[] = [
  */
 const toggleOpen = {
   amenityCategoryId: undefined,
-  title: 'More',
+  title: 'common.category.more',
   image: require('../../images/search_categories/toggle.png'),
 };
 
@@ -162,6 +163,6 @@ const toggleOpen = {
  */
 const toggleClose = {
   amenityCategoryId: undefined,
-  title: 'Less',
+  title: 'common.category.less',
   image: require('../../images/search_categories/toggle.png'),
 };

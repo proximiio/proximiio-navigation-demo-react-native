@@ -14,7 +14,7 @@ import {
   ProximiioFeatureType,
   ProximiioRouteEvent,
 } from 'react-native-proximiio-mapbox/src/types';
-import { Trans } from 'react-i18next';
+import i18n from 'i18next';
 
 interface Props {
   routeUpdate: ProximiioRouteEvent;
@@ -35,14 +35,14 @@ export default class RouteNavigation extends Component<Props, State> {
         {this.props.segment !== undefined && (
           <View style={styles.rowSegment}>
             <Text style={styles.rowText}>
-              <Trans>You are currently in</Trans> {this.props.segment.properties.title}
+              {i18n.t('navigation.you_are_in') + ' ' + this.props.segment.properties.title}
             </Text>
           </View>
         )}
         {this.props.hazard !== undefined && (
           <View style={styles.rowHazard}>
             <Text style={styles.rowText}>
-              <Trans>Watch out for</Trans> {this.props.hazard.properties.title}
+              {i18n.t('navigation.watch_out_for') + ' ' + this.props.hazard.properties.title}
             </Text>
           </View>
         )}
@@ -85,21 +85,21 @@ export default class RouteNavigation extends Component<Props, State> {
    */
   __getDirectionString(bearing) {
     if (bearing > -22.5 && bearing < 22.5) {
-      return <Trans>North</Trans>;
+      return i18n.t('navigation.north');
     } else if (bearing > 22.5 && bearing < 67.5) {
-      return <Trans>North-East</Trans>;
+      return i18n.t('navigation.north-east');
     } else if (bearing > 67.5 && bearing < 112.5) {
-      return <Trans>East</Trans>;
+      return i18n.t('navigation.east');
     } else if (bearing > 112.5 && bearing < 157.5) {
-      return <Trans>South-East</Trans>;
+      return i18n.t('navigation.south-east');
     } else if (bearing > -67.5 && bearing < -22.5) {
-      return <Trans>North-West</Trans>;
+      return i18n.t('navigation.north-west');
     } else if (bearing > -112.5 && bearing < -67.5) {
-      return <Trans>West</Trans>;
+      return i18n.t('navigation.west');
     } else if (bearing > -157.5 && bearing < -112.5) {
-      return <Trans>South-West</Trans>;
+      return i18n.t('navigation.south-west');
     } else {
-      return <Trans>South</Trans>;
+      return i18n.t('navigation.south');
     }
   }
 

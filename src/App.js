@@ -32,6 +32,7 @@ import {
   ProximiioMapboxSyncStatus,
 } from 'react-native-proximiio-mapbox/src/instance';
 import {Trans} from 'react-i18next';
+import i18n from "i18next";
 
 /**
  * Create UI stack to manage screens.
@@ -80,7 +81,7 @@ export default class App extends React.Component<Props, State> {
       return (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={Colors.primary} style={{marginBottom: 8}} animating />
-          <Text><Trans>Loading...</Trans></Text>
+          <Text>{i18n.t('app.loading')}</Text>
         </View>
       );
     }
@@ -93,7 +94,7 @@ export default class App extends React.Component<Props, State> {
             options={({navigation}) => {
               console.log('navigation', navigation);
               return {
-                title: <Trans>Map</Trans>,
+                title: i18n.t('app.title_map'),
                 headerRight: (tintColor) => this.__getSettingsButton(tintColor, navigation),
               };
             }}
@@ -107,12 +108,12 @@ export default class App extends React.Component<Props, State> {
           <Stack.Screen
             name="SearchScreen"
             component={SearchScreen}
-            options={{title: <Trans>Search</Trans>}}
+            options={{title: i18n.t('app.title_search')}}
           />
           <Stack.Screen
             name="PreferenceScreen"
             component={PreferenceScreen}
-            options={{title: <Trans>Settings</Trans>}}
+            options={{title: i18n.t('app.title_settings')}}
           />
         </Stack.Navigator>
       </NavigationContainer>

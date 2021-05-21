@@ -24,6 +24,7 @@ import PreferenceHelper, {
   DistanceUnitOption,
 } from '../../utils/PreferenceHelper';
 import {SettingsData} from 'react-native-settings-screen';
+import i18n from 'i18next';
 
 interface Props {
   /** Unit selection dialog visibility state toggle */
@@ -151,15 +152,12 @@ export default class PreferenceScreen extends React.Component<Props, State> {
           key={item.id}
           activeOpacity={0.5}
           onPress={() => onOptionSelected(item)}>
-          <Text style={styles.dialogSelectionOption}>{item.name}</Text>
+          <Text style={styles.dialogSelectionOption}>{i18n.t(item.name)}</Text>
         </TouchableOpacity>
       );
     });
     return (
-      <Dialog
-        visible={visibility}
-        title="Choose distance unit"
-        onDismiss={onDismiss}>
+      <Dialog visible={visibility} onDismiss={onDismiss}>
         <View>{optionViews}</View>
       </Dialog>
     );
@@ -171,7 +169,6 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @private
    */
   __onAccessibilityOptionSelected(newValue) {
-    console.log('accessibility changed', newValue);
     this.setState({ACCESSIBILITY_GUIDANCE: newValue.id}, () => {
       this.__hideAccessibilityDialog();
       this.__refreshSettingsData(this.state);
@@ -184,7 +181,6 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @private
    */
   __onReassuranceDistanceOptionSelected(newValue) {
-    console.log('route confirmation distance changed: ', newValue);
     this.setState({REASSURANCE_DISTANCE: newValue.id}, () => {
       this.__hideReassuranceDistanceDialog();
       this.__refreshSettingsData(this.state);
@@ -197,7 +193,6 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @private
    */
   __onUnitOptionSelected(newValue) {
-    console.log('unit changed', newValue);
     this.setState({DISTANCE_UNIT: newValue.id}, () => {
       this.__hideDistanceUnitDialog();
       this.__refreshSettingsData(this.state);
@@ -262,26 +257,26 @@ export default class PreferenceScreen extends React.Component<Props, State> {
     let data = [
       {
         type: 'SECTION',
-        header: 'Route options',
+        header: i18n.t('preferencescreen.route_options'),
         rows: [
           {
-            title: 'Avoid stairs',
+            title: i18n.t('preferencescreen.avoid_stairs'),
             renderAccessory: () => this.__switch(this.state.AVOID_STAIRS, (value) => this.setState({AVOID_STAIRS: value})),
           },
           {
-            title: 'Avoid elevators',
+            title: i18n.t('preferencescreen.avoid_elevators'),
             renderAccessory: () => this.__switch(this.state.AVOID_ELEVATORS, (value) => this.setState({AVOID_ELEVATORS: value})),
           },
           {
-            title: 'Avoid revolving doors',
+            title: i18n.t('preferencescreen.avoid_revolving_doors'),
             renderAccessory: () => this.__switch(this.state.AVOID_REVOLVING_DOORS, (value) => this.setState({AVOID_REVOLVING_DOORS: value})),
           },
           {
-            title: 'Use accessible routes',
+            title: i18n.t('preferencescreen.accessible_routes'),
             renderAccessory: () => this.__switch(this.state.AVOID_NARROW_ROUTES, (value) => this.setState({AVOID_NARROW_ROUTES: value})),
           },
           {
-            title: 'Measure distance in',
+            title: i18n.t('preferencescreen.distance_units'),
             subtitle: this.__getOptionNameById(DistanceUnitOption, this.state.DISTANCE_UNIT),
             onPress: this.__showDistanceUnitDialog.bind(this),
           },
@@ -289,38 +284,38 @@ export default class PreferenceScreen extends React.Component<Props, State> {
       },
       {
         type: 'SECTION',
-        header: 'Voice guidance',
+        header: i18n.t('preferencescreen.voice_guidance'),
         rows: [
           {
-            title: 'Enable voice guidance',
+            title: i18n.t('preferencescreen.voice_guidance_enable'),
             renderAccessory: () => this.__switch(this.state.VOICE_GUIDANCE, (value) => this.__toggleVoiceGuidance(value)),
           },
           {
-            title: 'Confirm direction of travel',
+            title: i18n.t('preferencescreen.voice_guidance_confirm_direction'),
             renderAccessory: () => this.__switch(this.state.HEADING_CORRECTION, (value) => this.setState({HEADING_CORRECTION: value}), !this.state.VOICE_GUIDANCE),
           },
           {
-            title: 'Tell me about decision points',
+            title: i18n.t('preferencescreen.voice_guidance_decision_points'),
             renderAccessory: () => this.__switch(this.state.DECISION_POINTS, (value) => this.setState({DECISION_POINTS: value}), !this.state.VOICE_GUIDANCE),
           },
           {
-            title: 'Tell me about hazards',
+            title: i18n.t('preferencescreen.voice_guidance_hazards'),
             renderAccessory: () => this.__switch(this.state.HAZARDS, (value) => this.setState({HAZARDS: value}), !this.state.VOICE_GUIDANCE),
           },
           {
-            title: 'Tell me about landmarks',
+            title: i18n.t('preferencescreen.voice_guidance_landmarks'),
             renderAccessory: () => this.__switch(this.state.LANDMARKS, (value) => this.setState({LANDMARKS: value}), !this.state.VOICE_GUIDANCE),
           },
           {
-            title: 'Tell me about areas',
+            title: i18n.t('preferencescreen.voice_guidance_areas'),
             renderAccessory: () => this.__switch(this.state.SEGMENTS, (value) => this.setState({SEGMENTS: value}), !this.state.VOICE_GUIDANCE),
           },
           {
-            title: 'Confirm route',
+            title: i18n.t('preferencescreen.voice_guidance_reasurrance'),
             renderAccessory: () => this.__switch(this.state.REASSURANCE_ENABLED, (value) => this.setState({REASSURANCE_ENABLED: value}), !this.state.VOICE_GUIDANCE),
           },
           {
-            title: 'Confirm route every',
+            title: i18n.t('preferencescreen.voice_guidance_reasurrance_distance'),
             subtitle: this.__getOptionNameById(ReassuranceDistanceOption, this.state.REASSURANCE_DISTANCE),
             onPress: this.__showReassuranceDistanceDialog.bind(this),
           },
@@ -328,10 +323,10 @@ export default class PreferenceScreen extends React.Component<Props, State> {
       },
       {
         type: 'SECTION',
-        header: 'Accessibility options',
+        header: i18n.t('preferencescreen.accessibility_options'),
         rows: [
           {
-            title: 'Guidance based on disability',
+            title: i18n.t('preferencescreen.accessibility_guidance'),
             subtitle: this.__getOptionNameById(AccessibilityGuidanceOption, this.state.ACCESSIBILITY_GUIDANCE),
             onPress: this.__showAccessibilityDialog.bind(this),
           },
@@ -352,7 +347,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
     let result = Object.entries(option).filter(it => it[1].id === id);
     console.log('option', Object.entries(option), result);
     if (result.length > 0) {
-      return result[0][1].name;
+      return i18n.t(result[0][1].name);
     } else {
       return undefined;
     }

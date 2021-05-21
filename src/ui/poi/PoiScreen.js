@@ -14,7 +14,7 @@ import PreferenceHelper from '../../utils/PreferenceHelper';
 import {PROXIMIIO_TOKEN} from '../../utils/Constants';
 import {ProximiioMapboxRoute} from 'react-native-proximiio-mapbox/src/types';
 import {Feature} from 'react-native-proximiio-mapbox/src/feature';
-import {Trans} from 'react-i18next';
+import i18n from 'i18next';
 
 /**
  * Length of a single step in meters.
@@ -74,7 +74,7 @@ export default class PoiScreen extends React.Component<Props, State> {
           )}
           {this.__renderImageTextRow(
             require('../../images/ic_trip.png'),
-            'Trip',
+            i18n.t('poiscreen.trip'),
           )}
           <Button
             title={this.__getTripButtonText(this.state.steps)}
@@ -87,7 +87,7 @@ export default class PoiScreen extends React.Component<Props, State> {
           />
           {this.__renderImageTextRow(
             require('../../images/ic_description.png'),
-            'Description',
+            i18n.t('poiscreen.description'),
           )}
           <Text style={styles.description}>{this.__getDescription(item)}</Text>
         </View>
@@ -124,7 +124,7 @@ export default class PoiScreen extends React.Component<Props, State> {
   __getDescription(feature: Feature) {
     let description = feature.getDescription();
     if (!description) {
-      return <Trans>No description available.</Trans>;
+      return i18n.t('poiscreen.no_description');
     } else {
       return description;
     }
@@ -132,7 +132,7 @@ export default class PoiScreen extends React.Component<Props, State> {
 
   __getTripButtonText(steps) {
     let stepsText = this.__getStepsText(steps);
-    return 'Start My Trip\n(' + stepsText + ')';
+    return i18n.t('poiscreen.start_my_trip') + '\n(' + stepsText + ')';
   }
 
   /**
@@ -145,11 +145,11 @@ export default class PoiScreen extends React.Component<Props, State> {
     switch (steps) {
       case undefined:
       case null:
-        return '(Calculating distance...)';
+        return i18n.t('poiscreen.calculating_steps');
       case -1:
-        return 'Could not calculate steps!';
+        return i18n.t('poiscreen.calculating_steps_failed');
       default:
-        return '' + steps + ' steps';
+        return i18n.t('poiscreen.calculating_steps_result', {count: steps});
     }
   }
 
@@ -179,22 +179,22 @@ export default class PoiScreen extends React.Component<Props, State> {
     let level = '';
     switch (feature.properties.level) {
       case -1:
-        level = 'Ground Floor';
+        level = i18n.t('common.floor_0');
         break;
       case 0:
-        level = 'First Floor';
+        level = i18n.t('common.floor_1');
         break;
       case 1:
-        level = 'Second Floor';
+        level = i18n.t('common.floor_2');
         break;
       case 2:
-        level = 'Third Floor';
+        level = i18n.t('common.floor_3');
         break;
       case 3:
-        level = 'Fourth Floor';
+        level = i18n.t('common.floor_4');
         break;
       default:
-        level = feature.properties.level + 'th Floor';
+        level = i18n.t('common.floor_n', {count: (feature.properties.level + 1)});
     }
     return level;
   }
@@ -209,7 +209,7 @@ export default class PoiScreen extends React.Component<Props, State> {
     let imageList = feature.getImageUrls(PROXIMIIO_TOKEN);
     if (!imageList || imageList.length === 0) {
       return [
-        'https://dummyimage.com/800x450/787878/fff.jpg&text=No+Image+Available',
+        'https://dummyimage.com/800x450/787878/fff.jpg&text=' + i18n.t('poiscreen.no_image'),
       ];
     } else {
       return imageList;

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
+import i18n from 'i18next';
 
 /**
  * Dummy component to show when search is empty.
@@ -11,7 +12,7 @@ export default class SearchEmptyItem extends Component {
         <View style={styles.imageWrapper}>
           <Image source={require('../../images/dummy.png')} style={styles.image} />
         </View>
-        <Text style={styles.text}>There are no items!</Text>
+        <Text style={styles.text}>{i18n.t('searchscreen.no_items')}</Text>
       </View>
     );
   }

@@ -3,6 +3,7 @@ import ProximiioMapbox from 'react-native-proximiio-mapbox/src/instance';
 import {ProximiioWayfindingOptions} from 'react-native-proximiio-mapbox/src/types';
 import {ProximiioRouteConfiguration} from 'react-native-proximiio-mapbox/src/types';
 import {MetersUnitConversion, StepUnitConversion} from './UnitConversions';
+import i18n from 'i18next';
 
 /**
  * Preference values (keys).
@@ -28,26 +29,26 @@ export const Preference = {
  * Options for accessibility.
  */
 export const AccessibilityGuidanceOption = {
-  NONE: {id: 'none', name: 'none'},
-  VISUALLY_IMPAIRED: {id: 'visually_impaired', name: 'visually impaired'},
+  NONE: {id: 'none', name: 'preferencescreen.accessibility_option_none'},
+  VISUALLY_IMPAIRED: {id: 'visually_impaired', name: 'preferencescreen.accessibility_option_visual'},
 };
 
 /**
  * Options for units used in navigation guidance.
  */
 export const DistanceUnitOption = {
-  METERS: {id: 'meters', name: 'meters'},
-  STEPS: {id: 'steps', name: 'steps'},
+  METERS: {id: 'meters', name: 'preferencescreen.unit_steps'},
+  STEPS: {id: 'steps', name: 'preferencescreen.unit_meters'},
 };
 
 /**
  * Options for reassuring user about current route each X meters.
  */
 export const ReassuranceDistanceOption = {
-  METERS_10: {id: 'meters_10', name: '10 meters', value: 10},
-  METERS_15: {id: 'meters_15', name: '15 meters', value: 15},
-  METERS_20: {id: 'meters_20', name: '20 meters', value: 20},
-  METERS_25: {id: 'meters_25', name: '25 meters', value: 25},
+  METERS_10: {id: 'meters_10', name: 'preferencescreen.reassurance_10m', value: 10},
+  METERS_15: {id: 'meters_15', name: 'preferencescreen.reassurance_15m', value: 15},
+  METERS_20: {id: 'meters_20', name: 'preferencescreen.reassurance_20m', value: 20},
+  METERS_25: {id: 'meters_25', name: 'preferencescreen.reassurance_25m', value: 25},
 };
 
 /**

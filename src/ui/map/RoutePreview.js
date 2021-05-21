@@ -12,7 +12,7 @@ import ProximiioMapbox from 'react-native-proximiio-mapbox';
 import {ProximiioMapboxRoute} from 'react-native-proximiio-mapbox/src/types';
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
 import {Colors} from '../../Style';
-import { Trans } from 'react-i18next';
+import i18n from 'i18next';
 
 interface Props {
   route: ProximiioMapboxRoute;
@@ -39,21 +39,21 @@ export default class RoutePreview extends Component<Props, State> {
           <View style={styles.button}>
             <Button
               color={'#777'}
-              title={this.state.showTripDetails ? 'Hide trip' : 'Show Trip'}
+              title={i18n.t(this.state.showTripDetails ? 'preview.hide_trip' : 'preview.show_trip')}
               onPress={() => this.setState({showTripDetails: !this.state.showTripDetails})}
             />
           </View>
           <View style={styles.button}>
             <Button
               color={'#cc0000'}
-              title={'Cancel'}
+              title={i18n.t('preview.cancel')}
               onPress={() => ProximiioMapbox.route.cancel()}
             />
           </View>
         </View>
         <View style={{padding: 8}}>
           <Button
-            title={'Start'}
+            title={i18n.t('preview.start')}
             onPress={() => ProximiioMapbox.route.start()}
           />
         </View>
@@ -75,7 +75,7 @@ export default class RoutePreview extends Component<Props, State> {
               source={require('../../images/ic_current_position.png')}
             />
             <Text style={styles.tripRowText}>
-              <Trans>Your location</Trans>
+              {i18n.t('preview.your_location')}
             </Text>
           </View>
           <View style={styles.tripRow}>
@@ -84,7 +84,7 @@ export default class RoutePreview extends Component<Props, State> {
               source={require('../../images/ic_preview_destination.png')}
             />
             <Text style={styles.tripRowText}>
-              {this.props.route.destination.properties.title ? this.props.route.destination.properties.title : <Trans>Destination</Trans> }
+              {this.props.route.destination.properties.title ? this.props.route.destination.properties.title : i18n.t('preview.destination') }
             </Text>
           </View>
         </>
@@ -110,12 +110,12 @@ export default class RoutePreview extends Component<Props, State> {
         <View style={styles.tripSummary}>
           <View style={styles.tripSummaryItem}>
             <Image style={styles.tripSummaryItemImage} source={require('../../images/ic_steps.png')} />
-            <Text>{distance} meter(s)</Text>
+            <Text>{i18n.t('preview.summary_meters', {count: distance})}</Text>
           </View>
           <View style={styles.tripSummarySeparator}/>
           <View style={styles.tripSummaryItem}>
             <Image style={styles.tripSummaryItemImage} source={require('../../images/ic_time.png')} />
-            <Text>{duration} minute(s)</Text>
+            <Text>{i18n.t('preview.summary_minutes', {count: duration})}</Text>
           </View>
         </View>
       </>
@@ -147,10 +147,10 @@ export default class RoutePreview extends Component<Props, State> {
    * @private
    */
   __renderTripStep(item) {
-    const instruction = item.index === 0 ? <Trans>Start navigation</Trans> : item.item.instruction;
+    const instruction = item.index === 0 ? i18n.t('preview.start_navigation') : item.item.instruction;
     let distance = undefined;
     if (item.index > 0 && item.item.distanceFromLastStep !== undefined) {
-      distance = Math.round(item.item.distanceFromLastStep);
+      distance = i18n.t('preview.meter', {count: Math.round(item.item.distanceFromLastStep)});
     }
 
     if (instruction === undefined) return <View />;
@@ -162,7 +162,7 @@ export default class RoutePreview extends Component<Props, State> {
         />
         <View style={styles.tripRowText}>
           <Text>{instruction}</Text>
-          {distance != null && (<Text style={styles.tripRowTextDistance}>{distance} <Trans>meter(s)</Trans></Text>)}
+          {distance != null && (<Text style={styles.tripRowTextDistance}>{distance}</Text>)}
         </View>
       </View>
     );

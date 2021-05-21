@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
+import i18n from 'i18next';
 
 /**
  * Footer component to mark end of search item list.
@@ -11,7 +12,7 @@ export default class SearchFooter extends Component {
         <View style={styles.imageWrapper}>
           <Image source={require('../../images/ic_end_search_results.png')} style={styles.image} />
         </View>
-        <Text style={styles.text}>End of results</Text>
+        <Text style={styles.text}>{i18n.t('searchscreen.end_of_results')}</Text>
       </View>
     );
   }

@@ -21,6 +21,7 @@ import {TouchableHighlight} from 'react-native-gesture-handler';
 import SearchFooter from './SearchFooter';
 import {Colors} from '../../Style';
 import {PROXIMIIO_TOKEN} from '../../utils/Constants';
+import i18n from "i18next";
 
 const numColumns = (Dimensions.get('window').width / 200).toFixed(0);
 const searchItemFlex = 1 / numColumns;
@@ -80,40 +81,41 @@ export default class SearchScreen extends Component<Props, State> {
 
   render() {
     return (
-      <View style={style.container}>
-        <CardView style={style.searchInputCard}>
-          <View style={style.searchInputCardContent}>
-            {this.state.featureCategoryFilter && (
-              <TouchableHighlight
-                activeOpacity={0.5}
-                underlayColor="#fff"
-                onPress={() => this.__updateCategoryFilter()}>
-                <View style={style.categoryFilter}>
-                  <Text>{this.state.featureCategoryFilter.title}</Text>
-                  <IconButton icon="close" size={16} style={style.categoryFilterClose} />
-                </View>
-              </TouchableHighlight>
-            )}
-            <View style={style.searchInput}>
-              <TextInput
-                placeholder={'Where do you want to go?'}
-                onChangeText={(title) => this.__updateSearchFilter(title)}
-                autoFocus
-              />
+        <View style={style.container}>
+          <CardView style={style.searchInputCard}>
+            <View style={style.searchInputCardContent}>
+              {this.state.featureCategoryFilter && (
+                  <TouchableHighlight
+                      activeOpacity={0.5}
+                      underlayColor="#fff"
+                      onPress={() => this.__updateCategoryFilter()}>
+                    <View style={style.categoryFilter}>
+                      <Text>{this.state.featureCategoryFilter.title}</Text>
+                      <IconButton icon="close" size={16} style={style.categoryFilterClose}/>
+                    </View>
+                  </TouchableHighlight>
+              )}
+              <View style={style.searchInput}>
+                <TextInput
+                    placeholder={i18n.t('common_search_hint')}
+                    onChangeText={(title) => this.__updateSearchFilter(title)}
+                    autoFocus
+                />
+              </View>
             </View>
-          </View>
-        </CardView>
-        <FlatList
-          contentContainerStyle={style.scrollviewContent}
-          data={this.state.filteredFeatureList}
-          numColumns={numColumns}
-          ListEmptyComponent={<SearchEmptyItem />}
-          ListFooterComponent={this.state.currentItemCount > 0 && <SearchFooter />}
-          ListHeaderComponent={this.state.featureListFilterTitle === '' && this.state.featureCategoryFilter == undefined && this.state.featureList.length > 0 && <SearchCategories onCategorySelected={this.__updateCategoryFilter.bind(this)}/>}
-          renderItem={({item}) => this.__renderSearchItem(item)}
-          style={style.searchItemList}
-        />
-      </View>
+          </CardView>
+          <FlatList
+              contentContainerStyle={style.scrollviewContent}
+              data={this.state.filteredFeatureList}
+              numColumns={numColumns}
+              ListEmptyComponent={<SearchEmptyItem/>}
+              ListFooterComponent={this.state.currentItemCount > 0 && <SearchFooter/>}
+              ListHeaderComponent={this.state.featureListFilterTitle === '' && this.state.featureCategoryFilter == undefined && this.state.featureList.length > 0 &&
+              <SearchCategories onCategorySelected={this.__updateCategoryFilter.bind(this)}/>}
+              renderItem={({item}) => this.__renderSearchItem(item)}
+              style={style.searchItemList}
+          />
+        </View>
     );
   }
 
@@ -125,31 +127,31 @@ export default class SearchScreen extends Component<Props, State> {
    */
   __renderSearchItem(poiFeature) {
     return (
-      <View style={style.searchItem}>
-        <CardView style={style.searchItemCard} key={poiFeature.properties.id}>
-          <TouchableHighlight
-            activeOpacity={0.5}
-            underlayColor="#eee"
-            onPress={() => {
-              this.props.navigation.navigate('ItemDetail', {item: poiFeature});
-            }}
-            style={style.searchItemTouch}>
-            <View>
-              <Image
-                source={this.__getCoverImage(poiFeature)}
-                style={style.searchItemImage}
-                on
-              />
-              <Text style={style.searchItemTitle}>
-                {poiFeature.properties.title}
-              </Text>
-              <Text style={style.searchItemFloor}>
-                {this.__getLevelString(poiFeature)}
-              </Text>
-            </View>
-          </TouchableHighlight>
-        </CardView>
-      </View>
+        <View style={style.searchItem}>
+          <CardView style={style.searchItemCard} key={poiFeature.properties.id}>
+            <TouchableHighlight
+                activeOpacity={0.5}
+                underlayColor="#eee"
+                onPress={() => {
+                  this.props.navigation.navigate('ItemDetail', {item: poiFeature});
+                }}
+                style={style.searchItemTouch}>
+              <View>
+                <Image
+                    source={this.__getCoverImage(poiFeature)}
+                    style={style.searchItemImage}
+                    on
+                />
+                <Text style={style.searchItemTitle} numberOfLines={1}>
+                  {poiFeature.properties.title}
+                </Text>
+                <Text style={style.searchItemFloor}>
+                  {this.__getLevelString(poiFeature)}
+                </Text>
+              </View>
+            </TouchableHighlight>
+          </CardView>
+        </View>
     );
   }
 
@@ -181,11 +183,11 @@ export default class SearchScreen extends Component<Props, State> {
    */
   async __updateFilteredFeatureList() {
     let list = this.state.featureList.filter((item) =>
-      this.__matchesSearchItemTitle(
-        item,
-        this.state.featureListFilterTitle,
-        this.state.featureCategoryFilter,
-      ),
+        this.__matchesSearchItemTitle(
+            item,
+            this.state.featureListFilterTitle,
+            this.state.featureCategoryFilter,
+        ),
     );
     this.setState({
       currentItemCount: list.length,
@@ -211,11 +213,11 @@ export default class SearchScreen extends Component<Props, State> {
     });
     // Update state with amenities and POIs
     this.setState(
-      {
-        amenityMap: amenityMap,
-        featureList: filteredFeatures,
-      },
-      () => this.__updateFilteredFeatureList(),
+        {
+          amenityMap: amenityMap,
+          featureList: filteredFeatures,
+        },
+        () => this.__updateFilteredFeatureList(),
     );
   }
 
@@ -230,8 +232,8 @@ export default class SearchScreen extends Component<Props, State> {
   __matchesSearchItemTitle(item: Feature, title, category) {
     if (category) {
       if (
-        !this.state.amenityMap.has(item.properties.amenity) ||
-        this.state.amenityMap.get(item.properties.amenity).categoryId !== category.amenityCategoryId
+          !this.state.amenityMap.has(item.properties.amenity)
+          || item.properties.amenity !== category.amenityId
       ) {
         return false;
       }
@@ -242,11 +244,11 @@ export default class SearchScreen extends Component<Props, State> {
       featureTitle = '';
     }
     return (
-      title === '' ||
-      (
-        item.properties.title !== undefined &&
-        featureTitle.toLocaleLowerCase().includes(title.toLocaleLowerCase())
-      )
+        title === '' ||
+        (
+            item.properties.title !== undefined &&
+            featureTitle.toLocaleLowerCase().includes(title.toLocaleLowerCase())
+        )
     );
   }
 
@@ -276,23 +278,23 @@ export default class SearchScreen extends Component<Props, State> {
   __getLevelString(feature) {
     let level = '';
     switch (feature.properties.level) {
+      case -1:
+        level = i18n.t('common.floor_0');
+        break;
       case 0:
-        level = 'Ground Floor';
+        level = i18n.t('common.floor_1');
         break;
       case 1:
-        level = 'First Floor';
+        level = i18n.t('common.floor_2');
         break;
       case 2:
-        level = 'Second Floor';
+        level = i18n.t('common.floor_3');
         break;
       case 3:
-        level = 'Third Floor';
-        break;
-      case 4:
-        level = 'Fourth Floor';
+        level = i18n.t('common.floor_4');
         break;
       default:
-        level = feature.properties.level + 'th Floor';
+        level = i18n.t('common.floor_n', {count: (feature.properties.level + 1)});
     }
     return level;
   }

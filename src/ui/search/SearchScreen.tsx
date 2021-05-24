@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import * as React from 'react';
 import {
   Dimensions,
   FlatList,
@@ -11,6 +11,7 @@ import {
 import CardView from '../../utils/CardView';
 
 import ProximiioMapbox, {
+  Amenity,
   Feature,
   ProximiioMapboxEvents,
 } from 'react-native-proximiio-mapbox';
@@ -23,15 +24,17 @@ import {Colors} from '../../Style';
 import {PROXIMIIO_TOKEN} from '../../utils/Constants';
 import i18n from 'i18next';
 
-const numColumns = (Dimensions.get('window').width / 200).toFixed(0);
+const numColumns = Math.round(Dimensions.get('window').width / 200);
 const searchItemFlex = 1 / numColumns;
 
-interface Props {}
+interface Props {
+  navigation: any;
+}
 interface State {
   /**
    * Map of amenityId => amenity.
    */
-  amenityMap: Map;
+  amenityMap: Map<String, Amenity>;
   /**
    * Full list of POI features.
    */
@@ -57,7 +60,7 @@ interface State {
 /**
  *
  */
-export default class SearchScreen extends Component<Props, State> {
+export default class SearchScreen extends React.Component<Props, State> {
   state = {
     amenityMap: new Map(),
     featureList: [],
@@ -66,54 +69,55 @@ export default class SearchScreen extends Component<Props, State> {
     featureCategoryFilter: null,
     currentItemCount: 0,
   };
+  featureSubscription = undefined;
 
   componentDidMount() {
-    this.__loadAmenitiesAndFeatures();
-    this.__featureSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.FEATURES_CHANGED, () => this.__loadAmenitiesAndFeatures());
+    this.loadAmenitiesAndFeatures();
+    this.featureSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.FEATURES_CHANGED, () => this.loadAmenitiesAndFeatures());
   }
 
   componentWillUnmount() {
     console.log('component will unmount');
-    if (this.__featureSubscription) {
-      this.__featureSubscription.remove();
+    if (this.featureSubscription) {
+      this.featureSubscription.remove();
     }
   }
 
   render() {
     return (
-      <View style={style.container}>
-        <CardView style={style.searchInputCard}>
-          <View style={style.searchInputCardContent}>
+      <View style={styles.container}>
+        <CardView style={styles.searchInputCard}>
+          <View style={styles.searchInputCardContent}>
             {this.state.featureCategoryFilter && (
               <TouchableHighlight
                 activeOpacity={0.5}
                 underlayColor="#fff"
-                onPress={() => this.__updateCategoryFilter()}>
-                <View style={style.categoryFilter}>
+                onPress={() => this.updateCategoryFilter(undefined)}>
+                <View style={styles.categoryFilter}>
                   <Text>{this.state.featureCategoryFilter.title}</Text>
-                  <IconButton icon="close" size={16} style={style.categoryFilterClose}/>
+                  <IconButton icon="close" size={16} style={styles.categoryFilterClose}/>
                 </View>
               </TouchableHighlight>
             )}
-            <View style={style.searchInput}>
+            <View style={styles.searchInput}>
               <TextInput
                 placeholder={i18n.t('common_search_hint')}
-                onChangeText={(title) => this.__updateSearchFilter(title)}
+                onChangeText={(title) => this.updateSearchFilter(title)}
                 autoFocus
               />
             </View>
           </View>
         </CardView>
         <FlatList
-          contentContainerStyle={style.scrollviewContent}
+          contentContainerStyle={styles.scrollviewContent}
           data={this.state.filteredFeatureList}
           numColumns={numColumns}
           ListEmptyComponent={<SearchEmptyItem/>}
           ListFooterComponent={this.state.currentItemCount > 0 && <SearchFooter/>}
-          ListHeaderComponent={this.state.featureListFilterTitle === '' && this.state.featureCategoryFilter == undefined && this.state.featureList.length > 0 &&
-          <SearchCategories onCategorySelected={this.__updateCategoryFilter.bind(this)}/>}
-          renderItem={({item}) => this.__renderSearchItem(item)}
-          style={style.searchItemList}
+          ListHeaderComponent={this.state.featureListFilterTitle === '' && !this.state.featureCategoryFilter && this.state.featureList.length > 0 &&
+          <SearchCategories onCategorySelected={this.updateCategoryFilter.bind(this)}/>}
+          renderItem={({item}) => this.renderSearchItem(item)}
+          style={styles.searchItemList}
         />
       </View>
     );
@@ -125,33 +129,32 @@ export default class SearchScreen extends Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  __renderSearchItem(poiFeature) {
+  private renderSearchItem(poiFeature) {
     return (
-        <View style={style.searchItem}>
-          <CardView style={style.searchItemCard} key={poiFeature.properties.id}>
-            <TouchableHighlight
-                activeOpacity={0.5}
-                underlayColor="#eee"
-                onPress={() => {
-                  this.props.navigation.navigate('ItemDetail', {item: poiFeature});
-                }}
-                style={style.searchItemTouch}>
-              <View>
-                <Image
-                    source={this.__getCoverImage(poiFeature)}
-                    style={style.searchItemImage}
-                    on
-                />
-                <Text style={style.searchItemTitle} numberOfLines={1}>
-                  {poiFeature.properties.title}
-                </Text>
-                <Text style={style.searchItemFloor}>
-                  {this.__getLevelString(poiFeature)}
-                </Text>
-              </View>
-            </TouchableHighlight>
-          </CardView>
-        </View>
+      <View style={styles.searchItem}>
+        <CardView style={styles.searchItemCard} key={poiFeature.properties.id}>
+          <TouchableHighlight
+            activeOpacity={0.5}
+            underlayColor="#eee"
+            onPress={() => {
+              this.props.navigation.navigate('ItemDetail', {item: poiFeature});
+            }}
+            style={styles.searchItemTouch}>
+            <View>
+              <Image
+                source={this.getCoverImage(poiFeature)}
+                style={styles.searchItemImage}
+              />
+              <Text style={styles.searchItemTitle} numberOfLines={1}>
+                {poiFeature.getTitle(i18n.language)}
+              </Text>
+              <Text style={styles.searchItemFloor}>
+                {this.getLevelString(poiFeature)}
+              </Text>
+            </View>
+          </TouchableHighlight>
+        </CardView>
+      </View>
     );
   }
 
@@ -160,20 +163,18 @@ export default class SearchScreen extends Component<Props, State> {
    * @param title {String}
    * @private
    */
-  __updateSearchFilter(title) {
+  private updateSearchFilter(title) {
     this.setState({featureListFilterTitle: title}, () => {
-      this.__updateFilteredFeatureList();
+      this.updateFilteredFeatureList();
     });
   }
 
   /**
    * Update search filter by category
-   * @param category {SearchCategory}
-   * @private
    */
-  __updateCategoryFilter(category) {
+  private updateCategoryFilter(category: SearchCategory | undefined) {
     this.setState({featureCategoryFilter: category}, () => {
-      this.__updateFilteredFeatureList();
+      this.updateFilteredFeatureList();
     });
   }
 
@@ -181,13 +182,13 @@ export default class SearchScreen extends Component<Props, State> {
    * Updates state with POIs matching filters.
    * @private
    */
-  async __updateFilteredFeatureList() {
+  private async updateFilteredFeatureList() {
     let list = this.state.featureList.filter((item) =>
-        this.__matchesSearchItemTitle(
-            item,
-            this.state.featureListFilterTitle,
-            this.state.featureCategoryFilter,
-        ),
+      this.matchesSearchItemTitle(
+        item,
+        this.state.featureListFilterTitle,
+        this.state.featureCategoryFilter,
+      ),
     );
     this.setState({
       currentItemCount: list.length,
@@ -199,7 +200,7 @@ export default class SearchScreen extends Component<Props, State> {
    * Update amenity and feature data and update component state.
    * @private
    */
-  __loadAmenitiesAndFeatures() {
+  private loadAmenitiesAndFeatures() {
     // Create map amenity id => amenity object for easier access
     let amenityMap = new Map();
     const amenities = ProximiioMapbox.getAmenities();
@@ -213,11 +214,11 @@ export default class SearchScreen extends Component<Props, State> {
     });
     // Update state with amenities and POIs
     this.setState(
-        {
-          amenityMap: amenityMap,
-          featureList: filteredFeatures,
-        },
-        () => this.__updateFilteredFeatureList(),
+      {
+        amenityMap: amenityMap,
+        featureList: filteredFeatures,
+      },
+      () => this.updateFilteredFeatureList(),
     );
   }
 
@@ -229,26 +230,26 @@ export default class SearchScreen extends Component<Props, State> {
    * @returns {boolean}
    * @private
    */
-  __matchesSearchItemTitle(item: Feature, title, category) {
+  private matchesSearchItemTitle(item: Feature, title: String, category: SearchCategory) {
     if (category) {
       if (
-          !this.state.amenityMap.has(item.properties.amenity)
-          || item.properties.amenity !== category.amenityId
+        !this.state.amenityMap.has(item.properties.amenity)
+        || this.state.amenityMap.get(item.properties.amenity).category_id !== category.amenityCategoryId
       ) {
         return false;
       }
     }
 
-    let featureTitle = item.properties.title;
+    let featureTitle = item.getTitle(i18n.language);
     if (featureTitle === undefined) {
       featureTitle = '';
     }
     return (
-        title === '' ||
-        (
-            item.properties.title !== undefined &&
-            featureTitle.toLocaleLowerCase().includes(title.toLocaleLowerCase())
-        )
+      title === '' ||
+      (
+        item.properties.title !== undefined &&
+        featureTitle.toLocaleLowerCase().includes(title.toLocaleLowerCase())
+      )
     );
   }
 
@@ -258,7 +259,7 @@ export default class SearchScreen extends Component<Props, State> {
    * @returns {null|{uri: string}}
    * @private
    */
-  __getCoverImage(feature) {
+  private getCoverImage(feature) {
     let imageUrlList = feature.getImageUrls(PROXIMIIO_TOKEN);
     if (!imageUrlList || imageUrlList.length === 0) {
       return null;
@@ -275,7 +276,7 @@ export default class SearchScreen extends Component<Props, State> {
    * @returns {string}
    * @private
    */
-  __getLevelString(feature) {
+  private getLevelString(feature) {
     let level = '';
     switch (feature.properties.level) {
       case -1:
@@ -300,7 +301,7 @@ export default class SearchScreen extends Component<Props, State> {
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.background,
     height: 400,

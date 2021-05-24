@@ -1,11 +1,16 @@
-import React, {Component} from 'react';
-import {View} from 'react-native';
+import * as React from 'react';
+import {StyleSheet, View} from 'react-native';
 import {Colors} from '../Style';
+
+interface Props {
+  style: StyleSheet;
+}
+interface State {}
 
 /**
  * CardView wraps content in card with shadow.
  */
-export default class CardView extends Component {
+export default class CardView extends React.Component<Props> {
   render() {
     return (
       <View style={{...cardStyle, ...this.props.style}}>

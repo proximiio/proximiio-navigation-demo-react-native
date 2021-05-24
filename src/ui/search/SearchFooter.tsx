@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import * as React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import i18n from 'i18next';
 
 /**
  * Footer component to mark end of search item list.
  */
-export default class SearchFooter extends Component {
+export default class SearchFooter extends React.Component {
   render() {
     return (
       <View style={styles.container} key={'footer'}>

@@ -1,12 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-import React from 'react';
+import * as React from 'react';
 import {
   StatusBar,
   StyleSheet,
@@ -19,7 +11,6 @@ import {SettingsScreen} from 'react-native-settings-screen';
 import {Dialog} from 'react-native-paper';
 import PreferenceHelper, {
   AccessibilityGuidanceOption,
-  Preference,
   ReassuranceDistanceOption,
   DistanceUnitOption,
 } from '../../utils/PreferenceHelper';
@@ -83,7 +74,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
     // Load stored preferences
     PreferenceHelper.getPreferences().then((preferences) => {
       this.setState(preferences, () => {
-        this.__refreshSettingsData();
+        this.refreshSettingsData();
       });
     });
   }
@@ -113,23 +104,23 @@ export default class PreferenceScreen extends React.Component<Props, State> {
       <View style={styles.container}>
         <StatusBar />
         <SettingsScreen data={this.state.settingsData} style={styles.settings} />
-        {this.__optionsDialog(
+        {this.optionsDialog(
           DistanceUnitOption,
           this.state.unitDialogVisible,
-          this.__onUnitOptionSelected.bind(this),
-          this.__hideDistanceUnitDialog.bind(this),
+          this.onUnitOptionSelected.bind(this),
+          this.hideDistanceUnitDialog.bind(this),
         )}
-        {this.__optionsDialog(
+        {this.optionsDialog(
           AccessibilityGuidanceOption,
           this.state.accessibilityDialogVisible,
-          this.__onAccessibilityOptionSelected.bind(this),
-          this.__hideAccessibilityDialog.bind(this),
+          this.onAccessibilityOptionSelected.bind(this),
+          this.hideAccessibilityDialog.bind(this),
         )}
-        {this.__optionsDialog(
+        {this.optionsDialog(
           ReassuranceDistanceOption,
           this.state.routeConfirmationDistanceDialogVisible,
-          this.__onReassuranceDistanceOptionSelected.bind(this),
-          this.__hideReassuranceDistanceDialog.bind(this),
+          this.onReassuranceDistanceOptionSelected.bind(this),
+          this.hideReassuranceDistanceDialog.bind(this),
         )}
       </View>
     );
@@ -144,7 +135,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  __optionsDialog(options, visibility, onOptionSelected, onDismiss) {
+  private optionsDialog(options, visibility, onOptionSelected, onDismiss) {
     let optionViews = Object.entries(options).map((it) => {
       let item = it[1];
       return (
@@ -168,10 +159,10 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @param newValue
    * @private
    */
-  __onAccessibilityOptionSelected(newValue) {
+  private onAccessibilityOptionSelected(newValue) {
     this.setState({ACCESSIBILITY_GUIDANCE: newValue.id}, () => {
-      this.__hideAccessibilityDialog();
-      this.__refreshSettingsData(this.state);
+      this.hideAccessibilityDialog();
+      this.refreshSettingsData();
     });
   }
 
@@ -180,10 +171,10 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @param newValue
    * @private
    */
-  __onReassuranceDistanceOptionSelected(newValue) {
+  private onReassuranceDistanceOptionSelected(newValue) {
     this.setState({REASSURANCE_DISTANCE: newValue.id}, () => {
-      this.__hideReassuranceDistanceDialog();
-      this.__refreshSettingsData(this.state);
+      this.hideReassuranceDistanceDialog();
+      this.refreshSettingsData();
     });
   }
 
@@ -192,36 +183,36 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @param newValue
    * @private
    */
-  __onUnitOptionSelected(newValue) {
+  private onUnitOptionSelected(newValue) {
     this.setState({DISTANCE_UNIT: newValue.id}, () => {
-      this.__hideDistanceUnitDialog();
-      this.__refreshSettingsData(this.state);
+      this.hideDistanceUnitDialog();
+      this.refreshSettingsData();
     });
   }
 
-  __showDistanceUnitDialog() {
+  private showDistanceUnitDialog() {
     this.setState({unitDialogVisible: true});
   }
 
-  __hideDistanceUnitDialog() {
+  private hideDistanceUnitDialog() {
     this.setState({unitDialogVisible: false});
   }
 
-  __showAccessibilityDialog() {
+  private showAccessibilityDialog() {
     this.setState({accessibilityDialogVisible: true});
   }
 
-  __hideAccessibilityDialog() {
+  private hideAccessibilityDialog() {
     this.setState({accessibilityDialogVisible: false});
   }
 
-  __showReassuranceDistanceDialog() {
+  private showReassuranceDistanceDialog() {
     if (this.state.VOICE_GUIDANCE) {
       this.setState({routeConfirmationDistanceDialogVisible: true});
     }
   }
 
-  __hideReassuranceDistanceDialog() {
+  private hideReassuranceDistanceDialog() {
     this.setState({routeConfirmationDistanceDialogVisible: false});
   }
 
@@ -233,7 +224,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  __switch(value, onValueChange, disabled: false) {
+  private renderSwitch(value, onValueChange, disabled: false) {
     console.log('disabled ', disabled);
     return (
       <Switch disabled={disabled} value={value} onValueChange={onValueChange} />
@@ -245,15 +236,15 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @param value
    * @private
    */
-  __toggleVoiceGuidance(value) {
-    this.setState({VOICE_GUIDANCE: value}, () => this.__refreshSettingsData());
+  private toggleVoiceGuidance(value) {
+    this.setState({VOICE_GUIDANCE: value}, () => this.refreshSettingsData());
   }
 
   /**
    * Forces update of the UI by re-generating settings data. This a a workaround due to settings screen not refreshing properly.
    * @private
    */
-  __refreshSettingsData() {
+  private refreshSettingsData() {
     let data = [
       {
         type: 'SECTION',
@@ -261,24 +252,24 @@ export default class PreferenceScreen extends React.Component<Props, State> {
         rows: [
           {
             title: i18n.t('preferencescreen.avoid_stairs'),
-            renderAccessory: () => this.__switch(this.state.AVOID_STAIRS, (value) => this.setState({AVOID_STAIRS: value})),
+            renderAccessory: () => this.renderSwitch(this.state.AVOID_STAIRS, (value) => this.setState({AVOID_STAIRS: value})),
           },
           {
             title: i18n.t('preferencescreen.avoid_elevators'),
-            renderAccessory: () => this.__switch(this.state.AVOID_ELEVATORS, (value) => this.setState({AVOID_ELEVATORS: value})),
+            renderAccessory: () => this.renderSwitch(this.state.AVOID_ELEVATORS, (value) => this.setState({AVOID_ELEVATORS: value})),
           },
           {
             title: i18n.t('preferencescreen.avoid_revolving_doors'),
-            renderAccessory: () => this.__switch(this.state.AVOID_REVOLVING_DOORS, (value) => this.setState({AVOID_REVOLVING_DOORS: value})),
+            renderAccessory: () => this.renderSwitch(this.state.AVOID_REVOLVING_DOORS, (value) => this.setState({AVOID_REVOLVING_DOORS: value})),
           },
           {
             title: i18n.t('preferencescreen.accessible_routes'),
-            renderAccessory: () => this.__switch(this.state.AVOID_NARROW_ROUTES, (value) => this.setState({AVOID_NARROW_ROUTES: value})),
+            renderAccessory: () => this.renderSwitch(this.state.AVOID_NARROW_ROUTES, (value) => this.setState({AVOID_NARROW_ROUTES: value})),
           },
           {
             title: i18n.t('preferencescreen.distance_units'),
-            subtitle: this.__getOptionNameById(DistanceUnitOption, this.state.DISTANCE_UNIT),
-            onPress: this.__showDistanceUnitDialog.bind(this),
+            subtitle: this.getOptionNameById(DistanceUnitOption, this.state.DISTANCE_UNIT),
+            onPress: this.showDistanceUnitDialog.bind(this),
           },
         ],
       },
@@ -288,36 +279,36 @@ export default class PreferenceScreen extends React.Component<Props, State> {
         rows: [
           {
             title: i18n.t('preferencescreen.voice_guidance_enable'),
-            renderAccessory: () => this.__switch(this.state.VOICE_GUIDANCE, (value) => this.__toggleVoiceGuidance(value)),
+            renderAccessory: () => this.renderSwitch(this.state.VOICE_GUIDANCE, (value) => this.toggleVoiceGuidance(value)),
           },
           {
             title: i18n.t('preferencescreen.voice_guidance_confirm_direction'),
-            renderAccessory: () => this.__switch(this.state.HEADING_CORRECTION, (value) => this.setState({HEADING_CORRECTION: value}), !this.state.VOICE_GUIDANCE),
+            renderAccessory: () => this.renderSwitch(this.state.HEADING_CORRECTION, (value) => this.setState({HEADING_CORRECTION: value}), !this.state.VOICE_GUIDANCE),
           },
           {
             title: i18n.t('preferencescreen.voice_guidance_decision_points'),
-            renderAccessory: () => this.__switch(this.state.DECISION_POINTS, (value) => this.setState({DECISION_POINTS: value}), !this.state.VOICE_GUIDANCE),
+            renderAccessory: () => this.renderSwitch(this.state.DECISION_POINTS, (value) => this.setState({DECISION_POINTS: value}), !this.state.VOICE_GUIDANCE),
           },
           {
             title: i18n.t('preferencescreen.voice_guidance_hazards'),
-            renderAccessory: () => this.__switch(this.state.HAZARDS, (value) => this.setState({HAZARDS: value}), !this.state.VOICE_GUIDANCE),
+            renderAccessory: () => this.renderSwitch(this.state.HAZARDS, (value) => this.setState({HAZARDS: value}), !this.state.VOICE_GUIDANCE),
           },
           {
             title: i18n.t('preferencescreen.voice_guidance_landmarks'),
-            renderAccessory: () => this.__switch(this.state.LANDMARKS, (value) => this.setState({LANDMARKS: value}), !this.state.VOICE_GUIDANCE),
+            renderAccessory: () => this.renderSwitch(this.state.LANDMARKS, (value) => this.setState({LANDMARKS: value}), !this.state.VOICE_GUIDANCE),
           },
           {
             title: i18n.t('preferencescreen.voice_guidance_areas'),
-            renderAccessory: () => this.__switch(this.state.SEGMENTS, (value) => this.setState({SEGMENTS: value}), !this.state.VOICE_GUIDANCE),
+            renderAccessory: () => this.renderSwitch(this.state.SEGMENTS, (value) => this.setState({SEGMENTS: value}), !this.state.VOICE_GUIDANCE),
           },
           {
             title: i18n.t('preferencescreen.voice_guidance_reasurrance'),
-            renderAccessory: () => this.__switch(this.state.REASSURANCE_ENABLED, (value) => this.setState({REASSURANCE_ENABLED: value}), !this.state.VOICE_GUIDANCE),
+            renderAccessory: () => this.renderSwitch(this.state.REASSURANCE_ENABLED, (value) => this.setState({REASSURANCE_ENABLED: value}), !this.state.VOICE_GUIDANCE),
           },
           {
             title: i18n.t('preferencescreen.voice_guidance_reasurrance_distance'),
-            subtitle: this.__getOptionNameById(ReassuranceDistanceOption, this.state.REASSURANCE_DISTANCE),
-            onPress: this.__showReassuranceDistanceDialog.bind(this),
+            subtitle: this.getOptionNameById(ReassuranceDistanceOption, this.state.REASSURANCE_DISTANCE),
+            onPress: this.showReassuranceDistanceDialog.bind(this),
           },
         ],
       },
@@ -327,8 +318,8 @@ export default class PreferenceScreen extends React.Component<Props, State> {
         rows: [
           {
             title: i18n.t('preferencescreen.accessibility_guidance'),
-            subtitle: this.__getOptionNameById(AccessibilityGuidanceOption, this.state.ACCESSIBILITY_GUIDANCE),
-            onPress: this.__showAccessibilityDialog.bind(this),
+            subtitle: this.getOptionNameById(AccessibilityGuidanceOption, this.state.ACCESSIBILITY_GUIDANCE),
+            onPress: this.showAccessibilityDialog.bind(this),
           },
         ],
       },
@@ -343,7 +334,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @returns {undefined|*}
    * @private
    */
-  __getOptionNameById(option, id) {
+  private getOptionNameById(option, id) {
     let result = Object.entries(option).filter(it => it[1].id === id);
     console.log('option', Object.entries(option), result);
     if (result.length > 0) {

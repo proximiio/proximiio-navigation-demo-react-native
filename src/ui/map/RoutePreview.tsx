@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import * as React from 'react';
 import {
   FlatList,
   Image,
@@ -24,7 +24,7 @@ interface State {
 /**
  * Screen previewing steps of displayed route.
  */
-export default class RoutePreview extends Component<Props, State> {
+export default class RoutePreview extends React.Component<Props, State> {
   state = {
     showTripDetails: false,
   };

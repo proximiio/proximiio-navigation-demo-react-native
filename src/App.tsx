@@ -1,12 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-import React from 'react';
+import * as React from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -23,7 +15,7 @@ import ProximiioMapbox from 'react-native-proximiio-mapbox';
 import MapScreen from './ui/map/MapScreen';
 import PoiScreen from './ui/poi/PoiScreen';
 import SearchScreen from './ui/search/SearchScreen';
-import {Colors, MyTheme} from './Style';
+import {Colors} from './Style';
 import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import PreferenceHelper from './utils/PreferenceHelper';
 import {MAPBOX_TOKEN, PROXIMIIO_TOKEN} from './utils/Constants';
@@ -31,8 +23,7 @@ import {
   ProximiioMapboxEvents,
   ProximiioMapboxSyncStatus,
 } from 'react-native-proximiio-mapbox/src/instance';
-import {Trans} from 'react-i18next';
-import i18n from "i18next";
+import i18n from 'i18next';
 
 /**
  * Create UI stack to manage screens.
@@ -66,6 +57,7 @@ export default class App extends React.Component<Props, State> {
     mapLevel: 0,
     proximiioReady: false,
   };
+  private syncListener = undefined;
 
   componentDidMount() {
     this.__initProximiio();
@@ -73,14 +65,19 @@ export default class App extends React.Component<Props, State> {
 
   componentWillUnmount() {
     // Cancel sync status listener
-    this.__syncListener.remove();
+    this.syncListener.remove();
   }
 
   render() {
     if (!this.state.proximiioReady) {
       return (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={Colors.primary} style={{marginBottom: 8}} animating />
+          <ActivityIndicator
+            size="large"
+            color={Colors.primary}
+            style={{marginBottom: 8}}
+            animating
+          />
           <Text>{i18n.t('app.loading')}</Text>
         </View>
       );
@@ -95,10 +92,10 @@ export default class App extends React.Component<Props, State> {
               console.log('navigation', navigation);
               return {
                 title: i18n.t('app.title_map'),
-                headerRight: (tintColor) => this.__getSettingsButton(tintColor, navigation),
+                headerRight: (tintColor) =>
+                  this.__getSettingsButton(tintColor, navigation),
               };
             }}
-            onOpenDetail={() => {}}
           />
           <Stack.Screen
             name="ItemDetail"
@@ -125,8 +122,13 @@ export default class App extends React.Component<Props, State> {
    */
   async __initProximiio() {
     // Proximi.io mapbox library sync listener
-    this.__syncListener = ProximiioMapbox.subscribe(ProximiioMapboxEvents.SYNC_STATUS, (status: ProximiioMapboxSyncStatus) => {
-        if (status === ProximiioMapboxSyncStatus.INITIAL_ERROR || status === ProximiioMapboxSyncStatus.INITIAL_NETWORK_ERROR) {
+    this.syncListener = ProximiioMapbox.subscribe(
+      ProximiioMapboxEvents.SYNC_STATUS,
+      (status: ProximiioMapboxSyncStatus) => {
+        if (
+          status === ProximiioMapboxSyncStatus.INITIAL_ERROR ||
+          status === ProximiioMapboxSyncStatus.INITIAL_NETWORK_ERROR
+        ) {
           setTimeout(() => {
             ProximiioMapbox.startSyncNow();
           }, 5000);
@@ -141,21 +143,11 @@ export default class App extends React.Component<Props, State> {
     ProximiioMapbox.setUserLocationToRouteSnappingEnabled(true);
     ProximiioMapbox.setUserLocationToRouteSnappingThreshold(6.0);
     ProximiioMapbox.setRouteFinishThreshold(2.5);
-    ProximiioMapbox.setStepImmediateThreshold(3.0);
+    ProximiioMapbox.setStepImmediateThreshold(3.5);
     ProximiioMapbox.setStepPreparationThreshold(3.0);
     ProximiioMapbox.setRerouteEnabled(true);
     ProximiioMapbox.setReRouteThreshold(15);
     ProximiioMapbox.ttsHeadingCorrectionThresholds(8, 90);
-    // ProximiioMapbox.setLevelOverrideMap({
-    //   '-1': 0,
-    //   '0': 1,
-    //   '1': 2,
-    //   '2': 3,
-    //   '3': 4,
-    //   '4': 5,
-    //   '5': 6,
-    //   '6': 7,
-    // });
     // Apply user preferences, manageable in preference screen
     await PreferenceHelper.applyPreferences();
     // Request permissions needed for localization
@@ -179,7 +171,10 @@ export default class App extends React.Component<Props, State> {
         style={styles.appbarButton}
         onPress={() => navigation.navigate('PreferenceScreen')}
         activeOpacity={0.5}>
-        <Image style={styles.appBarButtonImage} source={require('./images/ic_settings.png')} />
+        <Image
+          style={styles.appBarButtonImage}
+          source={require('./images/ic_settings.png')}
+        />
       </TouchableOpacity>
     );
   }

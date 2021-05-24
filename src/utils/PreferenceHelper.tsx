@@ -3,7 +3,6 @@ import ProximiioMapbox from 'react-native-proximiio-mapbox/src/instance';
 import {ProximiioWayfindingOptions} from 'react-native-proximiio-mapbox/src/types';
 import {ProximiioRouteConfiguration} from 'react-native-proximiio-mapbox/src/types';
 import {MetersUnitConversion, StepUnitConversion} from './UnitConversions';
-import i18n from 'i18next';
 
 /**
  * Preference values (keys).
@@ -25,30 +24,36 @@ export const Preference = {
   ACCESSIBILITY_GUIDANCE: 'ACCESSIBILITY_GUIDANCE',
 };
 
+export class PreferenceOptionItem {
+  id: String;
+  name: String;
+  value?: number;
+}
+
 /**
  * Options for accessibility.
  */
 export const AccessibilityGuidanceOption = {
-  NONE: {id: 'none', name: 'preferencescreen.accessibility_option_none'},
-  VISUALLY_IMPAIRED: {id: 'visually_impaired', name: 'preferencescreen.accessibility_option_visual'},
+  NONE: {id: 'none', name: 'preferencescreen.accessibility_option_none'} as PreferenceOptionItem,
+  VISUALLY_IMPAIRED: {id: 'visually_impaired', name: 'preferencescreen.accessibility_option_visual'} as PreferenceOptionItem,
 };
 
 /**
  * Options for units used in navigation guidance.
  */
 export const DistanceUnitOption = {
-  METERS: {id: 'meters', name: 'preferencescreen.unit_steps'},
-  STEPS: {id: 'steps', name: 'preferencescreen.unit_meters'},
+  METERS: {id: 'meters', name: 'preferencescreen.unit_steps'} as PreferenceOptionItem,
+  STEPS: {id: 'steps', name: 'preferencescreen.unit_meters'} as PreferenceOptionItem,
 };
 
 /**
  * Options for reassuring user about current route each X meters.
  */
 export const ReassuranceDistanceOption = {
-  METERS_10: {id: 'meters_10', name: 'preferencescreen.reassurance_10m', value: 10},
-  METERS_15: {id: 'meters_15', name: 'preferencescreen.reassurance_15m', value: 15},
-  METERS_20: {id: 'meters_20', name: 'preferencescreen.reassurance_20m', value: 20},
-  METERS_25: {id: 'meters_25', name: 'preferencescreen.reassurance_25m', value: 25},
+  METERS_10: {id: 'meters_10', name: 'preferencescreen.reassurance_10m', value: 10} as PreferenceOptionItem,
+  METERS_15: {id: 'meters_15', name: 'preferencescreen.reassurance_15m', value: 15} as PreferenceOptionItem,
+  METERS_20: {id: 'meters_20', name: 'preferencescreen.reassurance_20m', value: 20} as PreferenceOptionItem,
+  METERS_25: {id: 'meters_25', name: 'preferencescreen.reassurance_25m', value: 25} as PreferenceOptionItem,
 };
 
 /**
@@ -59,26 +64,26 @@ class PreferenceHelper {
    * Returns object with all preference values.
    * @returns {Promise<unknown>}
    */
-  getPreferences() {
-    return new Promise((resolve, reject) => {
+  static getPreferences(): Promise<any> {
+    return new Promise((resolve, _) => {
       let preferenceKeys = Object.entries(Preference).map((it) => it[0]);
       DefaultPreference.getMultiple(preferenceKeys).then(
         (preferenceResults) => {
           let preferences = {
-            AVOID_STAIRS: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[0]), false),
-            AVOID_ELEVATORS: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[1]), false),
-            AVOID_REVOLVING_DOORS: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[2]), false),
-            AVOID_NARROW_ROUTES: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[3]), false),
-            DISTANCE_UNIT: this.__getPreferenceOrDefault(preferenceResults[4], DistanceUnitOption.METERS.id),
-            VOICE_GUIDANCE: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[5]), true),
-            HEADING_CORRECTION: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[6]), true),
-            DECISION_POINTS: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[7]), false),
-            HAZARDS: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[8]), false),
-            LANDMARKS: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[9]), false),
-            SEGMENTS: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[10]), true),
-            REASSURANCE_ENABLED: this.__getPreferenceOrDefault(JSON.parse(preferenceResults[11]), true),
-            REASSURANCE_DISTANCE: this.__getPreferenceOrDefault(preferenceResults[12], ReassuranceDistanceOption.METERS_15.id),
-            ACCESSIBILITY_GUIDANCE: this.__getPreferenceOrDefault(preferenceResults[13], AccessibilityGuidanceOption.NONE.id),
+            AVOID_STAIRS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[0]), false),
+            AVOID_ELEVATORS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[1]), false),
+            AVOID_REVOLVING_DOORS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[2]), false),
+            AVOID_NARROW_ROUTES: this.getPreferenceOrDefault(JSON.parse(preferenceResults[3]), false),
+            DISTANCE_UNIT: this.getPreferenceOrDefault(preferenceResults[4], DistanceUnitOption.METERS.id),
+            VOICE_GUIDANCE: this.getPreferenceOrDefault(JSON.parse(preferenceResults[5]), true),
+            HEADING_CORRECTION: this.getPreferenceOrDefault(JSON.parse(preferenceResults[6]), true),
+            DECISION_POINTS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[7]), false),
+            HAZARDS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[8]), false),
+            LANDMARKS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[9]), false),
+            SEGMENTS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[10]), true),
+            REASSURANCE_ENABLED: this.getPreferenceOrDefault(JSON.parse(preferenceResults[11]), true),
+            REASSURANCE_DISTANCE: this.getPreferenceOrDefault(preferenceResults[12], ReassuranceDistanceOption.METERS_15.id),
+            ACCESSIBILITY_GUIDANCE: this.getPreferenceOrDefault(preferenceResults[13], AccessibilityGuidanceOption.NONE.id),
           };
           resolve(preferences);
         },
@@ -90,7 +95,7 @@ class PreferenceHelper {
    * Updates preferences with passed value.
    * Also automatically applies config to proximi.io libraries.
    */
-  async setPreferences(preferences) {
+  static async setPreferences(preferences) {
     await DefaultPreference.setMultiple(preferences);
     await this.applyPreferences();
   }
@@ -98,20 +103,20 @@ class PreferenceHelper {
   /**
    * Reads preferences and applies them to proximi.io libraries.
    */
-  async applyPreferences() {
+  static async applyPreferences() {
     let preferences = await this.getPreferences();
-    let disabilityPreference = preferences[Preference.ACCESSIBILITY_GUIDANCE];
+    let disabilityPreferenceId = preferences[Preference.ACCESSIBILITY_GUIDANCE];
     let medataKeys = [];
-    if (disabilityPreference === AccessibilityGuidanceOption.VISUALLY_IMPAIRED.id) {
+    if (disabilityPreferenceId === AccessibilityGuidanceOption.VISUALLY_IMPAIRED.id) {
       medataKeys = [1];
     }
-    let reassuranceDistanceOption = this.__getOptionById(
+    let reassuranceDistanceOption = this.getOptionById(
       ReassuranceDistanceOption,
       preferences[Preference.REASSURANCE_DISTANCE],
     ).value;
-    let unit = preferences[Preference.DISTANCE_UNIT];
+    let unitId = preferences[Preference.DISTANCE_UNIT];
     let unitConversion;
-    if (unit === DistanceUnitOption.STEPS.id) {
+    if (unitId === DistanceUnitOption.STEPS.id) {
       unitConversion = StepUnitConversion;
     } else {
       unitConversion = MetersUnitConversion;
@@ -119,7 +124,7 @@ class PreferenceHelper {
     ProximiioMapbox.ttsEnabled(preferences[Preference.VOICE_GUIDANCE]);
     ProximiioMapbox.ttsDecisionAlert(preferences[Preference.DECISION_POINTS], medataKeys);
     ProximiioMapbox.ttsHazardAlert(preferences[Preference.HAZARDS], medataKeys);
-    ProximiioMapbox.ttsHeadingCorrectionEnabled(preferences[Preference.HEADING_CORRECTION], medataKeys);
+    ProximiioMapbox.ttsHeadingCorrectionEnabled(preferences[Preference.HEADING_CORRECTION]);
     ProximiioMapbox.ttsLandmarkAlert(preferences[Preference.LANDMARKS], medataKeys);
     ProximiioMapbox.ttsSegmentAlert(preferences[Preference.SEGMENTS], preferences[Preference.SEGMENTS], medataKeys);
     ProximiioMapbox.ttsReassuranceInstructionEnabled(preferences[Preference.REASSURANCE_ENABLED]);
@@ -134,10 +139,10 @@ class PreferenceHelper {
    * @returns {undefined|*}
    * @private
    */
-  __getOptionById(option, id) {
+  private static getOptionById(option, id): PreferenceOptionItem {
     let result = Object.entries(option).filter((it) => it[1].id === id);
     if (result.length > 0) {
-      return result[0][1];
+      return result[0][1] as PreferenceOptionItem;
     } else {
       return undefined;
     }
@@ -150,7 +155,7 @@ class PreferenceHelper {
    * @returns {*}
    * @private
    */
-  __getPreferenceOrDefault(value, defaultValue) {
+  private static getPreferenceOrDefault(value, defaultValue) {
     if (value !== undefined && value !== null) {
       return value;
     } else {
@@ -163,7 +168,7 @@ class PreferenceHelper {
    * @param destinationFeatureId
    * @returns {Promise<void>}
    */
-  async routeFindWithPreferences(destinationFeatureId) {
+  static async routeFindWithPreferences(destinationFeatureId) {
     let preferences = this.getPreferences();
     let wayfindingOptions: ProximiioWayfindingOptions = {
       avoidElevators: preferences[Preference.AVOID_ELEVATORS],
@@ -180,4 +185,4 @@ class PreferenceHelper {
   }
 }
 
-export default PreferenceHelper = new PreferenceHelper();
+export default PreferenceHelper;

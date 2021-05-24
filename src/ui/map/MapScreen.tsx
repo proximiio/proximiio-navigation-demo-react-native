@@ -6,8 +6,14 @@
  * @flow strict-local
  */
 
-import React from 'react';
-import {StyleSheet, View, Text, TouchableHighlight, Image, ActivityIndicator} from 'react-native';
+import * as React from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableHighlight,
+  ActivityIndicator,
+} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {
   ProximiioContextProvider,
@@ -35,56 +41,61 @@ import {
 } from 'react-native-proximiio-mapbox/src/types';
 import {ProximiioFloor} from 'react-native-proximiio';
 import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
-import {Trans} from 'react-i18next';
-import importDirectionImage from "../../utils/DirectionImageImportUtil";
-import i18n from "i18next";
+import i18n from 'i18next';
 
-interface Props {}
+interface Props {
+  navigation: any;
+}
 
 interface State {
   followUser: boolean;
-  hazardFeature: ProximiioFeatureType;
+  hazard: ProximiioFeatureType | undefined;
   location: ProximiioLocation | undefined;
   mapLoaded: boolean;
   mapLevel: number;
-  route: ProximiioMapboxRoute;
-  routeStarted: Boolean;
-  routeUpdate: ProximiioRouteEvent;
+  route: ProximiioMapboxRoute | undefined;
+  routeUpdate: ProximiioRouteEvent | undefined;
+  started: Boolean;
   userLevel: number;
 }
 
 export default class MapScreen extends React.Component<Props, State> {
   _map: MapboxGL.MapView | null = null;
   _camera: MapboxGL.Camera | null = null;
-
   state = {
-    location: null,
     followUser: true,
+    hazard: undefined,
+    location: undefined,
     mapLoaded: false,
     mapLevel: 0,
-    userLevel: 0,
-    route: null,
-    routeUpdate: null,
+    route: undefined,
+    routeUpdate: undefined,
     started: false,
+    userLevel: 0,
   };
+  private positionUpdatedSubscription = undefined;
+  private floorChangedSubscription = undefined;
+  private routeSubscription = undefined;
+  private routeUpdateSubscription = undefined;
+  private onHazardSubscription = undefined;
 
   componentDidMount() {
-    this.__onMapPress = this.__onMapPress.bind(this);
-    this.__onFloorChange(Proximiio.floor);
-    this.__onPositionUpdate(Proximiio.location);
-    this.__positionUpdatedSubscription = Proximiio.subscribe(ProximiioEvents.PositionUpdated, (event) => this.__onPositionUpdate(event));
-    this.__floorChangedSubscription = Proximiio.subscribe(ProximiioEvents.FloorChanged, (event) => this.__onFloorChange(event));
-    this.__routeSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE, (event) => this.__onRoute(event));
-    this.__routeUpdateSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE_UPDATE, (event) => this.__onRouteUpdate(event));
-    this.__onHazardSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_HAZARD, (event) => this.__onHazard(event));
+    this.onMapPress = this.onMapPress.bind(this);
+    this.onFloorChange(Proximiio.floor);
+    this.onPositionUpdate(Proximiio.location);
+    this.positionUpdatedSubscription = Proximiio.subscribe(ProximiioEvents.PositionUpdated, (event) => this.onPositionUpdate(event));
+    this.floorChangedSubscription = Proximiio.subscribe(ProximiioEvents.FloorChanged, (event) => this.onFloorChange(event));
+    this.routeSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE, (event) => this.onRoute(event));
+    this.routeUpdateSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE_UPDATE, (event) => this.onRouteUpdate(event));
+    this.onHazardSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_HAZARD, (event) => this.onHazard(event));
   }
 
   componentWillUnmount() {
-    this.__positionUpdatedSubscription.remove();
-    this.__floorChangedSubscription.remove();
-    this.__routeSubscription.remove();
-    this.__routeUpdateSubscription.remove();
-    this.__onHazardSubscription.remove();
+    this.positionUpdatedSubscription.remove();
+    this.floorChangedSubscription.remove();
+    this.routeSubscription.remove();
+    this.routeUpdateSubscription.remove();
+    this.onHazardSubscription.remove();
   }
 
   render() {
@@ -95,8 +106,7 @@ export default class MapScreen extends React.Component<Props, State> {
           style={StyleSheet.absoluteFillObject}
           scrollEnabled={true}
           styleUrl={ProximiioMapbox.styleURL}
-          onDidFinishLoadingStyle={(style) => console.log('style loaded', style)}
-          onRegionWillChange={this.__onRegionWillChange.bind(this)}
+          onRegionWillChange={this.onRegionWillChange.bind(this)}
           onDidFinishLoadingMap={() => this.setState({mapLoaded: true})}>
           <MapboxGL.Camera
             ref={(camera) => {
@@ -111,7 +121,7 @@ export default class MapScreen extends React.Component<Props, State> {
           {this.state.mapLoaded && (
             <ProximiioContextProvider>
               <AmenitySource />
-              <GeoJSONSource level={this.state.mapLevel} onPress={(features: ProximiioFeature[]) => this.__onMapPress(features)} />
+              <GeoJSONSource level={this.state.mapLevel} onPress={(features: ProximiioFeatureType[]) => this.onMapPress(features)} />
               <RoutingSource level={this.state.mapLevel} />
               {
                 this.state.mapLevel === this.state.userLevel
@@ -126,16 +136,16 @@ export default class MapScreen extends React.Component<Props, State> {
           <FAB color={Colors.primary} icon="crosshairs-gps" style={styles.fab} onPress={() => this.__showAndFollowCurrentUserLocation()} />
         </View>
         {/* Route preview */}
-        {this.state.started === false && this.state.route !== null && (
+        {!this.state.started && this.state.route && (
           <RoutePreview
-            style={{flex: 1, width: '100%'}}
+            style={styles.routePreview}
             route={this.state.route}
           />
         )}
-        {this.__renderRouteCalculation()}
-        {this.__renderNavigation()}
-        {this.__renderSearch()}
-        {this.__renderFloorSelector()}
+        {this.renderRouteCalculation()}
+        {this.renderNavigation()}
+        {this.renderSearch()}
+        {this.renderFloorSelector()}
       </View>
     );
   }
@@ -143,7 +153,7 @@ export default class MapScreen extends React.Component<Props, State> {
   /**
    * Render UI when route is re/calculating.
    */
-  __renderRouteCalculation() {
+  private renderRouteCalculation() {
     if (
       this.state.started === false
       || this.state.routeUpdate === null
@@ -164,7 +174,7 @@ export default class MapScreen extends React.Component<Props, State> {
     );
   }
 
-  __renderNavigation() {
+  private renderNavigation() {
     if (this.state.started === false || this.state.route == null) {
       return null;
     }
@@ -177,7 +187,7 @@ export default class MapScreen extends React.Component<Props, State> {
     );
   }
 
-  __renderSearch() {
+  private renderSearch() {
     if (this.state.started === true || this.state.route) {
       return null;
     }
@@ -191,14 +201,16 @@ export default class MapScreen extends React.Component<Props, State> {
             onPress={() => {
               this.props.navigation.navigate('SearchScreen');
             }}>
-            <Text style={styles.searchText}>{i18n.t('common.search_hint')}</Text>
+            <Text style={styles.searchText}>
+              {i18n.t('common.search_hint')}
+            </Text>
           </TouchableHighlight>
         </CardView>
       </View>
     );
   }
 
-  __renderFloorSelector() {
+  private renderFloorSelector() {
     return (
       <View style={styles.floorPickerWrapper}>
         <FloorPicker
@@ -212,11 +224,8 @@ export default class MapScreen extends React.Component<Props, State> {
 
   /**
    * Find pressed POI on map.
-   * @param event
-   * @returns {Promise<void>}
-   * @private
    */
-  __onMapPress(event: ProximiioFeatureType[]) {
+  private onMapPress(event: ProximiioFeatureType[]) {
     let pois = event.filter((it) => it.properties.type === 'poi');
     if (pois.length > 0) {
       ProximiioMapbox.route.cancel();
@@ -226,11 +235,8 @@ export default class MapScreen extends React.Component<Props, State> {
 
   /**
    * Update map when user posiiton is updated.
-   * @param location
-   * @returns {Promise<void>}
-   * @private
    */
-  async __onPositionUpdate(location: ProximiioLocation) {
+  private async onPositionUpdate(location: ProximiioLocation) {
     console.log('location updated: ', location);
     if (!location) {
       return;
@@ -253,18 +259,16 @@ export default class MapScreen extends React.Component<Props, State> {
   /**
    * Listener for route object for navigation.
    * @param event
-   * @private
    */
-  __onRoute(event: ProximiioMapboxRoute) {
+  private onRoute(event: ProximiioMapboxRoute) {
     this.setState({route: event});
   }
 
   /**
    * Listener for route updates during navigation.
    * @param event
-   * @private
    */
-  __onRouteUpdate(event: ProximiioRouteEvent) {
+  private onRouteUpdate(event: ProximiioRouteEvent) {
     if (
       event.eventType === ProximiioRouteUpdateType.FINISHED
       || event.eventType === ProximiioRouteUpdateType.CANCELED
@@ -284,15 +288,19 @@ export default class MapScreen extends React.Component<Props, State> {
   /**
    * Listener for floor change. Switches map level if map level is the same as user level currently.
    * @param floor
-   * @private
    */
-  __onFloorChange(floor: ProximiioFloor) {
+  private onFloorChange(floor: ProximiioFloor) {
     let newUserLevel = floor ? floor.level || 0 : 0;
-    let newState = {
-      userLevel: newUserLevel,
-    };
+    let newState;
     if (this.state.userLevel === this.state.mapLevel) {
-      newState.mapLevel = newUserLevel;
+      newState = {
+        mapLevel: newUserLevel,
+        userLevel: newUserLevel,
+      };
+    } else {
+      newState = {
+        userLevel: newUserLevel,
+      };
     }
     this.setState(newState);
   }
@@ -302,7 +310,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param event
    * @private
    */
-  __onRegionWillChange(event) {
+  private onRegionWillChange(event) {
     if (this.state.followUser && event.properties.isUserInteraction === true) {
       this.setState({followUser: false});
     }
@@ -313,7 +321,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param hazard
    * @private
    */
-  __onHazard(hazard: ProximiioFeatureType) {
+  private onHazard(hazard: ProximiioFeatureType) {
     this.setState({hazard: hazard});
   }
 
@@ -429,5 +437,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 8,
     alignItems: 'flex-start',
+  },
+  routePreview: {
+    flex: 1,
+    width: '100%',
   },
 });

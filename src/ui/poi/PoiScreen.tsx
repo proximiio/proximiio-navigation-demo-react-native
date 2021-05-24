@@ -1,11 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @flow strict-local
- */
-
-import React from 'react';
+import * as React from 'react';
 import {Button, Image, StyleSheet, Text, View} from 'react-native';
 import {SliderBox} from 'react-native-image-slider-box';
 import ProximiioMapbox from 'react-native-proximiio-mapbox';
@@ -34,7 +27,7 @@ interface State {
  * Screen with detailed info about POI Feature.
  */
 export default class PoiScreen extends React.Component<Props, State> {
-  __mounted: false;
+  __mounted = false;
   state = {
     steps: null,
   };
@@ -46,7 +39,7 @@ export default class PoiScreen extends React.Component<Props, State> {
     ProximiioMapbox.route
       .calculate({destinationFeatureId: item.id})
       .then(this.__onRouteCalculated.bind(this))
-      .catch((e) => this.__onRouteCalculated(undefined));
+      .catch((_) => this.__onRouteCalculated(undefined));
   }
 
   componentWillUnmount() {
@@ -178,23 +171,26 @@ export default class PoiScreen extends React.Component<Props, State> {
   __getLevel(feature) {
     let level = '';
     switch (feature.properties.level) {
-      case -1:
+      case 0:
         level = i18n.t('common.floor_0');
         break;
-      case 0:
+      case 1:
         level = i18n.t('common.floor_1');
         break;
-      case 1:
+      case 2:
         level = i18n.t('common.floor_2');
         break;
-      case 2:
+      case 3:
         level = i18n.t('common.floor_3');
         break;
-      case 3:
+      case 4:
         level = i18n.t('common.floor_4');
         break;
+      case 5:
+        level = i18n.t('common.floor_5');
+        break;
       default:
-        level = i18n.t('common.floor_n', {count: (feature.properties.level + 1)});
+        level = i18n.t('common.floor_n', {count: (feature.properties.level)});
     }
     return level;
   }

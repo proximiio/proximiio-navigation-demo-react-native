@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import * as React from 'react';
 import {
   Image,
   StyleSheet,
@@ -23,7 +23,7 @@ interface Props {
 }
 interface State {}
 
-export default class RouteNavigation extends Component<Props, State> {
+export default class RouteNavigation extends React.Component<Props, State> {
   state = {};
 
   render() {

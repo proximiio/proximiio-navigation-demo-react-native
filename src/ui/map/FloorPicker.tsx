@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import * as React from 'react';
 import {View, StyleSheet} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import Proximiio, {ProximiioEvents} from 'react-native-proximiio';
+import Proximiio, {ProximiioEvents, ProximiioFloor} from 'react-native-proximiio';
 import {Colors} from '../../Style';
 
 interface Props {
@@ -13,11 +13,12 @@ interface State {
   floorList: [];
 }
 
-export default class FloorPicker extends Component<Props, State> {
+export default class FloorPicker extends React.Component<Props, State> {
   dropdown = null;
   state = {
     floorList: null,
   };
+  floorChangedSubscription = undefined;
 
   componentDidMount() {
     this.__refreshFloorList();
@@ -90,7 +91,7 @@ export default class FloorPicker extends Component<Props, State> {
    * @returns {boolean}
    * @private
    */
-  __onlyUnique(value, index, self: Array) {
+  __onlyUnique(value, index, self: ProximiioFloor[]) {
     let firstIndex = self.findIndex((it) => it.id === value.id);
     return self.indexOf(value) === firstIndex;
   }

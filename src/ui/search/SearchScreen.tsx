@@ -66,7 +66,7 @@ export default class SearchScreen extends React.Component<Props, State> {
     featureList: [],
     filteredFeatureList: [],
     featureListFilterTitle: '',
-    featureCategoryFilter: null,
+    featureCategoryFilter: undefined,
     currentItemCount: 0,
   };
   featureSubscription = undefined;
@@ -94,14 +94,14 @@ export default class SearchScreen extends React.Component<Props, State> {
                 underlayColor="#fff"
                 onPress={() => this.updateCategoryFilter(undefined)}>
                 <View style={styles.categoryFilter}>
-                  <Text>{this.state.featureCategoryFilter.title}</Text>
+                  <Text>{i18n.t(this.state.featureCategoryFilter.title)}</Text>
                   <IconButton icon="close" size={16} style={styles.categoryFilterClose}/>
                 </View>
               </TouchableHighlight>
             )}
             <View style={styles.searchInput}>
               <TextInput
-                placeholder={i18n.t('common_search_hint')}
+                placeholder={i18n.t('common.search_hint')}
                 onChangeText={(title) => this.updateSearchFilter(title)}
                 autoFocus
               />

@@ -131,9 +131,9 @@ export default class MapScreen extends React.Component<Props, State> {
           )}
         </MapboxGL.MapView>
         <View style={styles.fabWrapper}>
-          <FAB color={Colors.primary} icon="plus" style={styles.fab} onPress={() => this.__zoomIn()} />
-          <FAB color={Colors.primary} icon="minus" style={styles.fab} onPress={() => this.__zoomOut()} />
-          <FAB color={Colors.primary} icon="crosshairs-gps" style={styles.fab} onPress={() => this.__showAndFollowCurrentUserLocation()} />
+          <FAB color={Colors.primary} icon="plus" style={styles.fab} onPress={() => this.zoomIn()} />
+          <FAB color={Colors.primary} icon="minus" style={styles.fab} onPress={() => this.zoomOut()} />
+          <FAB color={Colors.primary} icon="crosshairs-gps" style={styles.fab} onPress={() => this.showAndFollowCurrentUserLocation()} />
         </View>
         {/* Route preview */}
         {!this.state.started && this.state.route && (
@@ -216,7 +216,7 @@ export default class MapScreen extends React.Component<Props, State> {
         <FloorPicker
           mapLevel={this.state.mapLevel}
           userLevel={this.state.userLevel}
-          onLevelChanged={this.__onLevelChanged.bind(this)}
+          onLevelChanged={this.onLevelChanged.bind(this)}
         />
       </View>
     );
@@ -278,7 +278,7 @@ export default class MapScreen extends React.Component<Props, State> {
       this.setState({route: null, routeUpdate: event, started: false});
     } else {
       if (event.eventType === ProximiioRouteUpdateType.CALCULATING) {
-        this.__showAndFollowCurrentUserLocation();
+        this.showAndFollowCurrentUserLocation();
       }else {
         this.setState({routeUpdate: event, started: true});
       }
@@ -330,7 +330,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param newLevel
    * @private
    */
-  __onLevelChanged(newLevel) {
+  private onLevelChanged(newLevel) {
     this.setState({mapLevel: newLevel});
   }
 
@@ -338,7 +338,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * Zooms map in.
    * @private
    */
-  __zoomIn() {
+  private zoomIn() {
     this._map.getZoom().then((zoom) => {
       this._camera.zoomTo(zoom + 1, 200);
     });
@@ -348,7 +348,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * Zooms map out.
    * @private
    */
-  __zoomOut() {
+  private zoomOut() {
     this._map.getZoom().then((zoom) => {
       this._camera.zoomTo(zoom - 1, 200);
     });
@@ -359,7 +359,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * @returns {Promise<void>}
    * @private
    */
-  async __showAndFollowCurrentUserLocation() {
+  private async showAndFollowCurrentUserLocation() {
     if (!this.state.location) {
       return;
     }

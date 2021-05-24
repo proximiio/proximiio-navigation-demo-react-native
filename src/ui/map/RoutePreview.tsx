@@ -32,9 +32,9 @@ export default class RoutePreview extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
-        {this.__renderTripStartEnd()}
-        {this.__renderTripSummary(this.props.route.distanceMeters)}
-        {this.__renderTripSteps()}
+        {this.renderTripStartEnd()}
+        {this.renderTripSummary(this.props.route.distanceMeters)}
+        {this.renderTripSteps()}
         <View style={styles.buttonBar}>
           <View style={styles.button}>
             <Button
@@ -66,7 +66,7 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @returns {boolean|JSX.Element}
    * @private
    */
-  __renderTripStartEnd() {
+  private renderTripStartEnd() {
     return (this.state.showTripDetails === false && (
         <>
           <View style={styles.tripRow}>
@@ -98,7 +98,7 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  __renderTripSummary(distanceInMeters) {
+  private renderTripSummary(distanceInMeters) {
     if (distanceInMeters == undefined) {
       return <View />;
     }
@@ -127,14 +127,14 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @returns {boolean|JSX.Element}
    * @private
    */
-  __renderTripSteps() {
+  private renderTripSteps() {
     return (
       this.state.showTripDetails &&
       <Text>Detail Trip Directions</Text> &&
       <FlatList
         style={styles.tripSteps}
         data={this.props.route.steps}
-        renderItem={(item, index) => this.__renderTripStep(item)}
+        renderItem={(item, index) => this.renderTripStep(item)}
         keyExtractor={(item, index) => 'index_' + index}
       />
     );
@@ -146,7 +146,7 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  __renderTripStep(item) {
+  private renderTripStep(item) {
     const instruction = item.index === 0 ? i18n.t('preview.start_navigation') : item.item.instruction;
     let distance = undefined;
     if (item.index > 0 && item.item.distanceFromLastStep !== undefined) {

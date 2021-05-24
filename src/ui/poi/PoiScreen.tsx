@@ -27,23 +27,23 @@ interface State {
  * Screen with detailed info about POI Feature.
  */
 export default class PoiScreen extends React.Component<Props, State> {
-  __mounted = false;
+  private mounted = false;
   state = {
     steps: null,
   };
 
   componentDidMount() {
-    this.__mounted = true;
+    this.mounted = true;
     let item: Feature = this.props.route.params.item;
     this.props.navigation.setOptions({title: item.getTitle()});
     ProximiioMapbox.route
       .calculate({destinationFeatureId: item.id})
-      .then(this.__onRouteCalculated.bind(this))
-      .catch((_) => this.__onRouteCalculated(undefined));
+      .then(this.onRouteCalculated.bind(this))
+      .catch((_) => this.onRouteCalculated(undefined));
   }
 
   componentWillUnmount() {
-    this.__mounted = false;
+    this.mounted = false;
   }
 
   render() {
@@ -51,26 +51,26 @@ export default class PoiScreen extends React.Component<Props, State> {
     return (
       <View style={styles.container}>
         <SliderBox
-          images={this.__getItemImages(item)}
+          images={this.getItemImages(item)}
           style={styles.slider}
           disableOnPress
         />
         <View style={styles.content}>
           <Text style={styles.heading}>{item.getTitle()}</Text>
-          {this.__renderImageTextRow(
+          {this.renderImageTextRow(
             require('../../images/ic_location.png'),
-            this.__getLevel(item),
+            this.getLevel(item),
           )}
-          {this.__renderImageTextRow(
+          {this.renderImageTextRow(
             require('../../images/ic_steps.png'),
-            this.__getStepsText(this.state.steps),
+            this.getStepsText(this.state.steps),
           )}
-          {this.__renderImageTextRow(
+          {this.renderImageTextRow(
             require('../../images/ic_trip.png'),
             i18n.t('poiscreen.trip'),
           )}
           <Button
-            title={this.__getTripButtonText(this.state.steps)}
+            title={this.getTripButtonText(this.state.steps)}
             onPress={() => {
               PreferenceHelper.routeFindWithPreferences(item.id);
               console.log('start trip button pressed');
@@ -78,11 +78,11 @@ export default class PoiScreen extends React.Component<Props, State> {
             }}
             style={styles.tripButton}
           />
-          {this.__renderImageTextRow(
+          {this.renderImageTextRow(
             require('../../images/ic_description.png'),
             i18n.t('poiscreen.description'),
           )}
-          <Text style={styles.description}>{this.__getDescription(item)}</Text>
+          <Text style={styles.description}>{this.getDescription(item)}</Text>
         </View>
       </View>
     );
@@ -93,8 +93,8 @@ export default class PoiScreen extends React.Component<Props, State> {
    * @param route
    * @private
    */
-  __onRouteCalculated(route: ProximiioMapboxRoute) {
-    if (!this.__mounted) {
+  private onRouteCalculated(route: ProximiioMapboxRoute) {
+    if (!this.mounted) {
       return;
     }
     if (route) {
@@ -114,7 +114,7 @@ export default class PoiScreen extends React.Component<Props, State> {
    * @returns {string|*}
    * @private
    */
-  __getDescription(feature: Feature) {
+  private getDescription(feature: Feature) {
     let description = feature.getDescription();
     if (!description) {
       return i18n.t('poiscreen.no_description');
@@ -123,8 +123,8 @@ export default class PoiScreen extends React.Component<Props, State> {
     }
   }
 
-  __getTripButtonText(steps) {
-    let stepsText = this.__getStepsText(steps);
+  private getTripButtonText(steps) {
+    let stepsText = this.getStepsText(steps);
     return i18n.t('poiscreen.start_my_trip') + '\n(' + stepsText + ')';
   }
 
@@ -134,7 +134,7 @@ export default class PoiScreen extends React.Component<Props, State> {
    * @returns {string}
    * @private
    */
-  __getStepsText(steps) {
+  private getStepsText(steps) {
     switch (steps) {
       case undefined:
       case null:
@@ -153,7 +153,7 @@ export default class PoiScreen extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  __renderImageTextRow(image, text) {
+  private renderImageTextRow(image, text) {
     return (
       <View style={styles.row}>
         <Image source={image} style={styles.rowImage} />
@@ -168,7 +168,7 @@ export default class PoiScreen extends React.Component<Props, State> {
    * @returns {string}
    * @private
    */
-  __getLevel(feature) {
+  private getLevel(feature) {
     let level = '';
     switch (feature.properties.level) {
       case 0:
@@ -201,7 +201,7 @@ export default class PoiScreen extends React.Component<Props, State> {
    * @returns {string[]}
    * @private
    */
-  __getItemImages(feature: Feature) {
+  private getItemImages(feature: Feature) {
     let imageList = feature.getImageUrls(PROXIMIIO_TOKEN);
     if (!imageList || imageList.length === 0) {
       return [

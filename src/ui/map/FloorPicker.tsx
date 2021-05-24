@@ -21,8 +21,8 @@ export default class FloorPicker extends React.Component<Props, State> {
   floorChangedSubscription = undefined;
 
   componentDidMount() {
-    this.__refreshFloorList();
-    this.floorChangedSubscription = Proximiio.subscribe(ProximiioEvents.FloorChanged, this.__onFloorChanged.bind(this));
+    this.refreshFloorList();
+    this.floorChangedSubscription = Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChanged.bind(this));
   }
 
   componentWillUnmount() {
@@ -46,21 +46,21 @@ export default class FloorPicker extends React.Component<Props, State> {
         selectedLabelStyle={styles.selectedLabel}
         placeholderStyle={styles.selectedLabel}
         defaultValue={this.props.mapLevel}
-        onChangeItem={(newLevel) => this.__onFloorSelected(newLevel)}
+        onChangeItem={(newLevel) => this.onFloorSelected(newLevel)}
       />
     );
   }
 
-  __onFloorSelected(selectedFloor) {
+  private onFloorSelected(selectedFloor) {
     this.props.onLevelChanged(selectedFloor.value);
   }
 
-  __onFloorChanged(floorChange) {
+  private onFloorChanged(floorChange) {
     console.log(floorChange);
-    this.__refreshFloorList();
+    this.refreshFloorList();
   }
 
-  async __refreshFloorList() {
+  private async refreshFloorList() {
     let floor = Proximiio.floor;
 
     // No current floor selected, user is outside
@@ -72,7 +72,7 @@ export default class FloorPicker extends React.Component<Props, State> {
     let floors = await Proximiio.floors();
     let newFloorList = floors
       .filter((item) => item.place_id === placeId)
-      .filter(this.__onlyUnique)
+      .filter(this.filterUnique)
       .map((item) => {
         return {
           label: item.name,
@@ -91,7 +91,7 @@ export default class FloorPicker extends React.Component<Props, State> {
    * @returns {boolean}
    * @private
    */
-  __onlyUnique(value, index, self: ProximiioFloor[]) {
+  private filterUnique(value, index, self: ProximiioFloor[]) {
     let firstIndex = self.findIndex((it) => it.id === value.id);
     return self.indexOf(value) === firstIndex;
   }

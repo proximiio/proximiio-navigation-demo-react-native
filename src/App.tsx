@@ -60,7 +60,7 @@ export default class App extends React.Component<Props, State> {
   private syncListener = undefined;
 
   componentDidMount() {
-    this.__initProximiio();
+    this.initProximiio();
   }
 
   componentWillUnmount() {
@@ -93,7 +93,7 @@ export default class App extends React.Component<Props, State> {
               return {
                 title: i18n.t('app.title_map'),
                 headerRight: (tintColor) =>
-                  this.__getSettingsButton(tintColor, navigation),
+                  this.getSettingsButton(tintColor, navigation),
               };
             }}
           />
@@ -120,7 +120,7 @@ export default class App extends React.Component<Props, State> {
   /**
    * Initializes Proximi.io location and mapbox libraries.
    */
-  async __initProximiio() {
+  private async initProximiio() {
     // Proximi.io mapbox library sync listener
     this.syncListener = ProximiioMapbox.subscribe(
       ProximiioMapboxEvents.SYNC_STATUS,
@@ -165,7 +165,7 @@ export default class App extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  __getSettingsButton(tintColor, navigation) {
+  private getSettingsButton(tintColor, navigation) {
     return (
       <TouchableOpacity
         style={styles.appbarButton}

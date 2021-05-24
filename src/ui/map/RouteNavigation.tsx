@@ -51,12 +51,12 @@ export default class RouteNavigation extends React.Component<Props, State> {
             <Image
               style={{
                 ...styles.image,
-                transform: this.__getDirectionRotation(this.props.routeUpdate.data.stepBearing),
+                transform: this.getDirectionRotation(this.props.routeUpdate.data.stepBearing),
               }}
               source={require('../../images/direction_icons/turn_straight.png')}
             />
             <Text style={styles.rowText}>
-              {this.__getDirectionString(this.props.routeUpdate.data.stepBearing)}
+              {this.getDirectionString(this.props.routeUpdate.data.stepBearing)}
             </Text>
             <TouchableNativeFeedback
               onPress={() => ProximiioMapbox.route.cancel()}>
@@ -83,7 +83,7 @@ export default class RouteNavigation extends React.Component<Props, State> {
    * @returns {string}
    * @private
    */
-  __getDirectionString(bearing) {
+  private getDirectionString(bearing) {
     if (bearing > -22.5 && bearing < 22.5) {
       return i18n.t('navigation.north');
     } else if (bearing > 22.5 && bearing < 67.5) {
@@ -109,7 +109,7 @@ export default class RouteNavigation extends React.Component<Props, State> {
    * @returns {[{rotate: Array}]}
    * @private
    */
-  __getDirectionRotation(bearing) {
+  private getDirectionRotation(bearing) {
     let rotation;
     if (bearing > -22.5 && bearing < 22.5) {
       rotation = 0;

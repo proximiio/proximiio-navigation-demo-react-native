@@ -1,12 +1,13 @@
 import * as React from 'react';
 import {Button, Image, StyleSheet, Text, View} from 'react-native';
 import {SliderBox} from 'react-native-image-slider-box';
-import ProximiioMapbox from 'react-native-proximiio-mapbox';
 import {Colors} from '../../Style';
 import PreferenceHelper from '../../utils/PreferenceHelper';
 import {PROXIMIIO_TOKEN, LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
-import {ProximiioMapboxRoute} from 'react-native-proximiio-mapbox/src/types';
-import {Feature} from 'react-native-proximiio-mapbox/src/feature';
+import ProximiioMapbox, {
+  Feature,
+  ProximiioMapboxRoute,
+} from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
 
 /**

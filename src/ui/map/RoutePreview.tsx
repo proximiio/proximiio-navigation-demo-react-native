@@ -1,15 +1,8 @@
 import * as React from 'react';
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  Button,
-  View,
-} from 'react-native';
-
-import ProximiioMapbox from 'react-native-proximiio-mapbox';
-import {ProximiioMapboxRoute} from 'react-native-proximiio-mapbox/src/types';
+import {FlatList, Image, StyleSheet, Text, Button, View} from 'react-native';
+import ProximiioMapbox, {
+  ProximiioMapboxRoute,
+} from 'react-native-proximiio-mapbox';
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
 import {Colors} from '../../Style';
 import i18n from 'i18next';

@@ -18,6 +18,10 @@ import ProximiioMapbox, {
   AmenitySource,
   GeoJSONSource,
   RoutingSource,
+  ProximiioMapboxRoute,
+  ProximiioFeatureType,
+  ProximiioRouteEvent,
+  ProximiioRouteUpdateType,
 } from 'react-native-proximiio-mapbox';
 import RoutePreview from './RoutePreview';
 import {FAB} from 'react-native-paper';
@@ -25,12 +29,6 @@ import RouteNavigation from './RouteNavigation';
 import CardView from '../../utils/CardView';
 import FloorPicker from './FloorPicker';
 import {Colors} from '../../Style';
-import {
-  ProximiioMapboxRoute,
-  ProximiioFeatureType,
-  ProximiioRouteEvent,
-  ProximiioRouteUpdateType,
-} from 'react-native-proximiio-mapbox/src/types';
 import {ProximiioFloor} from 'react-native-proximiio';
 import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
 import i18n from 'i18next';

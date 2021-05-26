@@ -6,14 +6,12 @@ import {
   TouchableNativeFeedback,
   View,
 } from 'react-native';
-
-import ProximiioMapbox from 'react-native-proximiio-mapbox';
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
 import {Colors} from '../../Style';
-import {
+import ProximiioMapbox, {
   ProximiioFeatureType,
   ProximiioRouteEvent,
-} from 'react-native-proximiio-mapbox/src/types';
+} from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
 
 interface Props {

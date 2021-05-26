@@ -1,4 +1,4 @@
-import {ProximiioUnitConversion} from 'react-native-proximiio-mapbox/src/types';
+import {ProximiioUnitConversion} from 'react-native-proximiio-mapbox';
 
 /**
  * This file contains unit conversion configurations used by Proximi.io mapbox library.

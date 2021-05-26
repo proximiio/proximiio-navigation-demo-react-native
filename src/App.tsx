@@ -11,22 +11,17 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio from 'react-native-proximiio';
-import ProximiioMapbox from 'react-native-proximiio-mapbox';
 import MapScreen from './ui/map/MapScreen';
 import PoiScreen from './ui/poi/PoiScreen';
 import SearchScreen from './ui/search/SearchScreen';
 import {Colors} from './Style';
 import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import PreferenceHelper from './utils/PreferenceHelper';
-import {
-  MAPBOX_TOKEN,
-  PROXIMIIO_TOKEN,
-  LEVEL_OVERRIDE_MAP,
-} from './utils/Constants';
-import {
+import {PROXIMIIO_TOKEN, LEVEL_OVERRIDE_MAP} from './utils/Constants';
+import ProximiioMapbox, {
   ProximiioMapboxEvents,
   ProximiioMapboxSyncStatus,
-} from 'react-native-proximiio-mapbox/src/instance';
+} from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
 
 /**
@@ -35,9 +30,9 @@ import i18n from 'i18next';
 const Stack = createStackNavigator();
 
 /**
- * Set mapbox token.
+ * Call necessary to init mapbox.
  */
-MapboxGL.setAccessToken(MAPBOX_TOKEN);
+MapboxGL.setAccessToken('');
 
 /**
  * RNComponent properties

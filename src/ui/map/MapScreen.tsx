@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import * as React from 'react';
 import {
   StyleSheet,
@@ -80,7 +72,6 @@ export default class MapScreen extends React.Component<Props, State> {
   private onHazardSubscription = undefined;
 
   componentDidMount() {
-    this.onMapPress = this.onMapPress.bind(this);
     this.onFloorChange(Proximiio.floor);
     this.onPositionUpdate(Proximiio.location);
     this.positionUpdatedSubscription = Proximiio.subscribe(ProximiioEvents.PositionUpdated, (event) => this.onPositionUpdate(event));
@@ -105,7 +96,7 @@ export default class MapScreen extends React.Component<Props, State> {
           ref={(map) => (this.map = map)}
           style={StyleSheet.absoluteFillObject}
           scrollEnabled={true}
-          styleUrl={ProximiioMapbox.styleURL}
+          styleURL={ProximiioMapbox.styleURL}
           onRegionWillChange={this.onRegionWillChange.bind(this)}
           onDidFinishLoadingMap={() => this.setState({mapLoaded: true})}>
           <MapboxGL.Camera
@@ -121,7 +112,9 @@ export default class MapScreen extends React.Component<Props, State> {
           {this.state.mapLoaded && (
             <ProximiioContextProvider>
               <AmenitySource />
-              <GeoJSONSource level={this.state.mapLevel} onPress={(features: ProximiioFeatureType[]) => this.onMapPress(features)}>
+              <GeoJSONSource
+                level={this.state.mapLevel}
+                onPress={this.onMapPress}>
                 <RoutingSource level={this.state.mapLevel} />
                 <UserLocationSource
                   showHeadingIndicator={true}
@@ -226,13 +219,13 @@ export default class MapScreen extends React.Component<Props, State> {
   /**
    * Find pressed POI on map.
    */
-  private onMapPress(event: ProximiioFeatureType[]) {
+  private onMapPress = (event: ProximiioFeatureType[]) => {
     let pois = event.filter((it) => it.properties.type === 'poi');
     if (pois.length > 0) {
       ProximiioMapbox.route.cancel();
       this.props.navigation.navigate('ItemDetail', {item: pois[0]});
     }
-  }
+  };
 
   /**
    * Update map when user posiiton is updated.

@@ -4,7 +4,7 @@ import {SliderBox} from 'react-native-image-slider-box';
 import ProximiioMapbox from 'react-native-proximiio-mapbox';
 import {Colors} from '../../Style';
 import PreferenceHelper from '../../utils/PreferenceHelper';
-import {PROXIMIIO_TOKEN} from '../../utils/Constants';
+import {PROXIMIIO_TOKEN, LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
 import {ProximiioMapboxRoute} from 'react-native-proximiio-mapbox/src/types';
 import {Feature} from 'react-native-proximiio-mapbox/src/feature';
 import i18n from 'i18next';
@@ -169,8 +169,9 @@ export default class PoiScreen extends React.Component<Props, State> {
    * @private
    */
   private getLevel(feature) {
+    let overrideLevel = LEVEL_OVERRIDE_MAP[feature.properties.level] | feature.properties.level | 0;
     let level = '';
-    switch (feature.properties.level) {
+    switch (overrideLevel) {
       case 0:
         level = i18n.t('common.floor_0');
         break;
@@ -186,11 +187,8 @@ export default class PoiScreen extends React.Component<Props, State> {
       case 4:
         level = i18n.t('common.floor_4');
         break;
-      case 5:
-        level = i18n.t('common.floor_5');
-        break;
       default:
-        level = i18n.t('common.floor_n', {count: (feature.properties.level)});
+        level = i18n.t('common.floor_n', {count: (feature.properties.level + 1)});
     }
     return level;
   }

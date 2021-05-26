@@ -21,7 +21,7 @@ import {IconButton} from 'react-native-paper';
 import {TouchableHighlight} from 'react-native-gesture-handler';
 import SearchFooter from './SearchFooter';
 import {Colors} from '../../Style';
-import {PROXIMIIO_TOKEN} from '../../utils/Constants';
+import {PROXIMIIO_TOKEN, LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
 import i18n from 'i18next';
 
 const numColumns = Math.round(Dimensions.get('window').width / 200);
@@ -277,21 +277,22 @@ export default class SearchScreen extends React.Component<Props, State> {
    * @private
    */
   private getLevelString(feature) {
+    let overrideLevel = LEVEL_OVERRIDE_MAP[feature.properties.level] | feature.properties.level | 0;
     let level = '';
-    switch (feature.properties.level) {
-      case -1:
+    switch (overrideLevel) {
+      case 0:
         level = i18n.t('common.floor_0');
         break;
-      case 0:
+      case 1:
         level = i18n.t('common.floor_1');
         break;
-      case 1:
+      case 2:
         level = i18n.t('common.floor_2');
         break;
-      case 2:
+      case 3:
         level = i18n.t('common.floor_3');
         break;
-      case 3:
+      case 4:
         level = i18n.t('common.floor_4');
         break;
       default:

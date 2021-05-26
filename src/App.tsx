@@ -18,7 +18,11 @@ import SearchScreen from './ui/search/SearchScreen';
 import {Colors} from './Style';
 import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import PreferenceHelper from './utils/PreferenceHelper';
-import {MAPBOX_TOKEN, PROXIMIIO_TOKEN} from './utils/Constants';
+import {
+  MAPBOX_TOKEN,
+  PROXIMIIO_TOKEN,
+  LEVEL_OVERRIDE_MAP,
+} from './utils/Constants';
 import {
   ProximiioMapboxEvents,
   ProximiioMapboxSyncStatus,
@@ -140,14 +144,15 @@ export default class App extends React.Component<Props, State> {
     Proximiio.setPdr(true, 4);
     Proximiio.setSnapToRoute(true, 20);
     await ProximiioMapbox.authorize(PROXIMIIO_TOKEN);
-    ProximiioMapbox.setUserLocationToRouteSnappingEnabled(true);
-    ProximiioMapbox.setUserLocationToRouteSnappingThreshold(6.0);
+    ProximiioMapbox.setRerouteEnabled(true);
+    ProximiioMapbox.setReRouteThreshold(15);
     ProximiioMapbox.setRouteFinishThreshold(2.5);
     ProximiioMapbox.setStepImmediateThreshold(3.5);
     ProximiioMapbox.setStepPreparationThreshold(3.0);
-    ProximiioMapbox.setRerouteEnabled(true);
-    ProximiioMapbox.setReRouteThreshold(15);
+    ProximiioMapbox.setUserLocationToRouteSnappingEnabled(true);
+    ProximiioMapbox.setUserLocationToRouteSnappingThreshold(6.0);
     ProximiioMapbox.ttsHeadingCorrectionThresholds(8, 90);
+    ProximiioMapbox.setLevelOverrideMap(LEVEL_OVERRIDE_MAP);
     // Apply user preferences, manageable in preference screen
     await PreferenceHelper.applyPreferences();
     // Request permissions needed for localization

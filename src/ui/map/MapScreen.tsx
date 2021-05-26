@@ -60,8 +60,8 @@ interface State {
 }
 
 export default class MapScreen extends React.Component<Props, State> {
-  _map: MapboxGL.MapView | null = null;
-  _camera: MapboxGL.Camera | null = null;
+  private map: MapboxGL.MapView | null = null;
+  private camera: MapboxGL.Camera | null = null;
   state = {
     followUser: true,
     hazard: undefined,
@@ -102,7 +102,7 @@ export default class MapScreen extends React.Component<Props, State> {
     return (
       <View style={styles.container}>
         <MapboxGL.MapView
-          ref={(map) => (this._map = map)}
+          ref={(map) => (this.map = map)}
           style={StyleSheet.absoluteFillObject}
           scrollEnabled={true}
           styleUrl={ProximiioMapbox.styleURL}
@@ -110,7 +110,7 @@ export default class MapScreen extends React.Component<Props, State> {
           onDidFinishLoadingMap={() => this.setState({mapLoaded: true})}>
           <MapboxGL.Camera
             ref={(camera) => {
-              this._camera = camera;
+              this.camera = camera;
             }}
             minZoomLevel={1}
             maxZoomLevel={24}
@@ -121,15 +121,16 @@ export default class MapScreen extends React.Component<Props, State> {
           {this.state.mapLoaded && (
             <ProximiioContextProvider>
               <AmenitySource />
-              <GeoJSONSource level={this.state.mapLevel} onPress={(features: ProximiioFeatureType[]) => this.onMapPress(features)} />
-              <RoutingSource level={this.state.mapLevel} />
-              {
-                this.state.mapLevel === this.state.userLevel
-                && <UserLocationSource showHeading={true} />
-              }
+              <GeoJSONSource level={this.state.mapLevel} onPress={(features: ProximiioFeatureType[]) => this.onMapPress(features)}>
+                <RoutingSource level={this.state.mapLevel} />
+                <UserLocationSource
+                  showHeadingIndicator={true}
+                  visible={this.state.mapLevel === this.state.userLevel}
+                  onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)} />
+              </GeoJSONSource>
             </ProximiioContextProvider>
           )}
-        </MapboxGL.MapView>
+      </MapboxGL.MapView>
         <View style={styles.fabWrapper}>
           <FAB color={Colors.primary} icon="plus" style={styles.fab} onPress={() => this.zoomIn()} />
           <FAB color={Colors.primary} icon="minus" style={styles.fab} onPress={() => this.zoomOut()} />
@@ -244,10 +245,10 @@ export default class MapScreen extends React.Component<Props, State> {
     let firstLocationUpdate = this.state.location == null;
     let followUser = this.state.followUser;
     let stateUpdate = {location: location};
-    let currentZoom = await this._map.getZoom();
+    let currentZoom = await this.map.getZoom();
     this.setState(stateUpdate);
     if (followUser || firstLocationUpdate) {
-      this._camera?.setCamera({
+      this.camera?.setCamera({
         centerCoordinate: [location.lng, location.lat],
         animationDuration: 200,
         animationMode: 'flyTo',
@@ -339,8 +340,8 @@ export default class MapScreen extends React.Component<Props, State> {
    * @private
    */
   private zoomIn() {
-    this._map.getZoom().then((zoom) => {
-      this._camera.zoomTo(zoom + 1, 200);
+    this.map.getZoom().then((zoom) => {
+      this.camera.zoomTo(zoom + 1, 200);
     });
   }
 
@@ -349,8 +350,8 @@ export default class MapScreen extends React.Component<Props, State> {
    * @private
    */
   private zoomOut() {
-    this._map.getZoom().then((zoom) => {
-      this._camera.zoomTo(zoom - 1, 200);
+    this.map.getZoom().then((zoom) => {
+      this.camera.zoomTo(zoom - 1, 200);
     });
   }
 
@@ -367,10 +368,10 @@ export default class MapScreen extends React.Component<Props, State> {
       followUser: true,
       mapLevel: this.state.userLevel,
     });
-    let currentZoom = await this._map.getZoom();
+    let currentZoom = await this.map.getZoom();
     let newZoom = Math.max(currentZoom, 18);
     console.log('zoom:', currentZoom, newZoom);
-    this._camera.setCamera({
+    this.camera.setCamera({
       centerCoordinate: [this.state.location.lng, this.state.location.lat],
       zoomLevel: newZoom,
       animationDuration: 200,

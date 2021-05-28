@@ -2,9 +2,11 @@ import * as React from 'react';
 import {
   StyleSheet,
   View,
+  Image,
   Text,
   TouchableHighlight,
   ActivityIndicator,
+  BackHandler, TouchableNativeFeedback,
 } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {
@@ -45,9 +47,17 @@ interface State {
   mapLevel: number;
   route: ProximiioMapboxRoute | undefined;
   routeUpdate: ProximiioRouteEvent | undefined;
+  segment: ProximiioFeatureType | undefined;
   started: Boolean;
   userLevel: number;
 }
+
+const routeEndedEventTypes = [
+  ProximiioRouteUpdateType.ROUTE_NOT_FOUND,
+  ProximiioRouteUpdateType.ROUTE_OSRM_NETWORK_ERROR,
+  ProximiioRouteUpdateType.CANCELED,
+  ProximiioRouteUpdateType.FINISHED,
+];
 
 export default class MapScreen extends React.Component<Props, State> {
   private map: MapboxGL.MapView | null = null;
@@ -60,32 +70,51 @@ export default class MapScreen extends React.Component<Props, State> {
     mapLevel: 0,
     route: undefined,
     routeUpdate: undefined,
+    segment: undefined,
     started: false,
     userLevel: 0,
   };
-  private positionUpdatedSubscription = undefined;
-  private floorChangedSubscription = undefined;
-  private routeSubscription = undefined;
-  private routeUpdateSubscription = undefined;
-  private onHazardSubscription = undefined;
 
   componentDidMount() {
     this.onFloorChange(Proximiio.floor);
     this.onPositionUpdate(Proximiio.location);
-    this.positionUpdatedSubscription = Proximiio.subscribe(ProximiioEvents.PositionUpdated, (event) => this.onPositionUpdate(event));
-    this.floorChangedSubscription = Proximiio.subscribe(ProximiioEvents.FloorChanged, (event) => this.onFloorChange(event));
-    this.routeSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE, (event) => this.onRoute(event));
-    this.routeUpdateSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE_UPDATE, (event) => this.onRouteUpdate(event));
-    this.onHazardSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_HAZARD, (event) => this.onHazard(event));
+    Proximiio.subscribe(ProximiioEvents.PositionUpdated, this.onPositionUpdate);
+    Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChange);
+    ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE, this.onRoute);
+    ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE_UPDATE, this.onRouteUpdate);
+    ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_HAZARD, this.onHazard);
+    ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_SEGMENT, this.onSegment);
+    BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
   }
 
   componentWillUnmount() {
-    this.positionUpdatedSubscription.remove();
-    this.floorChangedSubscription.remove();
-    this.routeSubscription.remove();
-    this.routeUpdateSubscription.remove();
-    this.onHazardSubscription.remove();
+    Proximiio.unsubscribe(ProximiioEvents.PositionUpdated, this.onPositionUpdate);
+    Proximiio.unsubscribe(ProximiioEvents.FloorChanged, this.onFloorChange);
+    ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ROUTE, this.onRoute);
+    ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ROUTE_UPDATE, this.onRouteUpdate);
+    ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ON_HAZARD, this.onHazard);
+    ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ON_SEGMENT, this.onSegment);
+    BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
   }
+
+  // shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
+  //   if (
+  //     this.state.followUser === nextState.followUser
+  //     && this.state.hazard === nextState.hazard
+  //     && this.state.mapLoaded === nextState.mapLoaded
+  //     && this.state.mapLevel === nextState.mapLevel
+  //     && this.state.route === nextState.route
+  //     && this.state.routeUpdate === nextState.routeUpdate
+  //     && this.state.started === nextState.started
+  //     && this.state.userLevel === nextState.userLevel
+  //   ) {
+  //     console.log('should component update', false);
+  //     return false;
+  //   } else {
+  //     console.log('should component update', true);
+  //     return true;
+  //   }
+  // }
 
   render() {
     return (
@@ -135,6 +164,7 @@ export default class MapScreen extends React.Component<Props, State> {
           />
         )}
         {this.renderRouteCalculation()}
+        {this.renderRouteEnded()}
         {this.renderNavigation()}
         {this.renderSearch()}
         {this.renderFloorSelector()}
@@ -166,21 +196,39 @@ export default class MapScreen extends React.Component<Props, State> {
     );
   }
 
+  private renderRouteEnded() {
+    if (!this.state.routeUpdate || !routeEndedEventTypes.includes(this.state.routeUpdate.eventType)) {
+      return null;
+    }
+    let isFinish = this.state.routeUpdate.eventType === ProximiioRouteUpdateType.FINISHED;
+    return (
+      <View style={styles.calculationRow}>
+        <Image style={styles.calculationImage} source={isFinish ? require('../../images/direction_icons/finish.png') : require('../../images/dummy.png') } />
+        <View style={styles.calculationRowText}>
+          <Text>{this.state.routeUpdate.text}</Text>
+        </View>
+        <TouchableNativeFeedback onPress={this.clearRoute}>
+          <Image style={styles.calculationRowCancel} source={require('../../images/ic_close.png')}/>
+        </TouchableNativeFeedback>
+      </View>
+    );
+  }
+
   private renderNavigation() {
     if (this.state.started === false || this.state.route == null) {
       return null;
     }
     return (
       <RouteNavigation
-        route={this.state.route}
         routeUpdate={this.state.routeUpdate}
         hazard={this.state.hazard}
+        segment={this.state.segment}
       />
     );
   }
 
   private renderSearch() {
-    if (this.state.started === true || this.state.route) {
+    if (this.state.started === true || this.state.route || this.state.routeUpdate) {
       return null;
     }
     return (
@@ -228,7 +276,7 @@ export default class MapScreen extends React.Component<Props, State> {
   /**
    * Update map when user posiiton is updated.
    */
-  private async onPositionUpdate(location: ProximiioLocation) {
+  private onPositionUpdate = async (location: ProximiioLocation) => {
     console.log('location updated: ', location);
     if (!location) {
       return;
@@ -246,21 +294,37 @@ export default class MapScreen extends React.Component<Props, State> {
         zoomLevel: firstLocationUpdate ? Math.max(currentZoom, 18) : currentZoom,
       });
     }
-  }
+  };
+
+  /**
+   * Override back press behaviour when navigation to just cancel navigation and not go out of map.
+   */
+  private onBackPress = () => {
+    if (this.state.route || this.state.routeUpdate) {
+      if (routeEndedEventTypes.includes(this.state.routeUpdate.eventType)) {
+        this.clearRoute();
+      } else {
+        ProximiioMapbox.route.cancel();
+      }
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   /**
    * Listener for route object for navigation.
    * @param event
    */
-  private onRoute(event: ProximiioMapboxRoute) {
+  private onRoute = (event: ProximiioMapboxRoute) => {
     this.setState({route: event});
-  }
+  };
 
   /**
    * Listener for route updates during navigation.
    * @param event
    */
-  private onRouteUpdate(event: ProximiioRouteEvent) {
+  private onRouteUpdate = (event: ProximiioRouteEvent) => {
     if (
       event.eventType === ProximiioRouteUpdateType.FINISHED
       || event.eventType === ProximiioRouteUpdateType.CANCELED
@@ -275,13 +339,20 @@ export default class MapScreen extends React.Component<Props, State> {
         this.setState({routeUpdate: event, started: true});
       }
     }
-  }
+  };
+
+  private clearRoute = () => {
+    this.setState({
+      route: undefined,
+      routeUpdate: undefined,
+    });
+  };
 
   /**
    * Listener for floor change. Switches map level if map level is the same as user level currently.
    * @param floor
    */
-  private onFloorChange(floor: ProximiioFloor) {
+  private onFloorChange = (floor: ProximiioFloor) => {
     let newUserLevel = floor ? floor.level || 0 : 0;
     let newState;
     if (this.state.userLevel === this.state.mapLevel) {
@@ -313,9 +384,18 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param hazard
    * @private
    */
-  private onHazard(hazard: ProximiioFeatureType) {
+  private onHazard = (hazard: ProximiioFeatureType) => {
     this.setState({hazard: hazard});
-  }
+  };
+
+  /**
+   * Listener for segment feature warning for navigation.
+   * @param segment
+   * @private
+   */
+  private onSegment = (segment: ProximiioFeatureType) => {
+    this.setState({segment: segment});
+  };
 
   /**
    *Listener for user level change.
@@ -425,10 +505,20 @@ const styles = StyleSheet.create({
     height: 24,
     width: 24,
   },
+  calculationImage: {
+    padding: 0,
+    height: 32,
+    width: 32,
+  },
   calculationRowText: {
     flex: 1,
     padding: 8,
     alignItems: 'flex-start',
+  },
+  calculationRowCancel: {
+    height: 32,
+    tintColor: Colors.black,
+    width: 32,
   },
   routePreview: {
     flex: 1,

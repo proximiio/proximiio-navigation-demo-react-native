@@ -6,7 +6,8 @@ import {
   Text,
   TouchableHighlight,
   ActivityIndicator,
-  BackHandler, TouchableNativeFeedback,
+  BackHandler,
+  TouchableNativeFeedback,
 } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {

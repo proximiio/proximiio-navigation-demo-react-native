@@ -33,6 +33,10 @@ const resources = {
       'common.category.entrance': 'Entrance',
       'common.category.more': 'More',
       'common.category.less': 'Less',
+      'common.steps': '{{count}} step',
+      'common.steps_plural': '{{count}} steps',
+      'common.meters': '{{count}} meter',
+      'common.meters_plural': '{{count}} meters',
 
       'searchscreen.no_items': 'There are no items!',
       'searchscreen.end_of_results': 'End of results',

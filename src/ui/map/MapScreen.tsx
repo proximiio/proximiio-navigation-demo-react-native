@@ -42,6 +42,7 @@ interface Props {
 
 interface State {
   followUser: boolean;
+  followUserHeading: boolean;
   hazard: ProximiioFeatureType | undefined;
   location: ProximiioLocation | undefined;
   mapLoaded: boolean;
@@ -60,11 +61,14 @@ const routeEndedEventTypes = [
   ProximiioRouteUpdateType.FINISHED,
 ];
 
+const cameraAnimationDuration = 250;
+
 export default class MapScreen extends React.Component<Props, State> {
   private map: MapboxGL.MapView | null = null;
   private camera: MapboxGL.Camera | null = null;
   state = {
     followUser: true,
+    followUserHeading: false,
     hazard: undefined,
     location: undefined,
     mapLoaded: false,
@@ -124,8 +128,9 @@ export default class MapScreen extends React.Component<Props, State> {
           ref={(map) => (this.map = map)}
           style={StyleSheet.absoluteFillObject}
           scrollEnabled={true}
+          compassEnabled={false}
           styleURL={ProximiioMapbox.styleURL}
-          onRegionWillChange={this.onRegionWillChange.bind(this)}
+          onRegionWillChange={this.onRegionWillChange}
           onDidFinishLoadingMap={() => this.setState({mapLoaded: true})}>
           <MapboxGL.Camera
             ref={(camera) => {
@@ -146,8 +151,10 @@ export default class MapScreen extends React.Component<Props, State> {
                 <RoutingSource level={this.state.mapLevel} />
                 <UserLocationSource
                   showHeadingIndicator={true}
+                  onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
+                  onHeadingChanged={this.onHeadingChanged}
                   visible={this.state.mapLevel === this.state.userLevel}
-                  onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)} />
+                />
               </GeoJSONSource>
             </ProximiioContextProvider>
           )}
@@ -155,6 +162,7 @@ export default class MapScreen extends React.Component<Props, State> {
         <View style={styles.fabWrapper}>
           <FAB color={Colors.primary} icon="plus" style={styles.fab} onPress={() => this.zoomIn()} />
           <FAB color={Colors.primary} icon="minus" style={styles.fab} onPress={() => this.zoomOut()} />
+          <FAB color={this.state.followUserHeading ? Colors.primary : Colors.gray} icon="compass" style={styles.fab} onPress={() => this.toggleFollowUserHeading()} />
           <FAB color={Colors.primary} icon="crosshairs-gps" style={styles.fab} onPress={() => this.showAndFollowCurrentUserLocation()} />
         </View>
         {/* Route preview */}
@@ -290,11 +298,35 @@ export default class MapScreen extends React.Component<Props, State> {
     if (followUser || firstLocationUpdate) {
       this.camera?.setCamera({
         centerCoordinate: [location.lng, location.lat],
-        animationDuration: 200,
+        animationDuration: cameraAnimationDuration,
         animationMode: 'flyTo',
         zoomLevel: firstLocationUpdate ? Math.max(currentZoom, 18) : currentZoom,
       });
     }
+  };
+
+  private onHeadingChanged = (heading: number) => {
+    if (this.state.followUserHeading) {
+      this.camera?.setCamera({
+        heading: heading,
+        animationDuration: cameraAnimationDuration,
+      });
+    }
+  };
+
+  private toggleFollowUserHeading = () => {
+    let willFollowUserHeading = !this.state.followUserHeading;
+    let newState;
+    if (willFollowUserHeading) {
+      newState = {
+        followUser: true,
+        followUserHeading: true,
+      };
+    } else {
+      newState = {followUserHeading: false};
+      this.onHeadingChanged(0);
+    }
+    this.setState(newState);
   };
 
   /**
@@ -336,7 +368,7 @@ export default class MapScreen extends React.Component<Props, State> {
     } else {
       if (event.eventType === ProximiioRouteUpdateType.CALCULATING) {
         this.showAndFollowCurrentUserLocation();
-      }else {
+      } else {
         this.setState({routeUpdate: event, started: true});
       }
     }
@@ -367,18 +399,22 @@ export default class MapScreen extends React.Component<Props, State> {
       };
     }
     this.setState(newState);
-  }
+  };
 
   /**
    * Listener on user interacting with map, to prevent moving map camera when user is panning by himself.
    * @param event
    * @private
    */
-  private onRegionWillChange(event) {
+  private onRegionWillChange = (event) => {
     if (this.state.followUser && event.properties.isUserInteraction === true) {
-      this.setState({followUser: false});
+      console.log('rotating?');
+      this.setState({
+        followUser: false,
+        followUserHeading: false,
+      });
     }
-  }
+  };
 
   /**
    * Listener for hazard feature warning for navigation.
@@ -413,7 +449,7 @@ export default class MapScreen extends React.Component<Props, State> {
    */
   private zoomIn() {
     this.map.getZoom().then((zoom) => {
-      this.camera.zoomTo(zoom + 1, 200);
+      this.camera.zoomTo(zoom + 1, cameraAnimationDuration);
     });
   }
 
@@ -423,7 +459,7 @@ export default class MapScreen extends React.Component<Props, State> {
    */
   private zoomOut() {
     this.map.getZoom().then((zoom) => {
-      this.camera.zoomTo(zoom - 1, 200);
+      this.camera.zoomTo(zoom - 1, cameraAnimationDuration);
     });
   }
 
@@ -446,7 +482,7 @@ export default class MapScreen extends React.Component<Props, State> {
     this.camera.setCamera({
       centerCoordinate: [this.state.location.lng, this.state.location.lat],
       zoomLevel: newZoom,
-      animationDuration: 200,
+      animationDuration: cameraAnimationDuration,
     });
   }
 }

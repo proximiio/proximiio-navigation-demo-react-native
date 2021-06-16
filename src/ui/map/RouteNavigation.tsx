@@ -9,6 +9,7 @@ import {
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
 import {Colors} from '../../Style';
 import ProximiioMapbox, {
+  Feature,
   ProximiioFeatureType,
   ProximiioRouteEvent,
 } from 'react-native-proximiio-mapbox';
@@ -16,8 +17,8 @@ import i18n from 'i18next';
 
 interface Props {
   routeUpdate: ProximiioRouteEvent;
-  hazard: ProximiioFeatureType;
-  segment: ProximiioFeatureType;
+  hazard: Feature;
+  segment: Feature;
 }
 interface State {}
 
@@ -30,17 +31,17 @@ export default class RouteNavigation extends React.Component<Props, State> {
     }
     return (
       <View style={styles.container}>
-        {this.props.segment !== undefined && (
+        {this.props.segment && (
           <View style={styles.rowSegment}>
             <Text style={styles.rowText}>
-              {i18n.t('navigation.you_are_in') + ' ' + this.props.segment.properties.title}
+              {i18n.t('navigation.you_are_in') + ' ' + this.props.segment.getTitle()}
             </Text>
           </View>
         )}
-        {this.props.hazard !== undefined && (
+        {this.props.hazard && (
           <View style={styles.rowHazard}>
             <Text style={styles.rowText}>
-              {i18n.t('navigation.watch_out_for') + ' ' + this.props.hazard.properties.title}
+              {i18n.t('navigation.watch_out_for') + ' ' + this.props.hazard.properties.getTitle()}
             </Text>
           </View>
         )}

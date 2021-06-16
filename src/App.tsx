@@ -1,27 +1,17 @@
 import * as React from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import {ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import Proximiio from 'react-native-proximiio';
+import Proximiio, {NotificationMode} from 'react-native-proximiio';
 import MapScreen from './ui/map/MapScreen';
 import PoiScreen from './ui/poi/PoiScreen';
 import SearchScreen from './ui/search/SearchScreen';
 import {Colors} from './Style';
 import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import PreferenceHelper from './utils/PreferenceHelper';
-import {PROXIMIIO_TOKEN, LEVEL_OVERRIDE_MAP} from './utils/Constants';
-import ProximiioMapbox, {
-  ProximiioMapboxEvents,
-  ProximiioMapboxSyncStatus,
-} from 'react-native-proximiio-mapbox';
+import {LEVEL_OVERRIDE_MAP, PROXIMIIO_TOKEN} from './utils/Constants';
+import ProximiioMapbox, {ProximiioMapboxEvents, ProximiioMapboxSyncStatus,} from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
 
 /**
@@ -138,9 +128,11 @@ export default class App extends React.Component<Props, State> {
     await Proximiio.authorize(PROXIMIIO_TOKEN);
     Proximiio.setPdr(true, 4);
     Proximiio.setSnapToRoute(true, 20);
+    Proximiio.setNotificationMode(NotificationMode.Disabled);
+    Proximiio.updateOptions();
     await ProximiioMapbox.authorize(PROXIMIIO_TOKEN);
     ProximiioMapbox.setRerouteEnabled(true);
-    ProximiioMapbox.setReRouteThreshold(15);
+    ProximiioMapbox.setReRouteThreshold(3);
     ProximiioMapbox.setRouteFinishThreshold(2.5);
     ProximiioMapbox.setStepImmediateThreshold(3.5);
     ProximiioMapbox.setStepPreparationThreshold(3.0);

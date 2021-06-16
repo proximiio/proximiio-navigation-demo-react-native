@@ -9,7 +9,7 @@ import {
   BackHandler,
   TouchableNativeFeedback,
 } from 'react-native';
-import MapboxGL from '@react-native-mapbox-gl/maps';
+import MapboxGL, {SymbolLayerStyle} from '@react-native-mapbox-gl/maps';
 import Proximiio, {
   ProximiioContextProvider,
   ProximiioEvents,
@@ -24,7 +24,7 @@ import ProximiioMapbox, {
   ProximiioMapboxRoute,
   ProximiioFeatureType,
   ProximiioRouteEvent,
-  ProximiioRouteUpdateType,
+  ProximiioRouteUpdateType, Feature,
 } from 'react-native-proximiio-mapbox';
 import RoutePreview from './RoutePreview';
 import {FAB} from 'react-native-paper';
@@ -43,13 +43,14 @@ interface Props {
 interface State {
   followUser: boolean;
   followUserHeading: boolean;
-  hazard: ProximiioFeatureType | undefined;
-  location: ProximiioLocation | undefined;
+  hazard?: Feature;
+  userLocationSourceStyle?: Object;
+  location?: ProximiioLocation;
   mapLoaded: boolean;
   mapLevel: number;
-  route: ProximiioMapboxRoute | undefined;
-  routeUpdate: ProximiioRouteEvent | undefined;
-  segment: ProximiioFeatureType | undefined;
+  route?: ProximiioMapboxRoute;
+  routeUpdate?: ProximiioRouteEvent;
+  segment?: Feature;
   started: Boolean;
   userLevel: number;
 }
@@ -63,6 +64,19 @@ const routeEndedEventTypes = [
 
 const cameraAnimationDuration = 250;
 
+const userLocationSourceStyleOverride = {
+  heading: {iconSize: 1.8},
+  outerRing: {circleRadius: 24},
+  middleRing: {circleRadius: 23},
+  innerRing: {circleColor: '#ff0000', circleRadius: 15},
+};
+const userLocationSourceStyleNoOverride = {
+  heading: {},
+  outerRing: {},
+  middleRing: {},
+  innerRing: {},
+};
+
 export default class MapScreen extends React.Component<Props, State> {
   private map: MapboxGL.MapView | null = null;
   private camera: MapboxGL.Camera | null = null;
@@ -70,6 +84,7 @@ export default class MapScreen extends React.Component<Props, State> {
     followUser: true,
     followUserHeading: false,
     hazard: undefined,
+    userLocationSourceStyle: userLocationSourceStyleNoOverride,
     location: undefined,
     mapLoaded: false,
     mapLevel: 0,
@@ -150,7 +165,7 @@ export default class MapScreen extends React.Component<Props, State> {
                 onPress={this.onMapPress}>
                 <RoutingSource level={this.state.mapLevel} />
                 <UserLocationSource
-                  showHeadingIndicator={true}
+                  showHeadingIndicator={false}
                   onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
                   onHeadingChanged={this.onHeadingChanged}
                   visible={this.state.mapLevel === this.state.userLevel}
@@ -158,19 +173,36 @@ export default class MapScreen extends React.Component<Props, State> {
               </GeoJSONSource>
             </ProximiioContextProvider>
           )}
-      </MapboxGL.MapView>
+        </MapboxGL.MapView>
         <View style={styles.fabWrapper}>
-          <FAB color={Colors.primary} icon="plus" style={styles.fab} onPress={() => this.zoomIn()} />
-          <FAB color={Colors.primary} icon="minus" style={styles.fab} onPress={() => this.zoomOut()} />
-          <FAB color={this.state.followUserHeading ? Colors.primary : Colors.gray} icon="compass" style={styles.fab} onPress={() => this.toggleFollowUserHeading()} />
-          <FAB color={Colors.primary} icon="crosshairs-gps" style={styles.fab} onPress={() => this.showAndFollowCurrentUserLocation()} />
+          <FAB
+            color={Colors.primary}
+            icon="plus"
+            style={styles.fab}
+            onPress={() => this.zoomIn()}
+          />
+          <FAB
+            color={Colors.primary}
+            icon="minus"
+            style={styles.fab}
+            onPress={() => this.zoomOut()}
+          />
+          <FAB
+            color={this.state.followUserHeading ? Colors.primary : Colors.gray}
+            icon="compass"
+            style={styles.fab}
+            onPress={() => this.toggleFollowUserHeading()}
+          />
+          <FAB
+            color={Colors.primary}
+            icon="crosshairs-gps"
+            style={styles.fab}
+            onPress={() => this.showAndFollowCurrentUserLocation()}
+          />
         </View>
         {/* Route preview */}
         {!this.state.started && this.state.route && (
-          <RoutePreview
-            style={styles.routePreview}
-            route={this.state.route}
-          />
+          <RoutePreview style={styles.routePreview} route={this.state.route} />
         )}
         {this.renderRouteCalculation()}
         {this.renderRouteEnded()}
@@ -186,18 +218,23 @@ export default class MapScreen extends React.Component<Props, State> {
    */
   private renderRouteCalculation() {
     if (
-      this.state.started === false
-      || this.state.routeUpdate === null
-      || (
-        this.state.routeUpdate.eventType !== ProximiioRouteUpdateType.CALCULATING
-        && this.state.routeUpdate.eventType !== ProximiioRouteUpdateType.RECALCULATING
-      )
+      this.state.started === false ||
+      this.state.routeUpdate === null ||
+      (this.state.routeUpdate.eventType !==
+        ProximiioRouteUpdateType.CALCULATING &&
+        this.state.routeUpdate.eventType !==
+          ProximiioRouteUpdateType.RECALCULATING)
     ) {
       return null;
     }
     return (
       <View style={styles.calculationRow}>
-        <ActivityIndicator size="large" color={Colors.primary} style={styles.calculationIndicator} animating />
+        <ActivityIndicator
+          size="large"
+          color={Colors.primary}
+          style={styles.calculationIndicator}
+          animating
+        />
         <View style={styles.calculationRowText}>
           <Text>{this.state.routeUpdate.text}</Text>
         </View>
@@ -206,18 +243,32 @@ export default class MapScreen extends React.Component<Props, State> {
   }
 
   private renderRouteEnded() {
-    if (!this.state.routeUpdate || !routeEndedEventTypes.includes(this.state.routeUpdate.eventType)) {
+    if (
+      !this.state.routeUpdate ||
+      !routeEndedEventTypes.includes(this.state.routeUpdate.eventType)
+    ) {
       return null;
     }
-    let isFinish = this.state.routeUpdate.eventType === ProximiioRouteUpdateType.FINISHED;
+    let isFinish =
+      this.state.routeUpdate.eventType === ProximiioRouteUpdateType.FINISHED;
     return (
       <View style={styles.calculationRow}>
-        <Image style={styles.calculationImage} source={isFinish ? require('../../images/direction_icons/finish.png') : require('../../images/dummy.png') } />
+        <Image
+          style={styles.calculationImage}
+          source={
+            isFinish
+              ? require('../../images/direction_icons/finish.png')
+              : require('../../images/dummy.png')
+          }
+        />
         <View style={styles.calculationRowText}>
           <Text>{this.state.routeUpdate.text}</Text>
         </View>
         <TouchableNativeFeedback onPress={this.clearRoute}>
-          <Image style={styles.calculationRowCancel} source={require('../../images/ic_close.png')}/>
+          <Image
+            style={styles.calculationRowCancel}
+            source={require('../../images/ic_close.png')}
+          />
         </TouchableNativeFeedback>
       </View>
     );
@@ -237,7 +288,11 @@ export default class MapScreen extends React.Component<Props, State> {
   }
 
   private renderSearch() {
-    if (this.state.started === true || this.state.route || this.state.routeUpdate) {
+    if (
+      this.state.started === true ||
+      this.state.route ||
+      this.state.routeUpdate
+    ) {
       return null;
     }
     return (
@@ -286,13 +341,17 @@ export default class MapScreen extends React.Component<Props, State> {
    * Update map when user posiiton is updated.
    */
   private onPositionUpdate = async (location: ProximiioLocation) => {
-    console.log('location updated: ', location);
+    console.log('location updated: ', location, this.state.location);
     if (!location) {
       return;
     }
     let firstLocationUpdate = this.state.location == null;
     let followUser = this.state.followUser;
-    let stateUpdate = {location: location};
+    let overrideUserLocationMarkerStyle = location.sourceType === 'native';
+    let stateUpdate = {
+      location: location,
+      userLocationSourceStyle: overrideUserLocationMarkerStyle ? userLocationSourceStyleOverride : userLocationSourceStyleNoOverride,
+    };
     let currentZoom = await this.map.getZoom();
     this.setState(stateUpdate);
     if (followUser || firstLocationUpdate) {
@@ -300,7 +359,9 @@ export default class MapScreen extends React.Component<Props, State> {
         centerCoordinate: [location.lng, location.lat],
         animationDuration: cameraAnimationDuration,
         animationMode: 'flyTo',
-        zoomLevel: firstLocationUpdate ? Math.max(currentZoom, 18) : currentZoom,
+        zoomLevel: firstLocationUpdate
+          ? Math.max(currentZoom, 18)
+          : currentZoom,
       });
     }
   };
@@ -359,10 +420,10 @@ export default class MapScreen extends React.Component<Props, State> {
    */
   private onRouteUpdate = (event: ProximiioRouteEvent) => {
     if (
-      event.eventType === ProximiioRouteUpdateType.FINISHED
-      || event.eventType === ProximiioRouteUpdateType.CANCELED
-      || event.eventType === ProximiioRouteUpdateType.ROUTE_NOT_FOUND
-      || event.eventType === ProximiioRouteUpdateType.ROUTE_OSRM_NETWORK_ERROR
+      event.eventType === ProximiioRouteUpdateType.FINISHED ||
+      event.eventType === ProximiioRouteUpdateType.CANCELED ||
+      event.eventType === ProximiioRouteUpdateType.ROUTE_NOT_FOUND ||
+      event.eventType === ProximiioRouteUpdateType.ROUTE_OSRM_NETWORK_ERROR
     ) {
       this.setState({route: null, routeUpdate: event, started: false});
     } else {
@@ -422,7 +483,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * @private
    */
   private onHazard = (hazard: ProximiioFeatureType) => {
-    this.setState({hazard: hazard});
+    this.setState({hazard: new Feature(hazard)});
   };
 
   /**
@@ -430,8 +491,12 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param segment
    * @private
    */
-  private onSegment = (segment: ProximiioFeatureType) => {
-    this.setState({segment: segment});
+  private onSegment = (event) => {
+    if (event.type === 'enter') {
+      this.setState({segment: new Feature(event.segment)});
+    } else {
+      this.setState({segment: undefined});
+    }
   };
 
   /**

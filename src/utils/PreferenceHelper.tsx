@@ -3,7 +3,11 @@ import ProximiioMapbox, {
   ProximiioWayfindingOptions,
   ProximiioRouteConfiguration,
 } from 'react-native-proximiio-mapbox';
-import {MetersUnitConversion, StepUnitConversion} from './UnitConversions';
+import {
+  MetersUnitConversion,
+  StepUnitConversion,
+  UnitConversionHelper,
+} from './UnitConversions';
 
 /**
  * Preference values (keys).
@@ -43,8 +47,8 @@ export const AccessibilityGuidanceOption = {
  * Options for units used in navigation guidance.
  */
 export const DistanceUnitOption = {
-  METERS: {id: 'meters', name: 'preferencescreen.unit_steps'} as PreferenceOptionItem,
-  STEPS: {id: 'steps', name: 'preferencescreen.unit_meters'} as PreferenceOptionItem,
+  METERS: {id: 'meters', name: 'preferencescreen.unit_meters'} as PreferenceOptionItem,
+  STEPS: {id: 'steps', name: 'preferencescreen.unit_steps'} as PreferenceOptionItem,
 };
 
 /**
@@ -131,6 +135,7 @@ class PreferenceHelper {
     ProximiioMapbox.ttsReassuranceInstructionEnabled(preferences[Preference.REASSURANCE_ENABLED]);
     ProximiioMapbox.ttsReassuranceInstructionDistance(reassuranceDistanceOption);
     ProximiioMapbox.setUnitConversion(unitConversion);
+    UnitConversionHelper.refreshPreferenceDistanceUnit();
   }
 
   /**

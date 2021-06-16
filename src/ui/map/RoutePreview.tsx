@@ -1,17 +1,29 @@
 import * as React from 'react';
-import {FlatList, Image, StyleSheet, Text, Button, View} from 'react-native';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  Button,
+  View,
+  ListRenderItemInfo,
+} from 'react-native';
 import ProximiioMapbox, {
   ProximiioMapboxRoute,
+  RouteStepDescriptor,
 } from 'react-native-proximiio-mapbox';
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
 import {Colors} from '../../Style';
 import i18n from 'i18next';
+import {UnitConversionHelper} from '../../utils/UnitConversions';
 
 interface Props {
   route: ProximiioMapboxRoute;
 }
 interface State {
   showTripDetails: boolean;
+  tripDistance: String;
+  tripDuration: String;
 }
 
 /**
@@ -20,7 +32,13 @@ interface State {
 export default class RoutePreview extends React.Component<Props, State> {
   state = {
     showTripDetails: false,
+    tripDistance: undefined,
+    tripDuration: undefined,
   };
+
+  componentDidMount() {
+    this.updateEstimates();
+  }
 
   render() {
     return (
@@ -91,24 +109,22 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  private renderTripSummary(distanceInMeters) {
-    if (distanceInMeters == undefined) {
-      return <View />;
-    }
-    const distance = Math.round(distanceInMeters);
-    const duration = Math.max(1, Math.round(distance / 1.4 / 60));
+  private renderTripSummary() {
+    // if (distanceInMeters == undefined) {
+    //   return <View />;
+    // }
     return (
       <>
         {this.state.showTripDetails === false && <View style={styles.tripSummarySeparatorVertical} />}
         <View style={styles.tripSummary}>
           <View style={styles.tripSummaryItem}>
             <Image style={styles.tripSummaryItemImage} source={require('../../images/ic_steps.png')} />
-            <Text>{i18n.t('preview.summary_meters', {count: distance})}</Text>
+            <Text>{this.state.tripDistance}</Text>
           </View>
           <View style={styles.tripSummarySeparator}/>
           <View style={styles.tripSummaryItem}>
             <Image style={styles.tripSummaryItemImage} source={require('../../images/ic_time.png')} />
-            <Text>{i18n.t('preview.summary_minutes', {count: duration})}</Text>
+            <Text>{this.state.tripDuration}</Text>
           </View>
         </View>
       </>
@@ -139,11 +155,11 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  private renderTripStep(item) {
+  private renderTripStep(item: ListRenderItemInfo<RouteStepDescriptor>) {
     const instruction = item.index === 0 ? i18n.t('preview.start_navigation') : item.item.instruction;
     let distance = undefined;
     if (item.index > 0 && item.item.distanceFromLastStep !== undefined) {
-      distance = i18n.t('preview.meter', {count: Math.round(item.item.distanceFromLastStep)});
+      distance = UnitConversionHelper.getDistanceInPreferredUnits(item.item.distanceFromLastStep);
     }
 
     if (instruction === undefined) return <View />;
@@ -159,6 +175,23 @@ export default class RoutePreview extends React.Component<Props, State> {
         </View>
       </View>
     );
+  }
+
+  private async updateEstimates() {
+    if (!this.props.route) {
+      this.setState({
+        tripDistance: undefined,
+        tripDuration: undefined,
+      });
+    } else {
+      let timeInMinutes = Math.max(1, Math.round(this.props.route.distanceMeters / 1.4 / 60));
+      let distance = UnitConversionHelper.getDistanceInPreferredUnits(this.props.route.distanceMeters);
+      let duration = i18n.t('preview.summary_minutes', {count: timeInMinutes});
+      this.setState({
+        tripDistance: distance,
+        tripDuration: duration,
+      });
+    }
   }
 }
 

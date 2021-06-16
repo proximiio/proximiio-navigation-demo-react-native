@@ -4,7 +4,7 @@ import {DefaultTheme} from '@react-navigation/native';
  * Define base colors here
  */
 const Colors = {
-  black: '#ffffff',
+  black: '#000000',
   blue: '#08aee6',
   blueDark: '#0783AC',
   red: '#ed174b',

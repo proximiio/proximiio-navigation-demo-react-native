@@ -9,19 +9,14 @@ import ProximiioMapbox, {
   ProximiioMapboxRoute,
 } from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
-
-/**
- * Length of a single step in meters.
- * @type {number}
- */
-const STEP_LENGTH = 0.65;
+import {UnitConversionHelper} from '../../utils/UnitConversions';
 
 interface Props {
   route: ProximiioMapboxRoute;
   navigation: any;
 }
 interface State {
-  steps: Number;
+  tripDistance: String | undefined;
 }
 
 /**
@@ -30,7 +25,7 @@ interface State {
 export default class PoiScreen extends React.Component<Props, State> {
   private mounted = false;
   state = {
-    steps: null,
+    tripDistance: i18n.t('poiscreen.calculating_steps'),
   };
 
   componentDidMount() {
@@ -39,8 +34,8 @@ export default class PoiScreen extends React.Component<Props, State> {
     this.props.navigation.setOptions({title: item.getTitle()});
     ProximiioMapbox.route
       .calculate({destinationFeatureId: item.id})
-      .then(this.onRouteCalculated.bind(this))
-      .catch((_) => this.onRouteCalculated(undefined));
+      .then(this.onRouteCalculated)
+      .catch(this.onRouteCalculated);
   }
 
   componentWillUnmount() {
@@ -64,14 +59,14 @@ export default class PoiScreen extends React.Component<Props, State> {
           )}
           {this.renderImageTextRow(
             require('../../images/ic_steps.png'),
-            this.getStepsText(this.state.steps),
+            this.state.tripDistance,
           )}
           {this.renderImageTextRow(
             require('../../images/ic_trip.png'),
             i18n.t('poiscreen.trip'),
           )}
           <Button
-            title={this.getTripButtonText(this.state.steps)}
+            title={this.getTripButtonText(this.state.tripDistance)}
             onPress={() => {
               PreferenceHelper.routeFindWithPreferences(item.id);
               console.log('start trip button pressed');
@@ -94,20 +89,18 @@ export default class PoiScreen extends React.Component<Props, State> {
    * @param route
    * @private
    */
-  private onRouteCalculated(route: ProximiioMapboxRoute) {
+  private onRouteCalculated = async (route: ProximiioMapboxRoute) => {
     if (!this.mounted) {
       return;
     }
+    let text;
     if (route) {
-      this.setState({
-        steps: Math.round(route.distanceMeters / STEP_LENGTH),
-      });
+      text = UnitConversionHelper.getDistanceInPreferredUnits(route.distanceMeters);
     } else {
-      this.setState({
-        steps: -1,
-      });
+      text = i18n.t('poiscreen.calculating_steps_failed');
     }
-  }
+    this.setState({tripDistance: text});
+  };
 
   /**
    * Get description or placeholder text.
@@ -124,27 +117,9 @@ export default class PoiScreen extends React.Component<Props, State> {
     }
   }
 
-  private getTripButtonText(steps) {
-    let stepsText = this.getStepsText(steps);
-    return i18n.t('poiscreen.start_my_trip') + '\n(' + stepsText + ')';
-  }
-
-  /**
-   * Generates text with number of steps to destination or placeholder if calculation failed or is in progress.
-   * @param steps
-   * @returns {string}
-   * @private
-   */
-  private getStepsText(steps) {
-    switch (steps) {
-      case undefined:
-      case null:
-        return i18n.t('poiscreen.calculating_steps');
-      case -1:
-        return i18n.t('poiscreen.calculating_steps_failed');
-      default:
-        return i18n.t('poiscreen.calculating_steps_result', {count: steps});
-    }
+  private getTripButtonText(tripDistance) {
+    let buttonText = i18n.t('poiscreen.start_my_trip');
+    return buttonText + '\n(' + tripDistance + ')';
   }
 
   /**
@@ -189,7 +164,7 @@ export default class PoiScreen extends React.Component<Props, State> {
         level = i18n.t('common.floor_4');
         break;
       default:
-        level = i18n.t('common.floor_n', {count: (feature.properties.level + 1)});
+        level = i18n.t('common.floor_n', {count: feature.properties.level + 1});
     }
     return level;
   }

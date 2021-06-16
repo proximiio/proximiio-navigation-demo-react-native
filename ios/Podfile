@@ -1,7 +1,20 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+use_frameworks!
 
-platform :ios, '10.0'
+# uncomment STATIC_LIBRARIES to compensate for missing archs when building on M1
+STATIC_LIBRARIES = [
+  'RNScreens',
+  'react-native-compass-heading',
+  'react-native-safe-area-context',
+  'react-native-mapbox-gl',
+  'RNVectorIcons',
+  'RNCMaskedView',
+  'RNDefaultPreference',
+  'react-native-proximiio'
+]
+
+platform :ios, '12.1'
 
 target 'RnDemoApp' do
   config = use_native_modules!
@@ -9,22 +22,33 @@ target 'RnDemoApp' do
   use_react_native!(:path => config["reactNativePath"])
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
-
   pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
-
+  
   target 'RnDemoAppTests' do
     inherit! :complete
     # Pods for testing
   end
-
-  # Enables Flipper.
-  #
-  # Note that if you have use_frameworks! enabled, Flipper will not work and
-  # you should disable these next few lines.
-  use_flipper!
-  post_install do |installer|
-    flipper_post_install(installer)
+  
+  pre_install do |installer|
+    installer.pod_targets.each do |pod|
+      if STATIC_LIBRARIES.include?(pod.name)
+        def pod.build_type
+          Pod::BuildType.static_library
+        end
+      end
+    end
+    $RNMBGL.pre_install(installer)
   end
+
+  post_install do |installer|
+      $RNMBGL.post_install(installer)
+      installer.pods_project.targets.each do |target|
+          target.build_configurations.each do |config|
+              config.build_settings['ENABLE_BITCODE'] = 'NO'
+          end
+      end
+  end
+
 end
 
 target 'RnDemoApp-tvOS' do

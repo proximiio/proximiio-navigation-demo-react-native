@@ -1,7 +1,9 @@
 PODS:
+  - Alamofire (5.4.3)
   - boost-for-react-native (1.63.0)
-  - CocoaAsyncSocket (7.6.4)
-  - CocoaLibEvent (1.0.0)
+  - CrystDBCipher (0.1.10):
+    - SQLCipher
+  - DarklyEventSource (4.1.1)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.63.2)
   - FBReactNativeSpec (0.63.2):
@@ -11,52 +13,6 @@ PODS:
     - React-Core (= 0.63.2)
     - React-jsi (= 0.63.2)
     - ReactCommon/turbomodule/core (= 0.63.2)
-  - Flipper (0.41.5):
-    - Flipper-Folly (~> 2.2)
-    - Flipper-RSocket (~> 1.1)
-  - Flipper-DoubleConversion (1.1.7)
-  - Flipper-Folly (2.2.0):
-    - boost-for-react-native
-    - CocoaLibEvent (~> 1.0)
-    - Flipper-DoubleConversion
-    - Flipper-Glog
-    - OpenSSL-Universal (= 1.0.2.19)
-  - Flipper-Glog (0.3.6)
-  - Flipper-PeerTalk (0.0.4)
-  - Flipper-RSocket (1.1.0):
-    - Flipper-Folly (~> 2.2)
-  - FlipperKit (0.41.5):
-    - FlipperKit/Core (= 0.41.5)
-  - FlipperKit/Core (0.41.5):
-    - Flipper (~> 0.41.5)
-    - FlipperKit/CppBridge
-    - FlipperKit/FBCxxFollyDynamicConvert
-    - FlipperKit/FBDefines
-    - FlipperKit/FKPortForwarding
-  - FlipperKit/CppBridge (0.41.5):
-    - Flipper (~> 0.41.5)
-  - FlipperKit/FBCxxFollyDynamicConvert (0.41.5):
-    - Flipper-Folly (~> 2.2)
-  - FlipperKit/FBDefines (0.41.5)
-  - FlipperKit/FKPortForwarding (0.41.5):
-    - CocoaAsyncSocket (~> 7.6)
-    - Flipper-PeerTalk (~> 0.0.4)
-  - FlipperKit/FlipperKitHighlightOverlay (0.41.5)
-  - FlipperKit/FlipperKitLayoutPlugin (0.41.5):
-    - FlipperKit/Core
-    - FlipperKit/FlipperKitHighlightOverlay
-    - FlipperKit/FlipperKitLayoutTextSearchable
-    - YogaKit (~> 1.18)
-  - FlipperKit/FlipperKitLayoutTextSearchable (0.41.5)
-  - FlipperKit/FlipperKitNetworkPlugin (0.41.5):
-    - FlipperKit/Core
-  - FlipperKit/FlipperKitReactPlugin (0.41.5):
-    - FlipperKit/Core
-  - FlipperKit/FlipperKitUserDefaultsPlugin (0.41.5):
-    - FlipperKit/Core
-  - FlipperKit/SKIOSNetworkPlugin (0.41.5):
-    - FlipperKit/Core
-    - FlipperKit/FlipperKitNetworkPlugin
   - Folly (2020.01.13.00):
     - boost-for-react-native
     - DoubleConversion
@@ -67,9 +23,27 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - OpenSSL-Universal (1.0.2.19):
-    - OpenSSL-Universal/Static (= 1.0.2.19)
-  - OpenSSL-Universal/Static (1.0.2.19)
+  - GRMustache.swift (4.0.1)
+  - IndoorAtlas (3.4.4)
+  - Mapbox-iOS-SDK (5.9.0):
+    - MapboxMobileEvents (= 0.10.2)
+  - MapboxMobileEvents (0.10.2)
+  - OpenCombine (0.12.0)
+  - OpenCombineDispatch (0.12.0):
+    - OpenCombine (>= 0.10.2)
+  - Proximiio (5.1.0):
+    - CrystDBCipher
+    - DarklyEventSource
+    - IndoorAtlas
+  - ProximiioMapbox (5.1.6):
+    - Alamofire
+    - GRMustache.swift
+    - Mapbox-iOS-SDK (= 5.9.0)
+    - Proximiio (= 5.1.0)
+    - SwiftyJSON
+  - ProximiioProcessor (0.1.11):
+    - Proximiio
+    - SwiftyJSON
   - RCTRequired (0.63.2)
   - RCTTypeSafety (0.63.2):
     - FBLazyVector (= 0.63.2)
@@ -236,6 +210,33 @@ PODS:
     - React-cxxreact (= 0.63.2)
     - React-jsi (= 0.63.2)
   - React-jsinspector (0.63.2)
+  - react-native-compass-heading (1.2.1):
+    - React
+  - react-native-mapbox-gl (8.2.0-beta2):
+    - Mapbox-iOS-SDK (~> 5.9.0)
+    - React
+    - React-Core
+    - react-native-mapbox-gl/DynamicLibrary (= 8.2.0-beta2)
+    - react-native-mapbox-gl/StaticLibraryFixer (= 8.2.0-beta2)
+  - react-native-mapbox-gl/DynamicLibrary (8.2.0-beta2):
+    - Mapbox-iOS-SDK (~> 5.9.0)
+    - React
+    - React-Core
+  - react-native-mapbox-gl/StaticLibraryFixer (8.2.0-beta2):
+    - Mapbox-iOS-SDK (~> 5.9.0)
+    - React
+    - React-Core
+  - react-native-proximiio (5.0.13):
+    - Proximiio
+    - React
+  - react-native-proximiio-mapbox (5.0.25):
+    - OpenCombine
+    - OpenCombineDispatch
+    - ProximiioMapbox (~> 5.1.6)
+    - ProximiioProcessor
+    - React
+  - react-native-safe-area-context (3.2.0):
+    - React-Core
   - React-RCTActionSheet (0.63.2):
     - React-Core/RCTActionSheetHeaders (= 0.63.2)
   - React-RCTAnimation (0.63.2):
@@ -296,33 +297,32 @@ PODS:
     - React-Core (= 0.63.2)
     - React-cxxreact (= 0.63.2)
     - React-jsi (= 0.63.2)
+  - RNCAsyncStorage (1.12.1):
+    - React-Core
+  - RNCMaskedView (0.1.11):
+    - React
+  - RNDefaultPreference (1.4.3):
+    - React
+  - RNGestureHandler (1.10.3):
+    - React-Core
+  - RNScreens (2.18.1):
+    - React-Core
+  - RNSettingsPage (1.0.0):
+    - React
+  - RNVectorIcons (7.1.0):
+    - React
+  - SQLCipher (4.4.3):
+    - SQLCipher/standard (= 4.4.3)
+  - SQLCipher/common (4.4.3)
+  - SQLCipher/standard (4.4.3):
+    - SQLCipher/common
+  - SwiftyJSON (5.0.1)
   - Yoga (1.14.0)
-  - YogaKit (1.18.1):
-    - Yoga (~> 1.14)
 
 DEPENDENCIES:
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/Libraries/FBReactNativeSpec`)
-  - Flipper (~> 0.41.1)
-  - Flipper-DoubleConversion (= 1.1.7)
-  - Flipper-Folly (~> 2.2)
-  - Flipper-Glog (= 0.3.6)
-  - Flipper-PeerTalk (~> 0.0.4)
-  - Flipper-RSocket (~> 1.1)
-  - FlipperKit (~> 0.41.1)
-  - FlipperKit/Core (~> 0.41.1)
-  - FlipperKit/CppBridge (~> 0.41.1)
-  - FlipperKit/FBCxxFollyDynamicConvert (~> 0.41.1)
-  - FlipperKit/FBDefines (~> 0.41.1)
-  - FlipperKit/FKPortForwarding (~> 0.41.1)
-  - FlipperKit/FlipperKitHighlightOverlay (~> 0.41.1)
-  - FlipperKit/FlipperKitLayoutPlugin (~> 0.41.1)
-  - FlipperKit/FlipperKitLayoutTextSearchable (~> 0.41.1)
-  - FlipperKit/FlipperKitNetworkPlugin (~> 0.41.1)
-  - FlipperKit/FlipperKitReactPlugin (~> 0.41.1)
-  - FlipperKit/FlipperKitUserDefaultsPlugin (~> 0.41.1)
-  - FlipperKit/SKIOSNetworkPlugin (~> 0.41.1)
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
@@ -337,6 +337,11 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
+  - react-native-compass-heading (from `../node_modules/react-native-compass-heading`)
+  - "react-native-mapbox-gl (from `../node_modules/@react-native-mapbox-gl/maps`)"
+  - react-native-proximiio (from `../node_modules/react-native-proximiio`)
+  - react-native-proximiio-mapbox (from `../node_modules/react-native-proximiio-mapbox`)
+  - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
   - React-RCTBlob (from `../node_modules/react-native/Libraries/Blob`)
@@ -347,22 +352,32 @@ DEPENDENCIES:
   - React-RCTText (from `../node_modules/react-native/Libraries/Text`)
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
+  - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
+  - RNDefaultPreference (from `../node_modules/react-native-default-preference`)
+  - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNScreens (from `../node_modules/react-native-screens`)
+  - RNSettingsPage (from `../node_modules/react-native-preference-screens/ios`)
+  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
+    - Alamofire
     - boost-for-react-native
-    - CocoaAsyncSocket
-    - CocoaLibEvent
-    - Flipper
-    - Flipper-DoubleConversion
-    - Flipper-Folly
-    - Flipper-Glog
-    - Flipper-PeerTalk
-    - Flipper-RSocket
-    - FlipperKit
-    - OpenSSL-Universal
-    - YogaKit
+    - CrystDBCipher
+    - DarklyEventSource
+    - GRMustache.swift
+    - IndoorAtlas
+    - Mapbox-iOS-SDK
+    - MapboxMobileEvents
+    - OpenCombine
+    - OpenCombineDispatch
+    - Proximiio
+    - ProximiioMapbox
+    - ProximiioProcessor
+    - SQLCipher
+    - SwiftyJSON
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -395,6 +410,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-compass-heading:
+    :path: "../node_modules/react-native-compass-heading"
+  react-native-mapbox-gl:
+    :path: "../node_modules/@react-native-mapbox-gl/maps"
+  react-native-proximiio:
+    :path: "../node_modules/react-native-proximiio"
+  react-native-proximiio-mapbox:
+    :path: "../node_modules/react-native-proximiio-mapbox"
+  react-native-safe-area-context:
+    :path: "../node_modules/react-native-safe-area-context"
   React-RCTActionSheet:
     :path: "../node_modules/react-native/Libraries/ActionSheetIOS"
   React-RCTAnimation:
@@ -415,26 +440,42 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-community/async-storage"
+  RNCMaskedView:
+    :path: "../node_modules/@react-native-community/masked-view"
+  RNDefaultPreference:
+    :path: "../node_modules/react-native-default-preference"
+  RNGestureHandler:
+    :path: "../node_modules/react-native-gesture-handler"
+  RNScreens:
+    :path: "../node_modules/react-native-screens"
+  RNSettingsPage:
+    :path: "../node_modules/react-native-preference-screens/ios"
+  RNVectorIcons:
+    :path: "../node_modules/react-native-vector-icons"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  Alamofire: e447a2774a40c996748296fa2c55112fdbbc42f9
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
-  CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
+  CrystDBCipher: 1aa65c16eac9086ec4924d3e231be73b7c8594cf
+  DarklyEventSource: 6df384dcdb211d2b6bfbbe93a3148bd25567dd61
   DoubleConversion: cde416483dac037923206447da6e1454df403714
   FBLazyVector: 3ef4a7f62e7db01092f9d517d2ebc0d0677c4a37
   FBReactNativeSpec: dc7fa9088f0f2a998503a352b0554d69a4391c5a
-  Flipper: 33585e2d9810fe5528346be33bcf71b37bb7ae13
-  Flipper-DoubleConversion: 38631e41ef4f9b12861c67d17cb5518d06badc41
-  Flipper-Folly: c12092ea368353b58e992843a990a3225d4533c3
-  Flipper-Glog: 1dfd6abf1e922806c52ceb8701a3599a79a200a6
-  Flipper-PeerTalk: 116d8f857dc6ef55c7a5a75ea3ceaafe878aadc9
-  Flipper-RSocket: 64e7431a55835eb953b0bf984ef3b90ae9fdddd7
-  FlipperKit: bc68102cd4952a258a23c9c1b316c7bec1fecf83
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
-  OpenSSL-Universal: 8b48cc0d10c1b2923617dfe5c178aa9ed2689355
+  GRMustache.swift: a6436504284b22b4b05daf5f46f77bd3fe00a9a2
+  IndoorAtlas: 47a4f7d0b0329ed715ac7246a2baa4c32bc3789d
+  Mapbox-iOS-SDK: a5915700ec84bc1a7f8b3e746d474789e35b7956
+  MapboxMobileEvents: 2bc0ca2eedb627b73cf403258dce2b2fa98074a6
+  OpenCombine: a8c52f249bc3c7e2bd5ffb75e8653e57a8e33d27
+  OpenCombineDispatch: 68ed85ae5255d558a14434a802f65fb833b50d39
+  Proximiio: baafad931a47d3c25bd099150b91b2d033ae7485
+  ProximiioMapbox: 2e750235b3c35174ff3be557ae846e205d0aa64c
+  ProximiioProcessor: 47b712f27be65f70298e56881e4ecace72c54042
   RCTRequired: f13f25e7b12f925f1f6a6a8c69d929a03c0129fe
   RCTTypeSafety: 44982c5c8e43ff4141eb519a8ddc88059acd1f3a
   React: e1c65dd41cb9db13b99f24608e47dd595f28ca9a
@@ -445,6 +486,11 @@ SPEC CHECKSUMS:
   React-jsi: 54245e1d5f4b690dec614a73a3795964eeef13a8
   React-jsiexecutor: 8ca588cc921e70590820ce72b8789b02c67cce38
   React-jsinspector: b14e62ebe7a66e9231e9581279909f2fc3db6606
+  react-native-compass-heading: bb83f8472786ad730947624f2a75a6563aa80b27
+  react-native-mapbox-gl: e0dea71cecc84e7a8744bf07bc8a3cc8dbef8894
+  react-native-proximiio: c47001c7ac1da26833a2f83b9f3bf2613cc7143e
+  react-native-proximiio-mapbox: 9488de34e0df106d46a846967098d67b6187ab9f
+  react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   React-RCTActionSheet: 910163b6b09685a35c4ebbc52b66d1bfbbe39fc5
   React-RCTAnimation: 9a883bbe1e9d2e158d4fb53765ed64c8dc2200c6
   React-RCTBlob: 39cf0ece1927996c4466510e25d2105f67010e13
@@ -455,9 +501,17 @@ SPEC CHECKSUMS:
   React-RCTText: 1b6773e776e4b33f90468c20fe3b16ca3e224bb8
   React-RCTVibration: 4d2e726957f4087449739b595f107c0d4b6c2d2d
   ReactCommon: a0a1edbebcac5e91338371b72ffc66aa822792ce
+  RNCAsyncStorage: b03032fdbdb725bea0bd9e5ec5a7272865ae7398
+  RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
+  RNDefaultPreference: 2f8d6d54230edbd78708ada8d63bb275e5a8415b
+  RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
+  RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
+  RNSettingsPage: 8c103cbcc01488cd0cd65d9128b5be5f517f0174
+  RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
+  SQLCipher: 155ffeafc9ac102e5c9b68e3e9a1297a98a27096
+  SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
   Yoga: 7740b94929bbacbddda59bf115b5317e9a161598
-  YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 6dd792d8a206d2c302b22931b1c2a198589beb18
+PODFILE CHECKSUM: eb514a88012ec51dbb74f7ae46bfac823398bd67
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.1

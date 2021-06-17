@@ -24,22 +24,22 @@ PODS:
     - glog
   - glog (0.3.5)
   - GRMustache.swift (4.0.1)
-  - IndoorAtlas (3.4.4)
+  - IndoorAtlas (3.4.7)
   - Mapbox-iOS-SDK (5.9.0):
     - MapboxMobileEvents (= 0.10.2)
   - MapboxMobileEvents (0.10.2)
   - OpenCombine (0.12.0)
   - OpenCombineDispatch (0.12.0):
     - OpenCombine (>= 0.10.2)
-  - Proximiio (5.1.0):
+  - Proximiio (5.1.2):
     - CrystDBCipher
     - DarklyEventSource
     - IndoorAtlas
-  - ProximiioMapbox (5.1.6):
+  - ProximiioMapbox (5.1.8):
     - Alamofire
     - GRMustache.swift
     - Mapbox-iOS-SDK (= 5.9.0)
-    - Proximiio (= 5.1.0)
+    - Proximiio (= 5.1.2)
     - SwiftyJSON
   - ProximiioProcessor (0.1.11):
     - Proximiio
@@ -229,10 +229,10 @@ PODS:
   - react-native-proximiio (5.0.13):
     - Proximiio
     - React
-  - react-native-proximiio-mapbox (5.0.25):
+  - react-native-proximiio-mapbox (5.0.34):
     - OpenCombine
     - OpenCombineDispatch
-    - ProximiioMapbox (~> 5.1.6)
+    - ProximiioMapbox (= 5.1.8)
     - ProximiioProcessor
     - React
   - react-native-safe-area-context (3.2.0):
@@ -468,13 +468,13 @@ SPEC CHECKSUMS:
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
   GRMustache.swift: a6436504284b22b4b05daf5f46f77bd3fe00a9a2
-  IndoorAtlas: 47a4f7d0b0329ed715ac7246a2baa4c32bc3789d
+  IndoorAtlas: f556e567a9466009e2097b64d92d2d507930bc6c
   Mapbox-iOS-SDK: a5915700ec84bc1a7f8b3e746d474789e35b7956
   MapboxMobileEvents: 2bc0ca2eedb627b73cf403258dce2b2fa98074a6
   OpenCombine: a8c52f249bc3c7e2bd5ffb75e8653e57a8e33d27
   OpenCombineDispatch: 68ed85ae5255d558a14434a802f65fb833b50d39
-  Proximiio: baafad931a47d3c25bd099150b91b2d033ae7485
-  ProximiioMapbox: 2e750235b3c35174ff3be557ae846e205d0aa64c
+  Proximiio: 81c68018627087caddc61ed8da1453b7096c2778
+  ProximiioMapbox: c69bbff9c6874235af7b866e12e7841774b1b237
   ProximiioProcessor: 47b712f27be65f70298e56881e4ecace72c54042
   RCTRequired: f13f25e7b12f925f1f6a6a8c69d929a03c0129fe
   RCTTypeSafety: 44982c5c8e43ff4141eb519a8ddc88059acd1f3a
@@ -489,7 +489,7 @@ SPEC CHECKSUMS:
   react-native-compass-heading: bb83f8472786ad730947624f2a75a6563aa80b27
   react-native-mapbox-gl: e0dea71cecc84e7a8744bf07bc8a3cc8dbef8894
   react-native-proximiio: c47001c7ac1da26833a2f83b9f3bf2613cc7143e
-  react-native-proximiio-mapbox: 9488de34e0df106d46a846967098d67b6187ab9f
+  react-native-proximiio-mapbox: e56aaedf4bc6e46e66688bdc1cf68fcacdceb258
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   React-RCTActionSheet: 910163b6b09685a35c4ebbc52b66d1bfbbe39fc5
   React-RCTAnimation: 9a883bbe1e9d2e158d4fb53765ed64c8dc2200c6
@@ -512,6 +512,6 @@ SPEC CHECKSUMS:
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
   Yoga: 7740b94929bbacbddda59bf115b5317e9a161598
 
-PODFILE CHECKSUM: eb514a88012ec51dbb74f7ae46bfac823398bd67
+PODFILE CHECKSUM: 6397bd8016c29d9ff363fb4d488aefb467f8b09d
 
 COCOAPODS: 1.10.1

@@ -1,23 +1,31 @@
 import * as React from 'react';
-import {ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {ActivityIndicator, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+// import {NavigationContainer} from '@react-navigation/native';
+// import {createStackNavigator} from '@react-navigation/stack';
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import Proximiio, {NotificationMode} from 'react-native-proximiio';
-import MapScreen from './ui/map/MapScreen';
-import PoiScreen from './ui/poi/PoiScreen';
-import SearchScreen from './ui/search/SearchScreen';
+import Proximiio, {NotificationMode, ProximiioContextProvider} from 'react-native-proximiio';
+// import MapScreen from './ui/map/MapScreen';
+// import PoiScreen from './ui/poi/PoiScreen';
+// import SearchScreen from './ui/search/SearchScreen';
 import {Colors} from './Style';
-import PreferenceScreen from './ui/preferences/PreferenceScreen';
+// import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import PreferenceHelper from './utils/PreferenceHelper';
 import {LEVEL_OVERRIDE_MAP, PROXIMIIO_TOKEN} from './utils/Constants';
-import ProximiioMapbox, {ProximiioMapboxEvents, ProximiioMapboxSyncStatus,} from 'react-native-proximiio-mapbox';
+import ProximiioMapbox, {
+  AmenitySource, GeoJSONSource,
+  ProximiioMapboxEvents,
+  ProximiioMapboxSyncStatus, RoutingSource, UserLocationSource,
+} from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
+import {MAP_STARTING_BOUNDS} from './utils/Constants';
+import {Appbar} from 'react-native-paper';
+import MapScreen from "./ui/map/MapScreen";
+import PreferenceScreen from "./ui/preferences/PreferenceScreen";
 
 /**
  * Create UI stack to manage screens.
  */
-const Stack = createStackNavigator();
+// const Stack = createStackNavigator();
 
 /**
  * Call necessary to init mapbox.
@@ -72,37 +80,80 @@ export default class App extends React.Component<Props, State> {
       );
     }
     return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Main"
-            component={MapScreen}
-            options={({navigation}) => {
-              console.log('navigation', navigation);
-              return {
-                title: i18n.t('app.title_map'),
-                headerRight: (tintColor) =>
-                  this.getSettingsButton(tintColor, navigation),
-              };
-            }}
-          />
-          <Stack.Screen
-            name="ItemDetail"
-            component={PoiScreen}
-            options={{title: ''}}
-          />
-          <Stack.Screen
-            name="SearchScreen"
-            component={SearchScreen}
-            options={{title: i18n.t('app.title_search')}}
-          />
-          <Stack.Screen
-            name="PreferenceScreen"
-            component={PreferenceScreen}
-            options={{title: i18n.t('app.title_settings')}}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <View style={{...StyleSheet.absoluteFillObject, backgroundColor: 'green'}}>
+        <Appbar.Header style={{backgroundColor: 'white'}}>
+          <Appbar.Content title="Proximiio Demo" />
+          <Appbar.Action icon="magnify" onPress={this.openSettings} />
+        </Appbar.Header>
+        <SafeAreaView style={{flex: 1}}>
+          {this.__renderMap()}
+          {/*{this.__renderPreferences()}*/}
+          {this.__renderPoiDetail()}
+          {this.__renderPreview()}
+          {this.__renderNavigation()}
+        </SafeAreaView>
+      </View>
+      // <NavigationContainer>
+      //   {this.__renderMap()}
+      //   <Stack.Navigator screenOptions={props => {}}>
+      //     <Stack.Screen
+      //       name="Main"
+      //       component={MapScreen}
+      //       options={({navigation}) => {
+      //         console.log('navigation', navigation);
+      //         return {
+      //           title: i18n.t('app.title_map'),
+      //           headerRight: (tintColor) => this.getSettingsButton(tintColor, navigation),
+      //           cardStyle: {backgroundColor: 'transparent', shadowColor:'transparent', },
+      //           transparentCard: true,
+      //           gestureEnabled: false,
+      //           cardOverlayEnabled: true,
+      //
+      //           transitionConfig: () => ({containerStyle: {backgroundColor: 'transparent'}}),
+      //         };
+      //       }}
+      //     />
+      //     <Stack.Screen
+      //       name="ItemDetail"
+      //       component={PoiScreen}
+      //       options={{title: ''}}
+      //     />
+      //     <Stack.Screen
+      //       name="SearchScreen"
+      //       component={SearchScreen}
+      //       options={{title: i18n.t('app.title_search')}}
+      //     />
+      //     <Stack.Screen
+      //       name="PreferenceScreen"
+      //       component={PreferenceScreen}
+      //       options={{title: i18n.t('app.title_settings')}}
+      //     />
+      //   </Stack.Navigator>
+      // </NavigationContainer>
+    );
+  }
+
+  __renderPreferences() {
+    return <PreferenceScreen />;
+  }
+
+  __renderPoiDetail() {
+    return <View />;
+  }
+
+  __renderPreview() {
+    return <View />;
+  }
+
+  __renderNavigation() {
+    return <View />;
+  }
+
+  __renderMap() {
+    return (
+      <MapScreen
+        onOpenSearch={() => {console.log('open search');}}
+        onOpenPoi={() => {console.log('open search');}} />
     );
   }
 
@@ -150,6 +201,10 @@ export default class App extends React.Component<Props, State> {
     });
   }
 
+  private openSettings = () => {
+    console.log('settings');
+  };
+
   /**
    * Create appbar settings button.
    * @param tintColor
@@ -184,5 +239,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
+  },
+  map: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#66660066',
   },
 });

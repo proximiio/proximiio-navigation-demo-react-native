@@ -35,9 +35,11 @@ import {Colors} from '../../Style';
 import {ProximiioFloor} from 'react-native-proximiio';
 import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
 import i18n from 'i18next';
+import {SearchCategory} from '../search/SearchCategories';
 
 interface Props {
-  navigation: any;
+  onOpenSearch: (searchCategory?: SearchCategory) => void;
+  onOpenPoi: (poi: Feature) => void;
 }
 
 interface State {
@@ -139,6 +141,33 @@ export default class MapScreen extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
+        {this.renderSearch()}
+        <View style={styles.fabWrapper}>
+          <FAB
+              color={Colors.primary}
+              icon="plus"
+              style={styles.fab}
+              onPress={() => this.zoomIn()}
+          />
+          <FAB
+              color={Colors.primary}
+              icon="minus"
+              style={styles.fab}
+              onPress={() => this.zoomOut()}
+          />
+          <FAB
+              color={this.state.followUserHeading ? Colors.primary : Colors.gray}
+              icon="compass"
+              style={styles.fab}
+              onPress={() => this.toggleFollowUserHeading()}
+          />
+          <FAB
+              color={Colors.primary}
+              icon="crosshairs-gps"
+              style={styles.fab}
+              onPress={() => this.showAndFollowCurrentUserLocation()}
+          />
+        </View>
         <MapboxGL.MapView
           ref={(map) => (this.map = map)}
           style={StyleSheet.absoluteFillObject}
@@ -174,32 +203,6 @@ export default class MapScreen extends React.Component<Props, State> {
             </ProximiioContextProvider>
           )}
         </MapboxGL.MapView>
-        <View style={styles.fabWrapper}>
-          <FAB
-            color={Colors.primary}
-            icon="plus"
-            style={styles.fab}
-            onPress={() => this.zoomIn()}
-          />
-          <FAB
-            color={Colors.primary}
-            icon="minus"
-            style={styles.fab}
-            onPress={() => this.zoomOut()}
-          />
-          <FAB
-            color={this.state.followUserHeading ? Colors.primary : Colors.gray}
-            icon="compass"
-            style={styles.fab}
-            onPress={() => this.toggleFollowUserHeading()}
-          />
-          <FAB
-            color={Colors.primary}
-            icon="crosshairs-gps"
-            style={styles.fab}
-            onPress={() => this.showAndFollowCurrentUserLocation()}
-          />
-        </View>
         {/* Route preview */}
         {!this.state.started && this.state.route && (
           <RoutePreview style={styles.routePreview} route={this.state.route} />
@@ -207,7 +210,6 @@ export default class MapScreen extends React.Component<Props, State> {
         {this.renderRouteCalculation()}
         {this.renderRouteEnded()}
         {this.renderNavigation()}
-        {this.renderSearch()}
         {this.renderFloorSelector()}
       </View>
     );
@@ -302,9 +304,7 @@ export default class MapScreen extends React.Component<Props, State> {
             style={{borderRadius: 8}}
             activeOpacity={0.9}
             underlayColor="#eeeeee"
-            onPress={() => {
-              this.props.navigation.navigate('SearchScreen');
-            }}>
+            onPress={() => {this.props.onOpenSearch()}}>
             <Text style={styles.searchText}>
               {i18n.t('common.search_hint')}
             </Text>
@@ -329,11 +329,11 @@ export default class MapScreen extends React.Component<Props, State> {
   /**
    * Find pressed POI on map.
    */
-  private onMapPress = (event: ProximiioFeatureType[]) => {
+  private onMapPress = (event: Feature[]) => {
     let pois = event.filter((it) => it.properties.type === 'poi');
     if (pois.length > 0) {
       ProximiioMapbox.route.cancel();
-      this.props.navigation.navigate('ItemDetail', {item: pois[0]});
+      this.props.onOpenPoi(pois[0]);
     }
   };
 
@@ -558,7 +558,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   },
   bottomContent: {
     flex: 0,
@@ -576,6 +576,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   searchCard: {
+    marginTop: 16,
     marginBottom: 16,
     marginHorizontal: 16,
     padding: 0,

@@ -12,12 +12,14 @@ import {Dialog} from 'react-native-paper';
 import PreferenceHelper, {
   AccessibilityGuidanceOption,
   ReassuranceDistanceOption,
-  DistanceUnitOption,
 } from '../../utils/PreferenceHelper';
 import {SettingsData} from 'react-native-settings-screen';
 import i18n from 'i18next';
+import {DistanceUnitOption} from './DistanceUnitOption';
 
-interface Props {
+interface Props {}
+
+interface State {
   /** Unit selection dialog visibility state toggle */
   unitDialogVisible: Boolean;
   /** Accessibility selection dialog visibility state toggle */
@@ -42,7 +44,6 @@ interface Props {
   /** Settings data structure, describes screen content. */
   settingsData: SettingsData;
 }
-interface State {}
 
 /**
  * Screen providing management of user preferences.
@@ -68,7 +69,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
     REASSURANCE_DISTANCE: ReassuranceDistanceOption.METERS_15.id,
     ACCESSIBILITY_GUIDANCE: AccessibilityGuidanceOption.NONE.id,
     settingsData: [],
-  };
+  } as State;
 
   componentDidMount() {
     // Load stored preferences
@@ -101,8 +102,8 @@ export default class PreferenceScreen extends React.Component<Props, State> {
 
   render() {
     return (
-      <View style={styles.container}>
-        <StatusBar />
+      <View style={StyleSheet.absoluteFill}>
+      {/*<StatusBar />*/}
         <SettingsScreen data={this.state.settingsData} style={styles.settings} />
         {this.optionsDialog(
           DistanceUnitOption,

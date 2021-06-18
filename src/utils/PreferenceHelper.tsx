@@ -6,8 +6,10 @@ import ProximiioMapbox, {
 import {
   MetersUnitConversion,
   StepUnitConversion,
-  UnitConversionHelper,
 } from './UnitConversions';
+import {UnitConversionHelper} from './UnitConversionHelper';
+import {PreferenceOptionItem} from '../ui/preferences/PreferenceOptionItem';
+import {DistanceUnitOption} from '../ui/preferences/DistanceUnitOption';
 
 /**
  * Preference values (keys).
@@ -29,12 +31,6 @@ export const Preference = {
   ACCESSIBILITY_GUIDANCE: 'ACCESSIBILITY_GUIDANCE',
 };
 
-export class PreferenceOptionItem {
-  id: String;
-  name: String;
-  value?: number;
-}
-
 /**
  * Options for accessibility.
  */
@@ -43,13 +39,7 @@ export const AccessibilityGuidanceOption = {
   VISUALLY_IMPAIRED: {id: 'visually_impaired', name: 'preferencescreen.accessibility_option_visual'} as PreferenceOptionItem,
 };
 
-/**
- * Options for units used in navigation guidance.
- */
-export const DistanceUnitOption = {
-  METERS: {id: 'meters', name: 'preferencescreen.unit_meters'} as PreferenceOptionItem,
-  STEPS: {id: 'steps', name: 'preferencescreen.unit_steps'} as PreferenceOptionItem,
-};
+
 
 /**
  * Options for reassuring user about current route each X meters.
@@ -135,7 +125,7 @@ class PreferenceHelper {
     ProximiioMapbox.ttsReassuranceInstructionEnabled(preferences[Preference.REASSURANCE_ENABLED]);
     ProximiioMapbox.ttsReassuranceInstructionDistance(reassuranceDistanceOption);
     ProximiioMapbox.setUnitConversion(unitConversion);
-    UnitConversionHelper.refreshPreferenceDistanceUnit();
+    UnitConversionHelper.refreshPreferenceDistanceUnit(preferences);
   }
 
   /**

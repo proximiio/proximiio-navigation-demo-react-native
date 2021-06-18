@@ -24,7 +24,7 @@
     "react-native-dropdown-picker": "^3.7.0",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-image-slider-box": "^1.0.12",
-    "react-native-paper": "^4.2.0",
+    "react-native-paper": "^4.9.1",
     "react-native-preference-screens": "^1.0.4",
     "react-native-proximiio": "https://github.com/proximiio/react-native-proximiio.git",
     "react-native-proximiio-mapbox": "https://github.com/proximiio/react-native-proximiio-mapbox.git",

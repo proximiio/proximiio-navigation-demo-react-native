@@ -153,7 +153,7 @@ export default class App extends React.Component<Props, State> {
     return (
       <MapScreen
         onOpenSearch={() => {console.log('open search');}}
-        onOpenPoi={() => {console.log('open search');}} />
+        onOpenPoi={() => {console.log('open poi');}} />
     );
   }
 

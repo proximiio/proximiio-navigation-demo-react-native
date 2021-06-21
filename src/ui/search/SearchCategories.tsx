@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
 
 export class SearchCategory {
   amenityCategoryId: String;
+  color: String;
   title: String;
   image: Object;
 }
@@ -111,39 +112,46 @@ export class SearchCategory {
  * Full list of all categories.
  * @type {SearchCategory[]}
  */
-const categoryList: SearchCategory[] = [
+export const categoryList: SearchCategory[] = [
   {
     amenityCategoryId: 'cef3a774-27e3-4df3-b4ec-a72ee15bed55',
+    color: '#E2CE19',
     title: 'common.category.cafeteria',
     image: require('../../images/search_categories/cafeteria.png'),
   },
   {
     amenityCategoryId: '07bef616-619b-4a34-99ab-362dd4bc0075',
+    color: '#4F86C3',
     title: 'common.category.lift',
     image: require('../../images/search_categories/lift.png'),
   },
   {
     amenityCategoryId: '16b509c5-aa6d-48f8-98bf-5a88b6c1e4fb',
+    color: '#71D9DE',
     title: 'common.category.washroom',
     image: require('../../images/search_categories/washrooms.png'),
   },
   {
     amenityCategoryId: '0368ed37-9f49-45d4-8c30-0a4a03badf6e',
+    color: '#8C62B6',
     title: 'common.category.reception',
     image: require('../../images/search_categories/reception.png'),
   },
   {
     amenityCategoryId: 'f6fd8bff-d04e-4e2a-8ea2-8980e1c9b326',
+    color: '#E2CE19',
     title: 'common.category.offices',
     image: require('../../images/search_categories/offices.png'),
   },
   {
     amenityCategoryId: 'e23fd1da-de48-4dca-8038-1c9ef1ebdd1b',
+    color: '#71D9DE',
     title: 'common.category.meeting_room',
     image: require('../../images/search_categories/meeting.png'),
   },
   {
     amenityCategoryId: 'c55b7222-153d-4afa-8824-8be2f0d92aa3',
+    color: '#8C62B6',
     title: 'common.category.entrance',
     image: require('../../images/search_categories/entrance.png'),
   },

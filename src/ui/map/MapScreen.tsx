@@ -7,7 +7,7 @@ import {
   TouchableHighlight,
   ActivityIndicator,
   BackHandler,
-  TouchableNativeFeedback,
+  TouchableNativeFeedback, FlatList, ListRenderItem, ListRenderItemInfo,
 } from 'react-native';
 import MapboxGL, {SymbolLayerStyle} from '@react-native-mapbox-gl/maps';
 import Proximiio, {
@@ -35,7 +35,10 @@ import {Colors} from '../../Style';
 import {ProximiioFloor} from 'react-native-proximiio';
 import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
 import i18n from 'i18next';
-import {SearchCategory} from '../search/SearchCategories';
+import {categoryList, SearchCategory} from '../search/SearchCategories';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import LinearGradient from 'react-native-linear-gradient';
+import {white} from "react-native-paper/lib/typescript/styles/colors";
 
 interface Props {
   onOpenSearch: (searchCategory?: SearchCategory) => void;
@@ -141,33 +144,6 @@ export default class MapScreen extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
-        {this.renderSearch()}
-        <View style={styles.fabWrapper}>
-          <FAB
-              color={Colors.primary}
-              icon="plus"
-              style={styles.fab}
-              onPress={() => this.zoomIn()}
-          />
-          <FAB
-              color={Colors.primary}
-              icon="minus"
-              style={styles.fab}
-              onPress={() => this.zoomOut()}
-          />
-          <FAB
-              color={this.state.followUserHeading ? Colors.primary : Colors.gray}
-              icon="compass"
-              style={styles.fab}
-              onPress={() => this.toggleFollowUserHeading()}
-          />
-          <FAB
-              color={Colors.primary}
-              icon="crosshairs-gps"
-              style={styles.fab}
-              onPress={() => this.showAndFollowCurrentUserLocation()}
-          />
-        </View>
         <MapboxGL.MapView
           ref={(map) => (this.map = map)}
           style={StyleSheet.absoluteFillObject}
@@ -204,9 +180,37 @@ export default class MapScreen extends React.Component<Props, State> {
           )}
         </MapboxGL.MapView>
         {/* Route preview */}
+        {this.renderSearch()}
+        <View style={styles.fabWrapper}>
+          <FAB
+              color={Colors.primary}
+              icon="plus"
+              style={styles.fab}
+              onPress={() => this.zoomIn()}
+          />
+          <FAB
+              color={Colors.primary}
+              icon="minus"
+              style={styles.fab}
+              onPress={() => this.zoomOut()}
+          />
+          <FAB
+              color={this.state.followUserHeading ? Colors.primary : Colors.gray}
+              icon="compass"
+              style={styles.fab}
+              onPress={() => this.toggleFollowUserHeading()}
+          />
+          <FAB
+              color={Colors.primary}
+              icon="crosshairs-gps"
+              style={styles.fab}
+              onPress={() => this.showAndFollowCurrentUserLocation()}
+          />
+        </View>
         {!this.state.started && this.state.route && (
           <RoutePreview style={styles.routePreview} route={this.state.route} />
         )}
+        {this.renderCategories()}
         {this.renderRouteCalculation()}
         {this.renderRouteEnded()}
         {this.renderNavigation()}
@@ -305,11 +309,41 @@ export default class MapScreen extends React.Component<Props, State> {
             activeOpacity={0.9}
             underlayColor="#eeeeee"
             onPress={() => {this.props.onOpenSearch()}}>
-            <Text style={styles.searchText}>
-              {i18n.t('common.search_hint')}
-            </Text>
+            <View style={styles.searchCardContent}>
+              <FontAwesome5Icon name="search" light={true} size={20} style={styles.searchIcon} />
+              <Text style={styles.searchText}>
+                {i18n.t('common.search_hint')}
+              </Text>
+            </View>
           </TouchableHighlight>
         </CardView>
+      </View>
+    );
+  }
+
+  private renderCategories() {
+    return (
+      <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.4)']} style={styles.searchCategoriesWrapper}>
+        <Text style={styles.searchCategoriesLabel}>Explore nearby</Text>
+        <FlatList
+          style={styles.searchCategories}
+          data={categoryList}
+          keyExtractor={(item => item.amenityCategoryId)}
+          horizontal={true}
+          renderItem={(renderItem) => this.renderCategoriesItem(renderItem)}
+        />
+      </LinearGradient>
+    );
+  }
+
+  private renderCategoriesItem(renderItem: ListRenderItemInfo<SearchCategory>) {
+    return (
+      <View
+        style={{...styles.searchCategoriesItem, backgroundColor: renderItem.item.color}}>
+        <Image style={styles.searchCategoriesItemImage} source={renderItem.item.image} />
+        <Text style={styles.searchCategoriesItemText}>
+          {i18n.t(renderItem.item.title)}
+        </Text>
       </View>
     );
   }
@@ -576,6 +610,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   searchCard: {
+    borderRadius: 48,
     marginTop: 16,
     marginBottom: 16,
     marginHorizontal: 16,
@@ -583,10 +618,52 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
-  searchText: {
-    color: Colors.gray,
+  searchCardContent: {
     paddingHorizontal: 12,
     paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchIcon: {
+    marginEnd: 12,
+  },
+  searchText: {
+    color: Colors.gray,
+  },
+  searchCategoriesWrapper: {
+    bottom: 0,
+    end: 0,
+    height: 'auto',
+    position: 'absolute',
+    start: 0,
+    top: 'auto',
+  },
+  searchCategoriesLabel: {
+    color: 'white',
+    fontSize: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  searchCategories: {
+    paddingVertical: 4,
+  },
+  searchCategoriesItem: {
+    alignItems: 'center',
+    backgroundColor: '#eeaaaa',
+    borderRadius: 48,
+    flexDirection: 'row',
+    margin: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  searchCategoriesItemImage: {
+    height: 24,
+    marginEnd: 4,
+    width: 24,
+  },
+  searchCategoriesItemText: {
+    color: 'white',
+    fontSize: 14,
   },
   floorPickerWrapper: {
     position: 'absolute',

@@ -1,26 +1,28 @@
 import * as React from 'react';
-import {ActivityIndicator, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-// import {NavigationContainer} from '@react-navigation/native';
-// import {createStackNavigator} from '@react-navigation/stack';
+import {
+  ActivityIndicator,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import Proximiio, {NotificationMode, ProximiioContextProvider} from 'react-native-proximiio';
-// import MapScreen from './ui/map/MapScreen';
-// import PoiScreen from './ui/poi/PoiScreen';
-// import SearchScreen from './ui/search/SearchScreen';
+import Proximiio, {NotificationMode} from 'react-native-proximiio';
 import {Colors} from './Style';
-// import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import PreferenceHelper from './utils/PreferenceHelper';
 import {LEVEL_OVERRIDE_MAP, PROXIMIIO_TOKEN} from './utils/Constants';
 import ProximiioMapbox, {
-  AmenitySource, GeoJSONSource,
   ProximiioMapboxEvents,
-  ProximiioMapboxSyncStatus, RoutingSource, UserLocationSource,
+  ProximiioMapboxSyncStatus,
 } from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
-import {MAP_STARTING_BOUNDS} from './utils/Constants';
 import {Appbar} from 'react-native-paper';
-import MapScreen from "./ui/map/MapScreen";
-import PreferenceScreen from "./ui/preferences/PreferenceScreen";
+import MapScreen from './ui/map/MapScreen';
+import PreferenceScreen from './ui/preferences/PreferenceScreen';
+import SearchScreen from './ui/search/SearchScreen';
+import {SearchCategory} from './ui/search/SearchCategories';
 
 /**
  * Create UI stack to manage screens.
@@ -41,8 +43,18 @@ interface Props {}
  */
 interface State {
   mapLoaded: Boolean;
-  mapLevel: Number;
   proximiioReady: Boolean;
+  showSearch: Boolean;
+  showPreferences: Boolean;
+}
+
+// TODO use?
+enum ScreenState {
+  MAP,
+  SEARCH,
+  SETTINGS,
+  PREVIEW,
+  NAVIGATION,
 }
 
 /**
@@ -51,8 +63,9 @@ interface State {
 export default class App extends React.Component<Props, State> {
   state = {
     mapLoaded: false,
-    mapLevel: 0,
     proximiioReady: false,
+    showSearch: false,
+    showPreferences: false,
   };
   private syncListener = undefined;
 
@@ -80,56 +93,23 @@ export default class App extends React.Component<Props, State> {
       );
     }
     return (
-      <View style={{...StyleSheet.absoluteFillObject, backgroundColor: 'green'}}>
+      <View
+        style={{...StyleSheet.absoluteFillObject, backgroundColor: 'green'}}>
         <Appbar.Header style={{backgroundColor: 'white'}}>
           <Appbar.Content title="Proximiio Demo" />
-          <Appbar.Action icon="magnify" onPress={this.openSettings} />
+          <Appbar.Action icon={'magnify'} onPress={this.openSettings} />
         </Appbar.Header>
         <SafeAreaView style={{flex: 1}}>
           {this.__renderMap()}
-          {/*{this.__renderPreferences()}*/}
-          {this.__renderPoiDetail()}
-          {this.__renderPreview()}
-          {this.__renderNavigation()}
+          <View style={styles.screensWrapper}>
+            {this.state.showSearch && this.__renderSearch()}
+            {this.state.showPreferences && this.__renderPreferences()}
+            {this.__renderPoiDetail()}
+            {this.__renderPreview()}
+            {this.__renderNavigation()}
+          </View>
         </SafeAreaView>
       </View>
-      // <NavigationContainer>
-      //   {this.__renderMap()}
-      //   <Stack.Navigator screenOptions={props => {}}>
-      //     <Stack.Screen
-      //       name="Main"
-      //       component={MapScreen}
-      //       options={({navigation}) => {
-      //         console.log('navigation', navigation);
-      //         return {
-      //           title: i18n.t('app.title_map'),
-      //           headerRight: (tintColor) => this.getSettingsButton(tintColor, navigation),
-      //           cardStyle: {backgroundColor: 'transparent', shadowColor:'transparent', },
-      //           transparentCard: true,
-      //           gestureEnabled: false,
-      //           cardOverlayEnabled: true,
-      //
-      //           transitionConfig: () => ({containerStyle: {backgroundColor: 'transparent'}}),
-      //         };
-      //       }}
-      //     />
-      //     <Stack.Screen
-      //       name="ItemDetail"
-      //       component={PoiScreen}
-      //       options={{title: ''}}
-      //     />
-      //     <Stack.Screen
-      //       name="SearchScreen"
-      //       component={SearchScreen}
-      //       options={{title: i18n.t('app.title_search')}}
-      //     />
-      //     <Stack.Screen
-      //       name="PreferenceScreen"
-      //       component={PreferenceScreen}
-      //       options={{title: i18n.t('app.title_settings')}}
-      //     />
-      //   </Stack.Navigator>
-      // </NavigationContainer>
     );
   }
 
@@ -150,10 +130,17 @@ export default class App extends React.Component<Props, State> {
   }
 
   __renderMap() {
+    if (this.state.showSearch || this.state.showPreferences) {
+      return;
+    }
     return (
-      <MapScreen
-        onOpenSearch={() => {console.log('open search');}}
-        onOpenPoi={() => {console.log('open poi');}} />
+      <MapScreen onOpenSearch={this.openSearch} onOpenPoi={this.openPoi} />
+    );
+  }
+
+  __renderSearch() {
+    return (
+      <SearchScreen onPoiSelected={(poi) => console.log('poi selected', poi.id)} />
     );
   }
 
@@ -202,29 +189,20 @@ export default class App extends React.Component<Props, State> {
   }
 
   private openSettings = () => {
-    console.log('settings');
+    console.log('open settings');
+    this.setState({showPreferences: true});
   };
 
-  /**
-   * Create appbar settings button.
-   * @param tintColor
-   * @param navigation
-   * @returns {JSX.Element}
-   * @private
-   */
-  private getSettingsButton(tintColor, navigation) {
-    return (
-      <TouchableOpacity
-        style={styles.appbarButton}
-        onPress={() => navigation.navigate('PreferenceScreen')}
-        activeOpacity={0.5}>
-        <Image
-          style={styles.appBarButtonImage}
-          source={require('./images/ic_settings.png')}
-        />
-      </TouchableOpacity>
-    );
-  }
+  private openSearch = (searchCategory?: SearchCategory) => {
+    console.log('open search');
+    this.setState({
+      showSearch: true,
+    });
+  };
+
+  private openPoi = () => {
+    console.log('open poi');
+  };
 }
 
 const styles = StyleSheet.create({
@@ -245,5 +223,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: '#66660066',
+  },
+  screensWrapper: {
+    ...StyleSheet.absoluteFillObject,
   },
 });

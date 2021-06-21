@@ -40,6 +40,8 @@ const resources = {
 
       'searchscreen.no_items': 'There are no items!',
       'searchscreen.end_of_results': 'End of results',
+      'searchscreen.results': '{{count}} result found',
+      'searchscreen.results_plural': '{{count}} results found',
 
       'navigation.you_are_in': 'You are currently in',
       'navigation.watch_out_for': 'Watch out for',

@@ -5,7 +5,7 @@ import {
   Image,
   StyleSheet,
   Text,
-  TextInput,
+  TextInput, TouchableOpacity,
   View,
 } from 'react-native';
 import CardView from '../../utils/CardView';
@@ -23,12 +23,13 @@ import SearchFooter from './SearchFooter';
 import {Colors} from '../../Style';
 import {PROXIMIIO_TOKEN, LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
 import i18n from 'i18next';
+import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 
 const numColumns = Math.round(Dimensions.get('window').width / 200);
 const searchItemFlex = 1 / numColumns;
 
 interface Props {
-  navigation: any;
+  onPoiSelected: (poiFeature: Feature) => any;
 }
 interface State {
   /**
@@ -88,6 +89,7 @@ export default class SearchScreen extends React.Component<Props, State> {
       <View style={styles.container}>
         <CardView style={styles.searchInputCard}>
           <View style={styles.searchInputCardContent}>
+            <FontAwesome5Icon name="search" light={true} size={20} style={styles.searchIcon} />
             {this.state.featureCategoryFilter && (
               <TouchableHighlight
                 activeOpacity={0.5}
@@ -111,15 +113,23 @@ export default class SearchScreen extends React.Component<Props, State> {
         <FlatList
           contentContainerStyle={styles.scrollviewContent}
           data={this.state.filteredFeatureList}
-          numColumns={numColumns}
+          // numColumns={numColumns}
           ListEmptyComponent={<SearchEmptyItem/>}
-          ListFooterComponent={this.state.currentItemCount > 0 && <SearchFooter/>}
-          ListHeaderComponent={this.state.featureListFilterTitle === '' && !this.state.featureCategoryFilter && this.state.featureList.length > 0 &&
-          <SearchCategories onCategorySelected={this.updateCategoryFilter.bind(this)}/>}
+          // ListFooterComponent={this.state.currentItemCount > 0 && <SearchFooter/>}
+          ListHeaderComponent={this.renderSearchHeader()}
           renderItem={({item}) => this.renderSearchItem(item)}
           style={styles.searchItemList}
         />
       </View>
+    );
+  }
+
+  private renderSearchHeader() {
+    if (this.state.filteredFeatureList.length === 0) {
+      return;
+    }
+    return (
+      <Text style={styles.searchItemHeader}>{i18n.t('searchscreen.results', {count: this.state.filteredFeatureList.length})}</Text>
     );
   }
 
@@ -131,30 +141,24 @@ export default class SearchScreen extends React.Component<Props, State> {
    */
   private renderSearchItem(poiFeature) {
     return (
-      <View style={styles.searchItem}>
-        <CardView style={styles.searchItemCard} key={poiFeature.properties.id}>
-          <TouchableHighlight
-            activeOpacity={0.5}
-            underlayColor="#eee"
-            onPress={() => {
-              this.props.navigation.navigate('ItemDetail', {item: poiFeature});
-            }}
-            style={styles.searchItemTouch}>
-            <View>
-              <Image
-                source={this.getCoverImage(poiFeature)}
-                style={styles.searchItemImage}
-              />
-              <Text style={styles.searchItemTitle} numberOfLines={1}>
-                {poiFeature.getTitle(i18n.language)}
-              </Text>
-              <Text style={styles.searchItemFloor}>
-                {this.getLevelString(poiFeature)}
-              </Text>
-            </View>
-          </TouchableHighlight>
-        </CardView>
-      </View>
+      <TouchableOpacity
+        activeOpacity={0.4}
+        onPress={() => this.props.onPoiSelected(poiFeature)}>
+        <View style={styles.searchItem}>
+          <Image
+            source={this.getFeatureImage(poiFeature)}
+            style={styles.searchItemImage}
+          />
+          <View style={styles.searchItemDescription}>
+            <Text style={styles.searchItemTitle} numberOfLines={1}>
+              {poiFeature.getTitle(i18n.language)}
+            </Text>
+            <Text style={styles.searchItemFloor}>
+              {this.getLevelString(poiFeature)}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   }
 
@@ -259,15 +263,9 @@ export default class SearchScreen extends React.Component<Props, State> {
    * @returns {null|{uri: string}}
    * @private
    */
-  private getCoverImage(feature) {
-    let imageUrlList = feature.getImageUrls(PROXIMIIO_TOKEN);
-    if (!imageUrlList || imageUrlList.length === 0) {
-      return null;
-    } else {
-      return {
-        uri: imageUrlList[0],
-      };
-    }
+  private getFeatureImage(feature) {
+    let amenity: Amenity = this.state.amenityMap.has(feature.properties.amenity) ? this.state.amenityMap.get(feature.properties.amenity) : null;
+    return amenity ? {uri: amenity.icon} : null;
   }
 
   /**
@@ -277,7 +275,7 @@ export default class SearchScreen extends React.Component<Props, State> {
    * @private
    */
   private getLevelString(feature) {
-    let overrideLevel = LEVEL_OVERRIDE_MAP[feature.properties.level] | feature.properties.level | 0;
+    let overrideLevel = LEVEL_OVERRIDE_MAP[feature.properties.level];
     let level = '';
     switch (overrideLevel) {
       case 0:
@@ -309,52 +307,54 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchItemTouch: {
-    flex: 1,
-    borderRadius: 8,
+    backgroundColor: 'red',
   },
   searchItem: {
-    flex: searchItemFlex,
-  },
-  searchItemCard: {
-    margin: 8,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
+    // flex: searchItemFlex,
+    flexDirection: 'row',
+    paddingHorizontal: 8,
   },
   searchItemImage: {
-    aspectRatio: 1.766,
+    aspectRatio: 1,
     flexDirection: 'row',
     backgroundColor: Colors.gray,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    margin: 0,
+    borderRadius: 48,
+    margin: 8,
+    width: 48,
+  },
+  searchItemDescription: {
+    alignSelf: 'center',
   },
   searchItemTitle: {
-    backgroundColor: Colors.primary,
-    textAlign: 'center',
-    color: Colors.white,
-    justifyContent: 'center',
-    padding: 8,
-    flex: 1,
+    paddingHorizontal: 8,
   },
   searchItemFloor: {
-    textAlign: 'center',
+    color: Colors.gray,
     justifyContent: 'center',
-    padding: 8,
-    flex: 1,
+    paddingHorizontal: 8,
   },
   searchItemList: {
     flex: 1,
   },
+  searchItemHeader: {
+    paddingHorizontal: 12,
+    fontSize: 16,
+    paddingTop: 4,
+    paddingBottom: 12,
+  },
   scrollviewContent: {
-    padding: 8,
     flexGrow: 1,
   },
   searchInputCard: {
     margin: 16,
+    borderRadius: 100,
   },
   searchInputCardContent: {
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  searchIcon: {
+    paddingHorizontal: 8,
   },
   searchInput: {
     flex: 1,

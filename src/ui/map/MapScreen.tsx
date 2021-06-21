@@ -322,8 +322,9 @@ export default class MapScreen extends React.Component<Props, State> {
   }
 
   private renderCategories() {
+    /*colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.22)', 'rgba(0,0,0,0.3)']}*/
     return (
-      <LinearGradient colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.4)']} style={styles.searchCategoriesWrapper}>
+      <View style={styles.searchCategoriesWrapper}>
         <Text style={styles.searchCategoriesLabel}>Explore nearby</Text>
         <FlatList
           style={styles.searchCategories}
@@ -332,19 +333,19 @@ export default class MapScreen extends React.Component<Props, State> {
           horizontal={true}
           renderItem={(renderItem) => this.renderCategoriesItem(renderItem)}
         />
-      </LinearGradient>
+      </View>
     );
   }
 
   private renderCategoriesItem(renderItem: ListRenderItemInfo<SearchCategory>) {
     return (
-      <View
+      <CardView
         style={{...styles.searchCategoriesItem, backgroundColor: renderItem.item.color}}>
         <Image style={styles.searchCategoriesItemImage} source={renderItem.item.image} />
         <Text style={styles.searchCategoriesItemText}>
           {i18n.t(renderItem.item.title)}
         </Text>
-      </View>
+      </CardView>
     );
   }
 
@@ -625,7 +626,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   searchIcon: {
-    marginEnd: 12,
+    paddingHorizontal: 8,
   },
   searchText: {
     color: Colors.gray,
@@ -634,15 +635,19 @@ const styles = StyleSheet.create({
     bottom: 0,
     end: 0,
     height: 'auto',
+    paddingTop: 8,
     position: 'absolute',
     start: 0,
     top: 'auto',
   },
   searchCategoriesLabel: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: {width: 1, height: 1},
+    textShadowRadius: 5,
   },
   searchCategories: {
     paddingVertical: 4,

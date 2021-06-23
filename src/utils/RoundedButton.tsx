@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  GestureResponderEvent,
+  GestureResponderEvent, StyleProp,
   StyleSheet,
   Text, TouchableHighlight,
   TouchableOpacity,
@@ -11,8 +11,8 @@ import {Colors, Shadow} from '../Style';
 interface Props {
   title: string;
   onPress: (event: GestureResponderEvent) => any;
-  buttonStyle?: StyleSheet;
-  titleStyle?: StyleSheet;
+  buttonStyle?: StyleProp<any>;
+  titleStyle?: StyleProp<any>;
 }
 interface State {}
 

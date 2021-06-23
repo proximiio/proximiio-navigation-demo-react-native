@@ -15,13 +15,14 @@ import ProximiioMapbox, {
 } from 'react-native-proximiio-mapbox';
 import {SliderBox} from 'react-native-image-slider-box';
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
-import {Colors} from '../../Style';
+import {Colors, Shadow} from '../../Style';
 import i18n from 'i18next';
 import {UnitConversionHelper} from '../../utils/UnitConversionHelper';
 import RoundedButton from '../../utils/RoundedButton';
 import CardView from '../../utils/CardView';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {PROXIMIIO_TOKEN} from '../../utils/Constants';
+import MapCardView from "./MapCardView";
 
 interface Props {
   route: ProximiioMapboxRoute;
@@ -52,14 +53,15 @@ export default class RoutePreview extends React.Component<Props, State> {
 
   render() {
     return (
-      <CardView style={styles.container}>
+      <MapCardView onClosePressed={() => ProximiioMapbox.route.cancel()}>
         {/*{this.renderTripStartEnd()}*/}
+        {this.renderCloseButton()}
         {this.renderImageGallery()}
         {this.renderTripSummary()}
         {this.renderExternalLink()}
         {this.renderTripSteps()}
         {this.renderTripButtons()}
-      </CardView>
+      </MapCardView>
     );
   }
 
@@ -148,23 +150,6 @@ export default class RoutePreview extends React.Component<Props, State> {
         {estimates && <Text style={styles.summaryEstimates}>{}</Text>}
       </View>
     );
-
-    // return (
-    //   <>
-    //     {this.state.showTripDetails === false && <View style={styles.tripSummarySeparatorVertical} />}
-    //     <View style={styles.tripSummary}>
-    //       <View style={styles.tripSummaryItem}>
-    //         <Image style={styles.tripSummaryItemImage} source={require('../../images/ic_steps.png')} />
-    //         <Text>{this.state.tripDistance}</Text>
-    //       </View>
-    //       <View style={styles.tripSummarySeparator}/>
-    //       <View style={styles.tripSummaryItem}>
-    //         <Image style={styles.tripSummaryItemImage} source={require('../../images/ic_time.png')} />
-    //         <Text>{this.state.tripDuration}</Text>
-    //       </View>
-    //     </View>
-    //   </>
-    // );
   }
 
   /**
@@ -332,11 +317,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     padding: 8,
   },
-  container: {
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    margin: 12,
-  },
   buttonBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -385,8 +365,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     borderTopStartRadius: 8,
     borderTopEndRadius: 8,
-    // width: 'calc(100% - 8)',
-    // maxWidth: 'calc(100% - 8)',
     flex: 0,
     flexGrow: 0,
   },

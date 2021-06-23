@@ -11,10 +11,10 @@ import i18n from 'i18next';
 import WebView from 'react-native-webview';
 import RoundedButton from '../../utils/RoundedButton';
 import {Colors, Shadow} from '../../Style';
+import PreferenceHelper from '../../utils/PreferenceHelper';
 
 interface Props {
-  onPrivacyAccepted: () => any;
-  navigation: any;
+  onPolicyAccepted?: () => any;
 }
 interface State {}
 
@@ -24,10 +24,6 @@ interface State {}
 export default class PolicyScreen extends React.Component<Props, State> {
   state = {};
   private webViewReference;
-
-  componentDidMount() {}
-
-  componentWillUnmount() {}
 
   render() {
     return (
@@ -62,13 +58,13 @@ export default class PolicyScreen extends React.Component<Props, State> {
     );
   }
 
-  private onAccepted() {
-    this.props.onPrivacyAccepted();
-  }
+  private onAccepted = async () => {
+    this.props.onPolicyAccepted();
+  };
 
-  private onDeclined() {
+  private onDeclined = () => {
     BackHandler.exitApp();
-  }
+  };
 
   private onWebViewNavigationStateChange = (event) => {
     if (event.url.startsWith('http')) {

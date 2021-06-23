@@ -29,6 +29,8 @@ export const Preference = {
   REASSURANCE_ENABLED: 'REASSURANCE_ENABLED',
   REASSURANCE_DISTANCE: 'REASSURANCE_DISTANCE',
   ACCESSIBILITY_GUIDANCE: 'ACCESSIBILITY_GUIDANCE',
+  // Privacy policy
+  PRIVACY_POLICY_ACCEPTED: 'PRIVACY_POLICY_ACCEPTED',
 };
 
 /**
@@ -55,6 +57,19 @@ export const ReassuranceDistanceOption = {
  * Helper class to manage user preferences.
  */
 class PreferenceHelper {
+
+  static getPrivacyPolicyAccepted(): Promise<Boolean> {
+    return new Promise(async (resolve, _) => {
+      const acceptedPreference = await DefaultPreference.get(Preference.PRIVACY_POLICY_ACCEPTED);
+      const accepted = acceptedPreference ? JSON.parse(acceptedPreference) : false;
+      resolve(accepted);
+    });
+  }
+
+  static async setPrivacyPolicyAccepted() {
+    await DefaultPreference.set(Preference.PRIVACY_POLICY_ACCEPTED, JSON.stringify(true));
+  }
+
   /**
    * Returns object with all preference values.
    * @returns {Promise<unknown>}

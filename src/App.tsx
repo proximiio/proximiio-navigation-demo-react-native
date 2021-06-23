@@ -24,6 +24,8 @@ import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import SearchScreen from './ui/search/SearchScreen';
 import {SearchCategory} from './ui/search/SearchCategories';
 import PolicyScreen from "./ui/policy/PolicyScreen";
+import {createStackNavigator} from "@react-navigation/stack";
+import {NavigationContainer} from "@react-navigation/native";
 
 /**
  * Create UI stack to manage screens.
@@ -34,6 +36,11 @@ import PolicyScreen from "./ui/policy/PolicyScreen";
  * Call necessary to init mapbox.
  */
 MapboxGL.setAccessToken('');
+
+/**
+ * Create stack for screen navigation
+ */
+const Stack = createStackNavigator();
 
 /**
  * RNComponent properties
@@ -47,15 +54,7 @@ interface State {
   proximiioReady: Boolean;
   showSearch: Boolean;
   showPreferences: Boolean;
-}
-
-// TODO use?
-enum ScreenState {
-  MAP,
-  SEARCH,
-  SETTINGS,
-  PREVIEW,
-  NAVIGATION,
+  policyAccepted: Boolean;
 }
 
 /**
@@ -67,81 +66,132 @@ export default class App extends React.Component<Props, State> {
     proximiioReady: false,
     showSearch: false,
     showPreferences: false,
+    policyAccepted: false,
   };
   private syncListener = undefined;
+  private policyAccepted = false;
 
   componentDidMount() {
-    this.initProximiio();
+    PreferenceHelper.getPrivacyPolicyAccepted().then((accepted) => {
+      this.setState({policyAccepted: accepted});
+      if (accepted) {
+        this.initProximiio();
+      }
+    });
   }
 
   componentWillUnmount() {
     // Cancel sync status listener
-    this.syncListener.remove();
+    this.syncListener?.remove();
   }
 
   render() {
-    if (!this.state.proximiioReady) {
-      return (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator
-            size="large"
-            color={Colors.primary}
-            style={{marginBottom: 8}}
-            animating
-          />
-          <Text>{i18n.t('app.loading')}</Text>
-        </View>
-      );
+    // Wait for preference to be loaded
+    if (this.state.policyAccepted === undefined) {
+      this.renderLoadingOverlay();
     }
+    // Preference loaded, policy not accepted
+    if (this.state.policyAccepted === false) {
+      return this.renderPolicyScreen();
+    }
+    // Init proximi.io libs
+    if (!this.state.proximiioReady) {
+      return this.renderLoadingOverlay();
+    }
+    // Render main app content
+    return this.renderScreenStack();
+  }
+
+  private renderLoadingOverlay() {
     return (
-      <View style={StyleSheet.absoluteFill}>
-        <Appbar.Header style={{backgroundColor: 'white'}}>
-          <Appbar.Content title="Proximiio Demo" />
-          <Appbar.Action icon={'magnify'} onPress={this.openSettings} />
-        </Appbar.Header>
-        <SafeAreaView style={{flex: 1}}>
-          {/*{this.__renderMap()}*/}
-          {/*<View style={styles.screensWrapper}>*/}
-          {/*  {this.state.showSearch && this.__renderSearch()}*/}
-          {/*  {this.state.showPreferences && this.__renderPreferences()}*/}
-          {/*  {this.__renderPoiDetail()}*/}
-          {/*  {this.__renderPreview()}*/}
-          {/*  {this.__renderNavigation()}*/}
-          {/*</View>*/}
-          <PolicyScreen navigation={null} onPrivacyAccepted={() => console.log('privacy policy accepted')} />
-        </SafeAreaView>
+      <View style={styles.loadingOverlay}>
+        <ActivityIndicator
+          size="large"
+          color={Colors.primary}
+          style={{marginBottom: 8}}
+          animating
+        />
+        <Text>{i18n.t('app.loading')}</Text>
       </View>
     );
   }
 
-  __renderPreferences() {
-    return <PreferenceScreen />;
-  }
-
-  __renderPoiDetail() {
-    return <View />;
-  }
-
-  __renderPreview() {
-    return <View />;
-  }
-
-  __renderNavigation() {
-    return <View />;
-  }
-
-  __renderMap() {
-    if (this.state.showSearch || this.state.showPreferences) {
-      return;
-    }
+  private renderPolicyScreen() {
     return (
-      <MapScreen onOpenSearch={this.openSearch} onOpenPoi={this.openPoi} />
+      <SafeAreaView style={{flex: 1}}>
+        <PolicyScreen onPolicyAccepted={this.onPolicyAccepted} />
+      </SafeAreaView>
     );
   }
 
-  __renderSearch() {
+  private renderScreenStack() {
     return (
-      <SearchScreen onPoiSelected={(poi) => console.log('poi selected', poi.id)} />
+      <NavigationContainer>
+        <Stack.Navigator headerMode={'float'}>
+          <Stack.Screen
+            name="Main"
+            component={MapScreen}
+            options={({navigation}) => {
+              console.log('navigation', navigation);
+              return {
+                title: i18n.t('app.title_map'),
+                headerRight: (tintColor) =>
+                  this.getSettingsButton(tintColor, navigation),
+              };
+            }}
+          />
+          <Stack.Screen
+            name="SearchScreen"
+            component={SearchScreen}
+            options={{title: i18n.t('app.title_search')}}
+          />
+          <Stack.Screen
+            name="PreferenceScreen"
+            component={PreferenceScreen}
+            options={{title: i18n.t('app.title_settings')}}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+      // <NavigationContainer>
+      //   <Stack.Navigator>
+      //     {/*<Stack.Screen*/}
+      //     {/*  name="PolicyScreen"*/}
+      //     {/*  component={PolicyScreen}*/}
+      //     {/*  initialParams={{onPolicyAccepted: this.onPolicyAccepted}}*/}
+      //     {/*/>*/}
+      //     <Stack.Screen name="MapScreen" component={MapScreen} />
+      //     <Stack.Screen name="PreferenceScreen" component={PreferenceScreen} />
+      //     {/*<Stack.Screen name="AboutScreen" component={AboutScreen} />*/}
+      //   </Stack.Navigator>
+      // </NavigationContainer>
+    );
+  }
+
+  private onPolicyAccepted = () => {
+    console.log('privacy policy accepted');
+    this.setState({policyAccepted: true});
+    PreferenceHelper.setPrivacyPolicyAccepted();
+    this.initProximiio();
+  };
+
+  /**
+   * Create appbar settings button.
+   * @param tintColor
+   * @param navigation
+   * @returns {JSX.Element}
+   * @private
+   */
+  private getSettingsButton(tintColor, navigation) {
+    return (
+      <TouchableOpacity
+        style={styles.appbarButton}
+        onPress={() => navigation.navigate('PreferenceScreen')}
+        activeOpacity={0.5}>
+        <Image
+          style={styles.appBarButtonImage}
+          source={require('./images/ic_settings.png')}
+        />
+      </TouchableOpacity>
     );
   }
 
@@ -188,22 +238,6 @@ export default class App extends React.Component<Props, State> {
       proximiioReady: true,
     });
   }
-
-  private openSettings = () => {
-    console.log('open settings');
-    this.setState({showPreferences: true});
-  };
-
-  private openSearch = (searchCategory?: SearchCategory) => {
-    console.log('open search');
-    this.setState({
-      showSearch: true,
-    });
-  };
-
-  private openPoi = () => {
-    console.log('open poi');
-  };
 }
 
 const styles = StyleSheet.create({
@@ -218,14 +252,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-  },
-  map: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#66660066',
-  },
-  screensWrapper: {
-    ...StyleSheet.absoluteFillObject,
   },
 });

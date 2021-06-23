@@ -746,7 +746,6 @@ const styles = StyleSheet.create({
     width: 32,
   },
   routePreview: {
-    flex: 1,
-    width: '100%',
+    // flex: 1,
   },
 });

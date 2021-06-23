@@ -2,11 +2,11 @@ import * as React from 'react';
 import {
   GestureResponderEvent,
   StyleSheet,
-  Text,
+  Text, TouchableHighlight,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Colors} from '../Style';
+import {Colors, Shadow} from '../Style';
 
 interface Props {
   title: string;
@@ -27,30 +27,31 @@ export default class RoundedButton extends React.Component<Props, State> {
     const buttonStyle = this.props.buttonStyle || {};
     const titleStyle = this.props.titleStyle || {};
     return (
-      <TouchableOpacity
-        style={styles.touchable}
-        accessibilityRole="button"
-        activeOpacity={0.8}
-        onPress={this.props.onPress}>
-        <View style={{...styles.container, ...buttonStyle}}>
-          <Text style={{...styles.title, ...titleStyle}}>{title}</Text>
-        </View>
-      </TouchableOpacity>
+      <View style={{...styles.container, ...buttonStyle}}>
+        <TouchableOpacity
+          style={styles.touchable}
+          accessibilityRole="button"
+          activeOpacity={0.7}
+          onPress={this.props.onPress}>
+          <Text numberOfLines={1} lineBreakMode={'tail'} style={{...styles.title, ...titleStyle}}>{title}</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  touchable: {
-    borderRadius: 100,
-    margin: 8,
-  },
   container: {
+    ...Shadow,
     borderRadius: 100,
     backgroundColor: Colors.blue,
-    padding: 12,
     textAlign: 'center',
     alignContent: 'center',
+    margin: 8,
+  },
+  touchable: {
+    borderRadius: 100,
+    padding: 12,
   },
   title: {
     color: '#fff',

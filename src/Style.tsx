@@ -6,12 +6,15 @@ import {DefaultTheme} from '@react-navigation/native';
 const ColorsBase = {
   black: '#000000',
   blue: '#08aee6',
+  blueLight2: '#4F86C3',
   blueDark: '#0783AC',
   red: '#ed174b',
   gray: '#999999',
   grayLight: '#cccccc',
+  greenLight: '#9EEE92',
   offWhite: '#eeeeee',
   white: '#ffffff',
+  pink: '#DB62B2',
 };
 
 /**
@@ -42,6 +45,7 @@ export const MyTheme = {
 };
 
 export const Shadow = {
+  elevation: 5,
   shadowColor: Colors.black,
   shadowOffset: {
     width: 0,

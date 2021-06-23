@@ -4,9 +4,11 @@ import {
   Image,
   StyleSheet,
   Text,
-  Button,
   View,
-  ListRenderItemInfo, TouchableOpacity, Linking, Dimensions,
+  ListRenderItemInfo,
+  TouchableOpacity,
+  Linking,
+  Dimensions,
 } from 'react-native';
 import ProximiioMapbox, {
   Feature,
@@ -15,14 +17,13 @@ import ProximiioMapbox, {
 } from 'react-native-proximiio-mapbox';
 import {SliderBox} from 'react-native-image-slider-box';
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
-import {Colors, Shadow} from '../../Style';
+import {Colors} from '../../Style';
 import i18n from 'i18next';
 import {UnitConversionHelper} from '../../utils/UnitConversionHelper';
 import RoundedButton from '../../utils/RoundedButton';
-import CardView from '../../utils/CardView';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {PROXIMIIO_TOKEN} from '../../utils/Constants';
-import MapCardView from "./MapCardView";
+import MapCardView from './MapCardView';
 
 interface Props {
   route: ProximiioMapboxRoute;
@@ -54,8 +55,6 @@ export default class RoutePreview extends React.Component<Props, State> {
   render() {
     return (
       <MapCardView onClosePressed={() => ProximiioMapbox.route.cancel()}>
-        {/*{this.renderTripStartEnd()}*/}
-        {this.renderCloseButton()}
         {this.renderImageGallery()}
         {this.renderTripSummary()}
         {this.renderExternalLink()}
@@ -64,36 +63,6 @@ export default class RoutePreview extends React.Component<Props, State> {
       </MapCardView>
     );
   }
-
-  /**
-   * Renders info about trip start and end.
-   * @returns {boolean|JSX.Element}
-   * @private
-   */
-  // private renderTripStartEnd() {
-  //   return (this.state.showTripDetails === false && (
-  //       <>
-  //         <View style={styles.tripRow}>
-  //           <Image
-  //             style={styles.tripRowImage}
-  //             source={require('../../images/ic_current_position.png')}
-  //           />
-  //           <Text style={styles.tripRowText}>
-  //             {i18n.t('preview.your_location')}
-  //           </Text>
-  //         </View>
-  //         <View style={styles.tripRow}>
-  //           <Image
-  //             style={styles.tripRowImage}
-  //             source={require('../../images/ic_preview_destination.png')}
-  //           />
-  //           <Text style={styles.tripRowText}>
-  //             {this.props.route.destination.properties.title ? this.props.route.destination.properties.title : i18n.t('preview.destination') }
-  //           </Text>
-  //         </View>
-  //       </>
-  //   ));
-  // }
 
   private renderExternalLink() {
     const metadata = this.state.destination?.properties?.metadata;
@@ -105,7 +74,9 @@ export default class RoutePreview extends React.Component<Props, State> {
     }
     // TODO: extract into transparent button component?
     return (
-      <TouchableOpacity style={styles.link} onPress={() => Linking.openURL(url)}>
+      <TouchableOpacity
+        style={styles.link}
+        onPress={() => Linking.openURL(url)}>
         <FontAwesome5Icon name="link" color={Colors.pink} />
         <Text style={styles.linkText}>{title}</Text>
       </TouchableOpacity>
@@ -123,7 +94,12 @@ export default class RoutePreview extends React.Component<Props, State> {
     const width = Dimensions.get('screen').width - 40;
     return (
       <View>
-        <SliderBox images={images} style={styles.slider} parentWidth={width} disableOnPress />
+        <SliderBox
+          images={images}
+          style={styles.slider}
+          parentWidth={width}
+          disableOnPress
+        />
       </View>
     );
   }
@@ -158,15 +134,19 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @private
    */
   private renderTripSteps() {
+    if (!this.state.showTripDetails) {
+      return null;
+    }
     return (
-      this.state.showTripDetails &&
-      <Text>Detail Trip Directions</Text> &&
-      <FlatList
-        style={styles.tripSteps}
-        data={this.props.route.steps}
-        renderItem={(item, index) => this.renderTripStep(item)}
-        keyExtractor={(item, index) => 'index_' + index}
-      />
+      <>
+        <Text>Detail Trip Directions</Text>
+        <FlatList
+          style={styles.tripSteps}
+          data={this.props.route.steps}
+          renderItem={(item) => this.renderTripStep(item)}
+          keyExtractor={(item, index) => 'index_' + index}
+        />
+      </>
     );
   }
 
@@ -188,7 +168,7 @@ export default class RoutePreview extends React.Component<Props, State> {
           />
           <RoundedButton
             buttonStyle={styles.buttonTrip}
-            textStyle={{color: Colors.blueDark}}
+            titleStyle={{color: Colors.blueDark}}
             title={i18n.t(this.state.showTripDetails ? 'preview.hide_trip' : 'preview.show_trip')}
             onPress={() => this.setState({showTripDetails: !this.state.showTripDetails})}
           />

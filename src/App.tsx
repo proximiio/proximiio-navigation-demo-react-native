@@ -23,6 +23,7 @@ import MapScreen from './ui/map/MapScreen';
 import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import SearchScreen from './ui/search/SearchScreen';
 import {SearchCategory} from './ui/search/SearchCategories';
+import PolicyScreen from "./ui/policy/PolicyScreen";
 
 /**
  * Create UI stack to manage screens.
@@ -93,21 +94,21 @@ export default class App extends React.Component<Props, State> {
       );
     }
     return (
-      <View
-        style={{...StyleSheet.absoluteFillObject, backgroundColor: 'green'}}>
+      <View style={StyleSheet.absoluteFill}>
         <Appbar.Header style={{backgroundColor: 'white'}}>
           <Appbar.Content title="Proximiio Demo" />
           <Appbar.Action icon={'magnify'} onPress={this.openSettings} />
         </Appbar.Header>
         <SafeAreaView style={{flex: 1}}>
-          {this.__renderMap()}
-          <View style={styles.screensWrapper}>
-            {this.state.showSearch && this.__renderSearch()}
-            {this.state.showPreferences && this.__renderPreferences()}
-            {this.__renderPoiDetail()}
-            {this.__renderPreview()}
-            {this.__renderNavigation()}
-          </View>
+          {/*{this.__renderMap()}*/}
+          {/*<View style={styles.screensWrapper}>*/}
+          {/*  {this.state.showSearch && this.__renderSearch()}*/}
+          {/*  {this.state.showPreferences && this.__renderPreferences()}*/}
+          {/*  {this.__renderPoiDetail()}*/}
+          {/*  {this.__renderPreview()}*/}
+          {/*  {this.__renderNavigation()}*/}
+          {/*</View>*/}
+          <PolicyScreen navigation={null} onPrivacyAccepted={() => console.log('privacy policy accepted')} />
         </SafeAreaView>
       </View>
     );

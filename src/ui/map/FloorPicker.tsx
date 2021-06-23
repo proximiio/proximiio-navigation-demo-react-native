@@ -2,7 +2,7 @@ import * as React from 'react';
 import {View, StyleSheet} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Proximiio, {ProximiioEvents, ProximiioFloor} from 'react-native-proximiio';
-import {Colors} from '../../Style';
+import {Colors, Shadow} from '../../Style';
 
 interface Props {
   mapLevel: number;
@@ -99,19 +99,18 @@ export default class FloorPicker extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   main: {
+    ...Shadow,
     backgroundColor: Colors.floorSelectorBackground,
     borderWidth: 0,
-    width: 256,
-  },
-  container: {
-    backgroundColor: Colors.floorSelectorBackground,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    width: 184,
+    height: 'auto',
+    flex: 0,
+    marginBottom: 16,
+    marginRight: 16,
+    borderBottomEndRadius: 100,
+    borderBottomStartRadius: 100,
+    borderTopEndRadius: 100,
+    borderTopStartRadius: 100,
   },
   selectedLabel: {
     textAlign: 'left',
@@ -122,6 +121,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     color: Colors.floorSelectorText,
     paddingVertical: 8,
+    zIndex: 2,
   },
   item: {
     justifyContent: 'flex-start',

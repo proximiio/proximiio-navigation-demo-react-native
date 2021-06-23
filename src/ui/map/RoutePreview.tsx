@@ -15,7 +15,7 @@ import ProximiioMapbox, {
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
 import {Colors} from '../../Style';
 import i18n from 'i18next';
-import {UnitConversionHelper} from '../../utils/UnitConversions';
+import {UnitConversionHelper} from "../../utils/UnitConversionHelper";
 
 interface Props {
   route: ProximiioMapboxRoute;

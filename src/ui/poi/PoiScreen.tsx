@@ -70,7 +70,7 @@ export default class PoiScreen extends React.Component<Props, State> {
             onPress={() => {
               PreferenceHelper.routeFindWithPreferences(item.id);
               console.log('start trip button pressed');
-              this.props.navigation.navigate('Main');
+              this.props.navigation.navigate('MapScreen');
             }}
             style={styles.tripButton}
           />

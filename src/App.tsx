@@ -129,10 +129,9 @@ export default class App extends React.Component<Props, State> {
       <NavigationContainer>
         <Stack.Navigator headerMode={'float'}>
           <Stack.Screen
-            name="Main"
+            name="MapScreen"
             component={MapScreen}
             options={({navigation}) => {
-              console.log('navigation', navigation);
               return {
                 title: i18n.t('app.title_map'),
                 headerRight: (tintColor) =>

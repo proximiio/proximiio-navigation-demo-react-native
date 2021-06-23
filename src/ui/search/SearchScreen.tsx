@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  Dimensions,
   FlatList,
   Image,
   StyleSheet,
@@ -15,21 +14,19 @@ import ProximiioMapbox, {
   Feature,
   ProximiioMapboxEvents,
 } from 'react-native-proximiio-mapbox';
-import SearchCategories, {SearchCategory} from './SearchCategories';
+import {SearchCategory} from './SearchCategories';
 import SearchEmptyItem from './SearchEmptyItem';
 import {IconButton} from 'react-native-paper';
 import {TouchableHighlight} from 'react-native-gesture-handler';
-import SearchFooter from './SearchFooter';
 import {Colors} from '../../Style';
-import {PROXIMIIO_TOKEN, LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
+import {LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
 import i18n from 'i18next';
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-
-const numColumns = Math.round(Dimensions.get('window').width / 200);
-const searchItemFlex = 1 / numColumns;
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import {RouteProp} from '@react-navigation/native';
 
 interface Props {
-  onPoiSelected: (poiFeature: Feature) => any;
+  route: RouteProp<any, any>;
+  navigation: any;
 }
 interface State {
   /**
@@ -74,6 +71,7 @@ export default class SearchScreen extends React.Component<Props, State> {
 
   componentDidMount() {
     this.loadAmenitiesAndFeatures();
+    this.state.featureCategoryFilter = this.props.route.params.searchCategory;
     this.featureSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.FEATURES_CHANGED, () => this.loadAmenitiesAndFeatures());
   }
 
@@ -143,7 +141,7 @@ export default class SearchScreen extends React.Component<Props, State> {
     return (
       <TouchableOpacity
         activeOpacity={0.4}
-        onPress={() => this.props.onPoiSelected(poiFeature)}>
+        onPress={() => this.openPoi(poiFeature)}>
         <View style={styles.searchItem}>
           <Image
             source={this.getFeatureImage(poiFeature)}
@@ -160,6 +158,10 @@ export default class SearchScreen extends React.Component<Props, State> {
         </View>
       </TouchableOpacity>
     );
+  }
+
+  private openPoi(feature: Feature) {
+    this.props.navigation.navigate('MapScreen', {feature: feature});
   }
 
   /**

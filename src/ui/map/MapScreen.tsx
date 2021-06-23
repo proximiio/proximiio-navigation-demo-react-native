@@ -7,7 +7,7 @@ import {
   TouchableHighlight,
   ActivityIndicator,
   BackHandler,
-  TouchableNativeFeedback, FlatList, ListRenderItem, ListRenderItemInfo,
+  TouchableNativeFeedback, FlatList, ListRenderItem, ListRenderItemInfo, TouchableOpacity,
 } from 'react-native';
 import MapboxGL, {SymbolLayerStyle} from '@react-native-mapbox-gl/maps';
 import Proximiio, {
@@ -39,10 +39,14 @@ import {categoryList, SearchCategory} from '../search/SearchCategories';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import LinearGradient from 'react-native-linear-gradient';
 import {white} from "react-native-paper/lib/typescript/styles/colors";
+import {RouteProp} from "@react-navigation/native";
+import PreferenceHelper from "../../utils/PreferenceHelper";
 
 interface Props {
   onOpenSearch: (searchCategory?: SearchCategory) => void;
   onOpenPoi: (poi: Feature) => void;
+  navigation: any;
+  route: RouteProp<any, any>;
 }
 
 interface State {
@@ -110,6 +114,15 @@ export default class MapScreen extends React.Component<Props, State> {
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_HAZARD, this.onHazard);
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_SEGMENT, this.onSegment);
     BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+    if (this.props.route.params && this.props.route.params.feature) {
+      const feature = this.props.route.params.feature;
+      PreferenceHelper.routeFindWithPreferences(feature.id);
+      // clear params
+      this.props.navigation.setParams({feature: undefined});
+    }
   }
 
   componentWillUnmount() {
@@ -182,18 +195,19 @@ export default class MapScreen extends React.Component<Props, State> {
         {/* Route preview */}
         {this.renderSearch()}
         <View style={styles.fabWrapper}>
-          <FAB
-              color={Colors.primary}
-              icon="plus"
-              style={styles.fab}
-              onPress={() => this.zoomIn()}
-          />
-          <FAB
-              color={Colors.primary}
-              icon="minus"
-              style={styles.fab}
-              onPress={() => this.zoomOut()}
-          />
+          {/*<FAB*/}
+          {/*    color={Colors.primary}*/}
+          {/*    icon="plus"*/}
+          {/*    style={styles.fab}*/}
+          {/*    onPress={() => this.zoomIn()}*/}
+          {/*/>*/}
+          {/*<FAB*/}
+          {/*    color={Colors.primary}*/}
+          {/*    icon="minus"*/}
+          {/*    style={styles.fab}*/}
+          {/*    onPress={() => this.zoomOut()}*/}
+          {/*/>*/}
+          {this.renderFloorSelector()}
           <FAB
               color={this.state.followUserHeading ? Colors.primary : Colors.gray}
               icon="compass"
@@ -207,14 +221,15 @@ export default class MapScreen extends React.Component<Props, State> {
               onPress={() => this.showAndFollowCurrentUserLocation()}
           />
         </View>
-        {!this.state.started && this.state.route && (
-          <RoutePreview style={styles.routePreview} route={this.state.route} />
-        )}
-        {this.renderCategories()}
-        {this.renderRouteCalculation()}
-        {this.renderRouteEnded()}
-        {this.renderNavigation()}
-        {this.renderFloorSelector()}
+        <View style={{left: 0, right:0, bottom: 0, position: 'absolute'}}>
+          {!this.state.started && this.state.route && (
+            <RoutePreview style={styles.routePreview} route={this.state.route} />
+          )}
+          {this.renderCategories()}
+          {this.renderRouteCalculation()}
+          {this.renderRouteEnded()}
+          {this.renderNavigation()}
+        </View>
       </View>
     );
   }
@@ -305,10 +320,10 @@ export default class MapScreen extends React.Component<Props, State> {
       <View>
         <CardView style={styles.searchCard}>
           <TouchableHighlight
-            style={{borderRadius: 8}}
+            style={styles.searchCardTouchable}
             activeOpacity={0.9}
             underlayColor="#eeeeee"
-            onPress={() => {this.props.onOpenSearch()}}>
+            onPress={() => this.openSearch()}>
             <View style={styles.searchCardContent}>
               <FontAwesome5Icon name="search" light={true} size={20} style={styles.searchIcon} />
               <Text style={styles.searchText}>
@@ -322,6 +337,9 @@ export default class MapScreen extends React.Component<Props, State> {
   }
 
   private renderCategories() {
+    if (!this.showSearchCategories()) {
+      return;
+    }
     /*colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.22)', 'rgba(0,0,0,0.3)']}*/
     return (
       <View style={styles.searchCategoriesWrapper}>
@@ -329,7 +347,7 @@ export default class MapScreen extends React.Component<Props, State> {
         <FlatList
           style={styles.searchCategories}
           data={categoryList}
-          keyExtractor={(item => item.amenityCategoryId)}
+          keyExtractor={(item) => item.amenityCategoryId}
           horizontal={true}
           renderItem={(renderItem) => this.renderCategoriesItem(renderItem)}
         />
@@ -339,27 +357,40 @@ export default class MapScreen extends React.Component<Props, State> {
 
   private renderCategoriesItem(renderItem: ListRenderItemInfo<SearchCategory>) {
     return (
-      <CardView
-        style={{...styles.searchCategoriesItem, backgroundColor: renderItem.item.color}}>
-        <Image style={styles.searchCategoriesItemImage} source={renderItem.item.image} />
-        <Text style={styles.searchCategoriesItemText}>
-          {i18n.t(renderItem.item.title)}
-        </Text>
-      </CardView>
+      <TouchableOpacity
+        onPress={() => this.openSearch(renderItem.item)}
+        activeOpacity={0.7}>
+        <CardView
+          style={{...styles.searchCategoriesItem, backgroundColor: renderItem.item.color}}>
+          <Image style={styles.searchCategoriesItemImage} source={renderItem.item.image} />
+          <Text style={styles.searchCategoriesItemText}>
+            {i18n.t(renderItem.item.title)}
+          </Text>
+        </CardView>
+      </TouchableOpacity>
     );
   }
 
   private renderFloorSelector() {
     return (
-      <View style={styles.floorPickerWrapper}>
-        <FloorPicker
-          mapLevel={this.state.mapLevel}
-          userLevel={this.state.userLevel}
-          onLevelChanged={this.onLevelChanged.bind(this)}
-        />
-      </View>
+      <FloorPicker
+        mapLevel={this.state.mapLevel}
+        userLevel={this.state.userLevel}
+        onLevelChanged={this.onLevelChanged.bind(this)}
+      />
     );
   }
+
+  private showSearchCategories() {
+    return !this.state.started && !this.state.route && !this.state.routeUpdate;
+  }
+
+  private openSearch = (searchCategory?: SearchCategory) => {
+    console.log('ioebn search', searchCategory);
+    this.props.navigation.navigate('SearchScreen', {
+      searchCategory: searchCategory,
+    });
+  };
 
   /**
    * Find pressed POI on map.
@@ -368,7 +399,8 @@ export default class MapScreen extends React.Component<Props, State> {
     let pois = event.filter((it) => it.properties.type === 'poi');
     if (pois.length > 0) {
       ProximiioMapbox.route.cancel();
-      this.props.onOpenPoi(pois[0]);
+      // this.props.onOpenPoi(pois[0]);
+      PreferenceHelper.routeFindWithPreferences(pois[0].id);
     }
   };
 
@@ -619,6 +651,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
+  searchCardTouchable: {
+    borderRadius: 48,
+  },
   searchCardContent: {
     paddingHorizontal: 12,
     paddingVertical: 16,
@@ -671,11 +706,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   floorPickerWrapper: {
-    position: 'absolute',
-    top: 24,
-    left: 24,
-    right: 24,
+    // position: 'absolute',
+    // top: 24,
+    // left: 24,
+    // right: 24,
+    backgroundColor: 'green',
+    padding: 16,
+    flex: 0,
+    height: 'auto',
     alignItems: 'center',
+    maxHeight: 100,
   },
   calculationRow: {
     alignItems: 'center',

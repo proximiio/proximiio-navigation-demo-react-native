@@ -27,18 +27,20 @@ export default function importDirectionImage(direction: RouteStepSymbol, monocol
     case 'HARD_RIGHT':
       return require('../images/direction_icons/turn_right_hard.png');
     case 'UP_ELEVATOR':
+      return require('../images/direction_icons/ic_elevator_up.png');
     case 'UP_ESCALATOR':
     case 'UP_STAIRS':
       return require('../images/direction_icons/level_up.png');
     case 'DOWN_ELEVATOR':
+      return require('../images/direction_icons/ic_elevator_down.png');
     case 'DOWN_ESCALATOR':
     case 'DOWN_STAIRS':
       return require('../images/direction_icons/level_down.png');
     case 'FINISH':
       if (monocolorOnly) {
-        return require('../images/ic_preview_destination.png');
-      } else {
         return require('../images/direction_icons/finish.png');
+      } else {
+        return require('../images/ic_preview_destination.png');
       }
     default:
       return require('../images/dummy.png');

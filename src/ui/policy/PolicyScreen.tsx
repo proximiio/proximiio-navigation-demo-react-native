@@ -11,7 +11,6 @@ import i18n from 'i18next';
 import WebView from 'react-native-webview';
 import RoundedButton from '../../utils/RoundedButton';
 import {Colors, Shadow} from '../../Style';
-import PreferenceHelper from '../../utils/PreferenceHelper';
 
 interface Props {
   onPolicyAccepted?: () => any;

@@ -91,9 +91,9 @@ export default class RoutePreview extends React.Component<Props, State> {
     if (!images || images.length === 0) {
       return null;
     }
-    const width = Dimensions.get('screen').width - 40;
+    const width = Dimensions.get('screen').width - 48;
     return (
-      <View>
+      <View style={styles.sliderWrapper}>
         <SliderBox
           images={images}
           style={styles.slider}
@@ -116,7 +116,15 @@ export default class RoutePreview extends React.Component<Props, State> {
       return null;
     }
     const title = this.state.destination.getTitle(i18n.language);
-    const description = this.state.destination.getDescription(i18n.language);
+    const descriptionMetadata: Object = this.state.destination?.properties?.metadata?.description;
+    let description = null;
+    if (descriptionMetadata != null) {
+      if (descriptionMetadata.hasOwnProperty(i18n.language)) {
+        description = descriptionMetadata[i18n.language];
+      } else {
+        description = descriptionMetadata['en'];
+      }
+    }
     const estimates = this.state.tripDuration + ' | ' + this.state.tripDistance;
 
     return (
@@ -156,18 +164,24 @@ export default class RoutePreview extends React.Component<Props, State> {
         <View>
           <RoundedButton
             buttonStyle={styles.buttonStart}
+            icon={require('../../images/ic_navigate.png')}
+            iconStyle={{tintColor: Colors.blueDark}}
             title={i18n.t('preview.start')}
+            titleStyle={{color: Colors.blueDark}}
             onPress={() => ProximiioMapbox.route.start()}
           />
         </View>
         <View style={styles.buttonBar}>
           <RoundedButton
             buttonStyle={styles.buttonParking}
+            icon={require('../../images/ic_parking.png')}
             title={i18n.t(this.state.hasWaypoint ? 'preview.nearest_parking_remove' : 'preview.nearest_parking')}
             onPress={() => ProximiioMapbox.route.cancel()}
           />
           <RoundedButton
             buttonStyle={styles.buttonTrip}
+            icon={require('../../images/ic_route.png')}
+            iconStyle={{tintColor: Colors.blueDark}}
             titleStyle={{color: Colors.blueDark}}
             title={i18n.t(this.state.showTripDetails ? 'preview.hide_trip' : 'preview.show_trip')}
             onPress={() => this.setState({showTripDetails: !this.state.showTripDetails})}
@@ -309,6 +323,7 @@ const styles = StyleSheet.create({
   summaryTitle: {
     color: Colors.black,
     fontWeight: 'bold',
+    fontSize: 20,
     marginBottom: 2,
   },
   summaryDescription: {
@@ -347,5 +362,8 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 8,
     flex: 0,
     flexGrow: 0,
+  },
+  sliderWrapper: {
+    marginBottom: 4,
   },
 });

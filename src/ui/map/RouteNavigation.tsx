@@ -14,6 +14,7 @@ import ProximiioMapbox, {
   ProximiioRouteEvent,
 } from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
+import MapCardView from "./MapCardView";
 
 interface Props {
   routeUpdate: ProximiioRouteEvent;
@@ -27,10 +28,10 @@ export default class RouteNavigation extends React.Component<Props, State> {
 
   render() {
     if (this.props.routeUpdate === undefined) {
-      return <View />;
+      return null;
     }
     return (
-      <View style={styles.container}>
+      <MapCardView style={styles.container} onClosePressed={() => ProximiioMapbox.route.cancel()}>
         {this.props.segment && (
           <View style={styles.rowSegment}>
             <Text style={styles.rowText}>
@@ -46,24 +47,6 @@ export default class RouteNavigation extends React.Component<Props, State> {
           </View>
         )}
         {this.props.routeUpdate.data !== undefined && (
-          <View style={styles.rowBearing}>
-            <Image
-              style={{
-                ...styles.image,
-                transform: this.getDirectionRotation(this.props.routeUpdate.data.stepBearing),
-              }}
-              source={require('../../images/direction_icons/turn_straight.png')}
-            />
-            <Text style={styles.rowText}>
-              {this.getDirectionString(this.props.routeUpdate.data.stepBearing)}
-            </Text>
-            <TouchableNativeFeedback
-              onPress={() => ProximiioMapbox.route.cancel()}>
-              <Image style={styles.image} source={require('../../images/ic_close.png')}/>
-            </TouchableNativeFeedback>
-          </View>
-        )}
-        {this.props.routeUpdate.data !== undefined && (
           <View style={styles.rowNavigation}>
             <Image
               style={styles.image}
@@ -72,7 +55,7 @@ export default class RouteNavigation extends React.Component<Props, State> {
             <Text style={styles.rowText}>{this.props.routeUpdate.text}</Text>
           </View>
         )}
-      </View>
+      </MapCardView>
     );
   }
 
@@ -134,11 +117,11 @@ export default class RouteNavigation extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    // width: '100%',
   },
   image: {
     height: 32,
-    tintColor: Colors.navigationContentColor,
+    tintColor: Colors.black,
     width: 32,
   },
   row: {
@@ -150,13 +133,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 16,
-    backgroundColor: Colors.primary,
   },
   rowBearing: {
     alignItems: 'center',
     flexDirection: 'row',
     padding: 16,
-    backgroundColor: Colors.primaryDark,
   },
   rowHazard: {
     alignItems: 'center',
@@ -171,7 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.segmentBackground,
   },
   rowText: {
-    color: Colors.navigationContentColor,
+    color: Colors.black,
     flex: 1,
     padding: 8,
   },

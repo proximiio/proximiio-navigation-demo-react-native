@@ -75,6 +75,8 @@ const resources = {
       'preview.nearest_parking': 'Nearest parking on route',
       'preview.nearest_parking_remove': 'Remove parking',
 
+      'mapscreen.calculating': 'Calculating...',
+
       'poiscreen.no_description': 'No description available.',
       'poiscreen.start_my_trip': 'Start My Trip',
       'poiscreen.calculating_steps': 'Calculating distance...',

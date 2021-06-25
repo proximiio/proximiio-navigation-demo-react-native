@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {View} from 'react-native';
+import {StyleProp, View} from 'react-native';
 import {Colors} from '../Style';
 
 interface Props {
-  style: any;
+  style?: StyleProp<any>;
 }
 interface State {}
 

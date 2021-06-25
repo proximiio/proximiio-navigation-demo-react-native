@@ -41,6 +41,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {white} from "react-native-paper/lib/typescript/styles/colors";
 import {RouteProp} from "@react-navigation/native";
 import PreferenceHelper from "../../utils/PreferenceHelper";
+import MapCardView from "./MapCardView";
 
 interface Props {
   onOpenSearch: (searchCategory?: SearchCategory) => void;
@@ -222,9 +223,7 @@ export default class MapScreen extends React.Component<Props, State> {
           />
         </View>
         <View style={{left: 0, right:0, bottom: 0, position: 'absolute'}}>
-          {!this.state.started && this.state.route && (
-            <RoutePreview style={styles.routePreview} route={this.state.route} />
-          )}
+          {this.renderRoutePreview()}
           {this.renderCategories()}
           {this.renderRouteCalculation()}
           {this.renderRouteEnded()}
@@ -239,17 +238,17 @@ export default class MapScreen extends React.Component<Props, State> {
    */
   private renderRouteCalculation() {
     if (
-      this.state.started === false ||
-      this.state.routeUpdate === null ||
-      (this.state.routeUpdate.eventType !==
-        ProximiioRouteUpdateType.CALCULATING &&
-        this.state.routeUpdate.eventType !==
-          ProximiioRouteUpdateType.RECALCULATING)
+      !!this.state.route
+      || !this.state.routeUpdate
+      || (
+        this.state.routeUpdate.eventType !== ProximiioRouteUpdateType.CALCULATING
+        && this.state.routeUpdate.eventType !== ProximiioRouteUpdateType.RECALCULATING
+      )
     ) {
       return null;
     }
     return (
-      <View style={styles.calculationRow}>
+      <MapCardView style={styles.calculationRow} onClosePressed={() => ProximiioMapbox.route.cancel()}>
         <ActivityIndicator
           size="large"
           color={Colors.primary}
@@ -257,9 +256,9 @@ export default class MapScreen extends React.Component<Props, State> {
           animating
         />
         <View style={styles.calculationRowText}>
-          <Text>{this.state.routeUpdate.text}</Text>
+          <Text>{i18n.t('mapscreen.calculating')}</Text>
         </View>
-      </View>
+      </MapCardView>
     );
   }
 
@@ -270,18 +269,11 @@ export default class MapScreen extends React.Component<Props, State> {
     ) {
       return null;
     }
-    let isFinish =
-      this.state.routeUpdate.eventType === ProximiioRouteUpdateType.FINISHED;
+    let isFinish = this.state.routeUpdate.eventType === ProximiioRouteUpdateType.FINISHED;
+    let icon = isFinish ? require('../../images/direction_icons/finish.png') : require('../../images/dummy.png');
     return (
-      <View style={styles.calculationRow}>
-        <Image
-          style={styles.calculationImage}
-          source={
-            isFinish
-              ? require('../../images/direction_icons/finish.png')
-              : require('../../images/dummy.png')
-          }
-        />
+      <MapCardView style={styles.calculationRow} onClosePressed={this.clearRoute}>
+        <Image style={styles.calculationImage} source={icon} />
         <View style={styles.calculationRowText}>
           <Text>{this.state.routeUpdate.text}</Text>
         </View>
@@ -291,7 +283,7 @@ export default class MapScreen extends React.Component<Props, State> {
             source={require('../../images/ic_close.png')}
           />
         </TouchableNativeFeedback>
-      </View>
+      </MapCardView>
     );
   }
 
@@ -333,6 +325,15 @@ export default class MapScreen extends React.Component<Props, State> {
           </TouchableHighlight>
         </CardView>
       </View>
+    );
+  }
+
+  private renderRoutePreview() {
+    if (this.state.started || !this.state.route) {
+      return null;
+    }
+    return (
+      <RoutePreview route={this.state.route} />
     );
   }
 
@@ -496,6 +497,7 @@ export default class MapScreen extends React.Component<Props, State> {
     } else {
       if (event.eventType === ProximiioRouteUpdateType.CALCULATING) {
         this.showAndFollowCurrentUserLocation();
+        this.setState({routeUpdate: event, started: false, route: null});
       } else {
         this.setState({routeUpdate: event, started: true});
       }
@@ -719,9 +721,8 @@ const styles = StyleSheet.create({
   },
   calculationRow: {
     alignItems: 'center',
-    backgroundColor: Colors.background,
     flexDirection: 'row',
-    padding: 8,
+    paddingHorizontal: 16,
     alignContent: 'center',
     justifyContent: 'space-around',
   },
@@ -738,14 +739,12 @@ const styles = StyleSheet.create({
   calculationRowText: {
     flex: 1,
     padding: 8,
+    marginStart: 4,
     alignItems: 'flex-start',
   },
   calculationRowCancel: {
     height: 32,
     tintColor: Colors.black,
     width: 32,
-  },
-  routePreview: {
-    // flex: 1,
   },
 });

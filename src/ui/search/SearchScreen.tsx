@@ -85,29 +85,7 @@ export default class SearchScreen extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
-        <CardView style={styles.searchInputCard}>
-          <View style={styles.searchInputCardContent}>
-            <FontAwesome5Icon name="search" light={true} size={20} style={styles.searchIcon} />
-            {this.state.featureCategoryFilter && (
-              <TouchableHighlight
-                activeOpacity={0.5}
-                underlayColor="#fff"
-                onPress={() => this.updateCategoryFilter(undefined)}>
-                <View style={styles.categoryFilter}>
-                  <Text>{i18n.t(this.state.featureCategoryFilter.title)}</Text>
-                  <IconButton icon="close" size={16} style={styles.categoryFilterClose}/>
-                </View>
-              </TouchableHighlight>
-            )}
-            <View style={styles.searchInput}>
-              <TextInput
-                placeholder={i18n.t('common.search_hint')}
-                onChangeText={(title) => this.updateSearchFilter(title)}
-                autoFocus
-              />
-            </View>
-          </View>
-        </CardView>
+        {this.renderSearchInputCard()}
         <FlatList
           contentContainerStyle={styles.scrollviewContent}
           data={this.state.filteredFeatureList}
@@ -119,6 +97,34 @@ export default class SearchScreen extends React.Component<Props, State> {
           style={styles.searchItemList}
         />
       </View>
+    );
+  }
+
+  private renderSearchInputCard() {
+    return (
+      <CardView style={styles.searchInputCard}>
+        <View style={styles.searchInputCardContent}>
+          <FontAwesome5Icon name="search" light={true} size={20} style={styles.searchIcon} />
+          {this.state.featureCategoryFilter && (
+            <TouchableHighlight
+              activeOpacity={0.5}
+              underlayColor="#fff"
+              onPress={() => this.updateCategoryFilter(undefined)}>
+              <View style={styles.categoryFilter}>
+                <Text>{i18n.t(this.state.featureCategoryFilter.title)}</Text>
+                <IconButton icon="close" size={16} style={styles.categoryFilterClose}/>
+              </View>
+            </TouchableHighlight>
+          )}
+          <View style={styles.searchInput}>
+            <TextInput
+              placeholder={i18n.t('common.search_hint')}
+              onChangeText={(title) => this.updateSearchFilter(title)}
+              autoFocus
+            />
+          </View>
+        </View>
+      </CardView>
     );
   }
 

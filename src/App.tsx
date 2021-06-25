@@ -127,7 +127,7 @@ export default class App extends React.Component<Props, State> {
   private renderScreenStack() {
     return (
       <NavigationContainer>
-        <Stack.Navigator headerMode={'float'}>
+        <Stack.Navigator>
           <Stack.Screen
             name="MapScreen"
             component={MapScreen}

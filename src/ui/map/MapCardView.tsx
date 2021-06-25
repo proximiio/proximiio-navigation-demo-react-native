@@ -17,7 +17,7 @@ export default class MapCardView extends React.Component<Props, State> {
       <CardView style={{...styles.cardView, ...this.props.style}}>
         <TouchableOpacity
           style={styles.closeButton}
-          onPress={() => ProximiioMapbox.route.cancel()}>
+          onPress={() => this.props.onClosePressed()}>
           <FontAwesome5Icon name={'times'} color={Colors.white} size={16} />
         </TouchableOpacity>
         {this.props.children}
@@ -28,21 +28,22 @@ export default class MapCardView extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   cardView: {
-    paddingHorizontal: 8,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     margin: 12,
+    borderRadius: 24,
   },
   closeButton: {
     ...Shadow,
     backgroundColor: Colors.red,
     padding: 8,
     borderRadius: 100,
-    width: 42,
-    height: 42,
+    width: 48,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    right: 12,
-    top: -21,
+    right: 20,
+    top: -26,
   },
 });

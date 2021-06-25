@@ -270,19 +270,13 @@ export default class MapScreen extends React.Component<Props, State> {
       return null;
     }
     let isFinish = this.state.routeUpdate.eventType === ProximiioRouteUpdateType.FINISHED;
-    let icon = isFinish ? require('../../images/direction_icons/finish.png') : require('../../images/dummy.png');
+    let icon = isFinish ? require('../../images/direction_icons/finish.png') : require('../../images/direction_icons/canceled.png');
     return (
       <MapCardView style={styles.calculationRow} onClosePressed={this.clearRoute}>
         <Image style={styles.calculationImage} source={icon} />
         <View style={styles.calculationRowText}>
           <Text>{this.state.routeUpdate.text}</Text>
         </View>
-        <TouchableNativeFeedback onPress={this.clearRoute}>
-          <Image
-            style={styles.calculationRowCancel}
-            source={require('../../images/ic_close.png')}
-          />
-        </TouchableNativeFeedback>
       </MapCardView>
     );
   }
@@ -506,8 +500,9 @@ export default class MapScreen extends React.Component<Props, State> {
 
   private clearRoute = () => {
     this.setState({
-      route: undefined,
-      routeUpdate: undefined,
+      route: null,
+      routeUpdate: null,
+      started: false,
     });
   };
 

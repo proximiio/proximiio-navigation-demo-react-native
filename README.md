@@ -16,7 +16,7 @@ please run "pod repo update" followed by "pod install"
 
 ## Configuration
 
-Enter Proximi.io Application Token in "src/utils/Constants.js"
+Enter Proximi.io Application Token in "src/utils/Constants.tsx"
 
 ### IOS Specific Configuration
 Click RNDemoApp in the Project Browser on the left, then select RnDemoApp under Targets, click "Signing & Capabilities" tab and finish your app signing setup.

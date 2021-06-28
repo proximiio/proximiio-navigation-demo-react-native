@@ -5,14 +5,15 @@ import {
   FlatList,
   Text,
   Image,
-  ListRenderItem,
   ListRenderItemInfo,
-  TouchableOpacity, TouchableHighlight, StyleProp
+  TouchableOpacity,
+  StyleProp,
 } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
-import Proximiio, {ProximiioEvents, ProximiioFloor} from 'react-native-proximiio';
+import Proximiio, {ProximiioEvents} from 'react-native-proximiio';
 import {Colors, Shadow} from '../../Style';
-import i18n from "i18next";
+import i18n from 'i18next';
+import {LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
+import {TouchableHighlight} from 'react-native-gesture-handler';
 
 interface Props {
   mapLevel: number;
@@ -43,7 +44,7 @@ export default class FloorPicker extends React.Component<Props, State> {
   }
 
   render() {
-    const currentFloorLevelKey = 'common.floor_' + this.props.mapLevel;
+    const currentFloorLevelKey = 'common.floor_' + LEVEL_OVERRIDE_MAP.get(this.props.mapLevel);
     const currentFloorLevelImageWithRotation = {...styles.currentFloorLevelImage} as StyleProp<any>;
     if (this.state.open) {
       currentFloorLevelImageWithRotation.transform = [{rotate: '180deg'}];
@@ -51,8 +52,8 @@ export default class FloorPicker extends React.Component<Props, State> {
     return (
       <View style={styles.container}>
         <TouchableOpacity
-          onPress={this.toggleOpen}
-          activeOpacity={0.8}>
+          activeOpacity={0.9}
+          onPress={this.toggleOpen}>
           <View style={styles.currentFloorLevel}>
             <Text style={styles.currentFloorLevelText}>{i18n.t(currentFloorLevelKey)}</Text>
             <Image style={currentFloorLevelImageWithRotation} source={require('../../images/ic_floor_spinner.png')} />
@@ -64,11 +65,11 @@ export default class FloorPicker extends React.Component<Props, State> {
   }
 
   private renderLevelItem = (renderItem: ListRenderItemInfo<any>) => {
-    const floorLevelKey = 'common.floor_' + renderItem.item;
+    const floorLevelStringKey = 'common.floor_' + LEVEL_OVERRIDE_MAP.get(renderItem.item);
     return (
       <TouchableOpacity onPress={() => this.onFloorSelected(renderItem.item)} activeOpacity={0.8}>
         <Text style={styles.floorListItem}>
-          {i18n.t(floorLevelKey)}
+          {i18n.t(floorLevelStringKey)}
         </Text>
       </TouchableOpacity>
     );
@@ -124,27 +125,26 @@ const styles = StyleSheet.create({
   currentFloorLevel: {
     ...Shadow,
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: Colors.greenLight,
     borderRadius: 100,
-    color: Colors.blueDark,
     flexDirection: 'row',
-    fontSize: 16,
     marginBottom: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
   currentFloorLevelText: {
     color: Colors.blueDark2,
+    fontSize: 16,
+    marginEnd: 8,
   },
   currentFloorLevelImage: {
-    marginStart: 8,
     height: 12,
     width: 12,
   },
   floorList: {
     flex: 0,
     alignSelf: 'flex-end',
-    paddingStart: 24,
     maxHeight: 156,
   },
   floorListItem: {

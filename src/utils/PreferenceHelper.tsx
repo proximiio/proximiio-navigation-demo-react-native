@@ -1,7 +1,7 @@
 import DefaultPreference from 'react-native-default-preference';
 import ProximiioMapbox, {
   ProximiioWayfindingOptions,
-  ProximiioRouteConfiguration,
+  ProximiioRouteConfiguration, Feature,
 } from 'react-native-proximiio-mapbox';
 import {
   MetersUnitConversion,
@@ -10,6 +10,7 @@ import {
 import {UnitConversionHelper} from './UnitConversionHelper';
 import {PreferenceOptionItem} from '../ui/preferences/PreferenceOptionItem';
 import {DistanceUnitOption} from '../ui/preferences/DistanceUnitOption';
+import * as turf from '@turf/turf';
 
 /**
  * Preference values (keys).
@@ -52,6 +53,11 @@ export const ReassuranceDistanceOption = {
   METERS_20: {id: 'meters_20', name: 'preferencescreen.reassurance_20m', value: 20} as PreferenceOptionItem,
   METERS_25: {id: 'meters_25', name: 'preferencescreen.reassurance_25m', value: 25} as PreferenceOptionItem,
 };
+
+/**
+ * ID of amenity for parking spaces. Used to add a parking as a waypoint for navigation.
+ */
+const AMENITY_PARKING_ID = 'c1eaab1a-3f02-4491-a515-af8d628f74fb:9da478a4-b0ce-47ba-8b44-32a4b31150a8';
 
 /**
  * Helper class to manage user preferences.
@@ -177,9 +183,10 @@ class PreferenceHelper {
   /**
    * Helper method to find route while applying restrictions set by user in preference screen.
    * @param destinationFeatureId
+   * @param withParking
    * @returns {Promise<void>}
    */
-  static async routeFindWithPreferences(destinationFeatureId) {
+  static async routeFindWithPreferences(destinationFeatureId: String, withParking: boolean = false) {
     let preferences = this.getPreferences();
     let wayfindingOptions: ProximiioWayfindingOptions = {
       avoidElevators: preferences[Preference.AVOID_ELEVATORS],
@@ -192,7 +199,23 @@ class PreferenceHelper {
       destinationFeatureId: destinationFeatureId,
       wayfindingOptions: wayfindingOptions,
     };
+    if (withParking) {
+      const destination = ProximiioMapbox.getFeatures().find((it) => it.id === destinationFeatureId);
+      const parkingFeatures = ProximiioMapbox.getFeatures().filter((it) => it.properties.amenity === AMENITY_PARKING_ID);
+      const bestParking = parkingFeatures.reduce((prev, curr) => this.returnFeatureNearerToDestination(destination, curr, prev));
+      routeConfiguration.waypointFeatureIdList = [[bestParking.id]];
+    }
     ProximiioMapbox.route.findAndPreview(routeConfiguration);
+  }
+
+  private static returnFeatureNearerToDestination(destination: Feature, featureA: Feature, featureB?: Feature): Feature {
+    const distanceA = turf.distance(featureA, destination, {units: 'meters'});
+    const distanceB = featureB ? turf.distance(featureB, destination, {units: 'meters'}) : null;
+    if (!distanceB || distanceA < distanceB) {
+      return featureA;
+    } else {
+      return featureB;
+    }
   }
 }
 

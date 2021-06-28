@@ -8,6 +8,7 @@ const ColorsBase = {
   blue: '#08aee6',
   blueLight2: '#4F86C3',
   blueDark: '#0783AC',
+  blueDark2: '#004B8A',
   red: '#ED246C',
   gray: '#999999',
   grayLight: '#cccccc',

@@ -1,8 +1,18 @@
 import * as React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Text,
+  Image,
+  ListRenderItem,
+  ListRenderItemInfo,
+  TouchableOpacity, TouchableHighlight, StyleProp
+} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Proximiio, {ProximiioEvents, ProximiioFloor} from 'react-native-proximiio';
 import {Colors, Shadow} from '../../Style';
+import i18n from "i18next";
 
 interface Props {
   mapLevel: number;
@@ -10,125 +20,141 @@ interface Props {
   onLevelChanged: (newMapLevel: number) => void;
 }
 interface State {
-  floorList: [];
+  currentFloor: number;
+  levelList: number[];
+  open: boolean;
 }
 
 export default class FloorPicker extends React.Component<Props, State> {
-  dropdown = null;
   state = {
-    floorList: null,
-  };
+    currentFloor: 0,
+    levelList: [],
+    open: false,
+  } as State;
   floorChangedSubscription = undefined;
 
   componentDidMount() {
     this.refreshFloorList();
-    this.floorChangedSubscription = Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChanged.bind(this));
+    Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChanged);
   }
 
   componentWillUnmount() {
-    this.floorChangedSubscription.remove();
+    Proximiio.unsubscribe(ProximiioEvents.FloorChanged, this.onFloorChanged);
   }
 
   render() {
-    if (!this.state.floorList) {
-      this.dropdown = null;
-      return <View />;
+    const currentFloorLevelKey = 'common.floor_' + this.props.mapLevel;
+    const currentFloorLevelImageWithRotation = {...styles.currentFloorLevelImage} as StyleProp<any>;
+    if (this.state.open) {
+      currentFloorLevelImageWithRotation.transform = [{rotate: '180deg'}];
     }
     return (
-      <DropDownPicker
-        controller={(instance) => (this.dropdown = instance)}
-        items={this.state.floorList}
-        arrowColor={'#ffffff'}
-        style={styles.main}
-        dropDownStyle={styles.dropdown}
-        itemStyle={styles.item}
-        labelStyle={styles.label}
-        selectedLabelStyle={styles.selectedLabel}
-        placeholderStyle={styles.selectedLabel}
-        defaultValue={this.props.mapLevel}
-        onChangeItem={(newLevel) => this.onFloorSelected(newLevel)}
-      />
+      <View style={styles.container}>
+        <TouchableOpacity
+          onPress={this.toggleOpen}
+          activeOpacity={0.8}>
+          <View style={styles.currentFloorLevel}>
+            <Text style={styles.currentFloorLevelText}>{i18n.t(currentFloorLevelKey)}</Text>
+            <Image style={currentFloorLevelImageWithRotation} source={require('../../images/ic_floor_spinner.png')} />
+          </View>
+        </TouchableOpacity>
+        {this.state.open && <FlatList style={styles.list} data={this.state.levelList} keyExtractor={(item, index) => '' + index} renderItem={this.renderLevelItem} />}
+      </View>
     );
   }
 
-  private onFloorSelected(selectedFloor) {
-    this.props.onLevelChanged(selectedFloor.value);
-  }
+  private renderLevelItem = (renderItem: ListRenderItemInfo<any>) => {
+    const floorLevelKey = 'common.floor_' + renderItem.item;
+    return (
+      <TouchableOpacity onPress={() => this.onFloorSelected(renderItem.item)} activeOpacity={0.8}>
+        <Text style={styles.listItem}>
+          {i18n.t(floorLevelKey)}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
-  private onFloorChanged(floorChange) {
+  private toggleOpen = () => {
+    this.setState({open: !this.state.open});
+  };
+
+  private onFloorSelected = (selectedFloorLevel) => {
+    this.props.onLevelChanged(selectedFloorLevel);
+    this.toggleOpen();
+  };
+
+  private onFloorChanged = (floorChange) => {
     console.log(floorChange);
     this.refreshFloorList();
-  }
+  };
 
   private async refreshFloorList() {
     let floor = Proximiio.floor;
-
-    // No current floor selected, user is outside
-    if (!floor) {
-      this.setState({floorList: null});
-      return;
-    }
-    let placeId = floor.place_id;
     let floors = await Proximiio.floors();
-    let newFloorList = floors
-      .filter((item) => item.place_id === placeId)
+    let newLevelList = floors
+      .map((it) => it.level)
       .filter(this.filterUnique)
-      .map((item) => {
-        return {
-          label: item.name,
-          value: item.level,
-        };
-      })
-      .sort((a, b) => a.value - b.value);
-    this.setState({floorList: newFloorList});
+      .sort((a, b) => a - b);
+    this.setState({
+      levelList: newLevelList,
+      currentFloor: floor?.level || 0,
+    });
   }
 
   /**
    * Helper method for filtering out only unique floors
-   * @param value {ProximiioFloor}
-   * @param index {Number}
-   * @param self {Array}
+   * @param value {number}
+   * @param index {number}
+   * @param self {Array<number>}
    * @returns {boolean}
    * @private
    */
-  private filterUnique(value, index, self: ProximiioFloor[]) {
-    let firstIndex = self.findIndex((it) => it.id === value.id);
-    return self.indexOf(value) === firstIndex;
+  private filterUnique(value: number, index: number, self: number[]) {
+    let firstIndex = self.findIndex((it) => it === value);
+    return index === firstIndex;
   }
 }
 
 const styles = StyleSheet.create({
-  main: {
-    ...Shadow,
-    backgroundColor: Colors.floorSelectorBackground,
-    borderWidth: 0,
-    width: 184,
-    height: 'auto',
-    flex: 0,
+  container: {
+    marginEnd: 16,
     marginBottom: 16,
-    marginRight: 16,
-    borderBottomEndRadius: 100,
-    borderBottomStartRadius: 100,
-    borderTopEndRadius: 100,
-    borderTopStartRadius: 100,
   },
-  selectedLabel: {
-    textAlign: 'left',
-    color: Colors.floorSelectorText,
-    backgroundColor: Colors.floorSelectorBackground,
+  currentFloorLevel: {
+    ...Shadow,
+    alignItems: 'center',
+    backgroundColor: Colors.greenLight,
+    borderRadius: 100,
+    color: Colors.blueDark,
+    flexDirection: 'row',
+    fontSize: 16,
+    marginBottom: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  label: {
-    textAlign: 'left',
-    color: Colors.floorSelectorText,
-    paddingVertical: 8,
-    zIndex: 2,
+  currentFloorLevelText: {
+    color: Colors.blueDark2,
   },
-  item: {
-    justifyContent: 'flex-start',
-    padding: 12,
+  currentFloorLevelImage: {
+    marginStart: 8,
+    height: 12,
+    width: 12,
   },
-  dropdown: {
-    backgroundColor: Colors.floorSelectorBackground,
-    width: 256,
+  list: {
+    flex: 0,
+    alignSelf: 'flex-end',
+    paddingStart: 24,
+    maxHeight: 156,
+  },
+  listItem: {
+    ...Shadow,
+    alignSelf: 'flex-end',
+    backgroundColor: Colors.blueDark,
+    borderRadius: 100,
+    color: Colors.white,
+    fontSize: 12,
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
 });

@@ -24,6 +24,7 @@ import RoundedButton from '../../utils/RoundedButton';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {PROXIMIIO_TOKEN} from '../../utils/Constants';
 import MapCardView from './MapCardView';
+import PreferenceHelper from "../../utils/PreferenceHelper";
 
 interface Props {
   route: ProximiioMapboxRoute;
@@ -176,7 +177,7 @@ export default class RoutePreview extends React.Component<Props, State> {
             buttonStyle={styles.buttonParking}
             icon={require('../../images/ic_parking.png')}
             title={i18n.t(this.state.hasWaypoint ? 'preview.nearest_parking_remove' : 'preview.nearest_parking')}
-            onPress={() => ProximiioMapbox.route.cancel()}
+            onPress={this.toggleParking}
           />
           <RoundedButton
             buttonStyle={styles.buttonTrip}
@@ -233,6 +234,10 @@ export default class RoutePreview extends React.Component<Props, State> {
       return imageList;
     }
   }
+
+  private toggleParking = () => {
+    PreferenceHelper.routeFindWithPreferences(this.props.route.destination.id, !this.state.hasWaypoint);
+  };
 
   private async updateEstimates() {
     if (!this.props.route) {

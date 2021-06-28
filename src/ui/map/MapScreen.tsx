@@ -326,6 +326,7 @@ export default class MapScreen extends React.Component<Props, State> {
     if (this.state.started || !this.state.route) {
       return null;
     }
+    console.log(this.state.route);
     return (
       <RoutePreview route={this.state.route} />
     );
@@ -371,7 +372,7 @@ export default class MapScreen extends React.Component<Props, State> {
       <FloorPicker
         mapLevel={this.state.mapLevel}
         userLevel={this.state.userLevel}
-        onLevelChanged={this.onLevelChanged.bind(this)}
+        onLevelChanged={this.onLevelChanged}
       />
     );
   }
@@ -568,9 +569,9 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param newLevel
    * @private
    */
-  private onLevelChanged(newLevel) {
+  private onLevelChanged = (newLevel) => {
     this.setState({mapLevel: newLevel});
-  }
+  };
 
   /**
    * Zooms map in.

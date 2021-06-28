@@ -244,10 +244,7 @@ export default class SearchScreen extends React.Component<Props, State> {
    */
   private matchesSearchItemTitle(item: Feature, title: String, category: SearchCategory) {
     if (category) {
-      if (
-        !this.state.amenityMap.has(item.properties.amenity)
-        || this.state.amenityMap.get(item.properties.amenity).category_id !== category.amenityCategoryId
-      ) {
+      if (item.properties.amenity !== category.amenityId) {
         return false;
       }
     }

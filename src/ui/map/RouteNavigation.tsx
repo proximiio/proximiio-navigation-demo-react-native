@@ -58,61 +58,6 @@ export default class RouteNavigation extends React.Component<Props, State> {
       </MapCardView>
     );
   }
-
-  /**
-   * Transforms bearing degrees into 'nice' text info.
-   * @param bearing
-   * @returns {string}
-   * @private
-   */
-  private getDirectionString(bearing) {
-    if (bearing > -22.5 && bearing < 22.5) {
-      return i18n.t('navigation.north');
-    } else if (bearing > 22.5 && bearing < 67.5) {
-      return i18n.t('navigation.north-east');
-    } else if (bearing > 67.5 && bearing < 112.5) {
-      return i18n.t('navigation.east');
-    } else if (bearing > 112.5 && bearing < 157.5) {
-      return i18n.t('navigation.south-east');
-    } else if (bearing > -67.5 && bearing < -22.5) {
-      return i18n.t('navigation.north-west');
-    } else if (bearing > -112.5 && bearing < -67.5) {
-      return i18n.t('navigation.west');
-    } else if (bearing > -157.5 && bearing < -112.5) {
-      return i18n.t('navigation.south-west');
-    } else {
-      return i18n.t('navigation.south');
-    }
-  }
-
-  /**
-   * Transforms bearing degrees into rotation transformation style that rotates arrow to appropriate cardinal direction.
-   * @param bearing
-   * @returns {[{rotate: Array}]}
-   * @private
-   */
-  private getDirectionRotation(bearing) {
-    let rotation;
-    if (bearing > -22.5 && bearing < 22.5) {
-      rotation = 0;
-    } else if (bearing > 22.5 && bearing < 67.5) {
-      rotation = 45;
-    } else if (bearing > 67.5 && bearing < 112.5) {
-      rotation = 90;
-    } else if (bearing > 112.5 && bearing < 157.5) {
-      rotation = 135;
-    } else if (bearing > -67.5 && bearing < -22.5) {
-      rotation = -45;
-    } else if (bearing > -112.5 && bearing < -67.5) {
-      rotation = -90;
-    } else if (bearing > -157.5 && bearing < -112.5) {
-      rotation = -135;
-    } else {
-      rotation = 180;
-    }
-    let degreesString = rotation + 'deg';
-    return [{rotate: degreesString}];
-  }
 }
 
 const styles = StyleSheet.create({
@@ -127,12 +72,12 @@ const styles = StyleSheet.create({
   row: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 16,
+    // padding: 16,
   },
   rowNavigation: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 16,
+    // padding: 16,
   },
   rowBearing: {
     alignItems: 'center',

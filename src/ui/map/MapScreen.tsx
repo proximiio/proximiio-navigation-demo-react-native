@@ -336,14 +336,13 @@ export default class MapScreen extends React.Component<Props, State> {
     if (!this.showSearchCategories()) {
       return;
     }
-    /*colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.22)', 'rgba(0,0,0,0.3)']}*/
     return (
       <View style={styles.searchCategoriesWrapper}>
         <Text style={styles.searchCategoriesLabel}>Explore nearby</Text>
         <FlatList
           style={styles.searchCategories}
           data={categoryList}
-          keyExtractor={(item) => item.amenityCategoryId}
+          keyExtractor={(item) => item.amenityId}
           horizontal={true}
           renderItem={(renderItem) => this.renderCategoriesItem(renderItem)}
         />
@@ -643,7 +642,6 @@ const styles = StyleSheet.create({
   searchCard: {
     borderRadius: 48,
     marginTop: 16,
-    marginBottom: 16,
     marginHorizontal: 16,
     padding: 0,
     paddingHorizontal: 0,
@@ -698,6 +696,7 @@ const styles = StyleSheet.create({
     height: 24,
     marginEnd: 4,
     width: 24,
+    tintColor: Colors.white,
   },
   searchCategoriesItemText: {
     color: 'white',

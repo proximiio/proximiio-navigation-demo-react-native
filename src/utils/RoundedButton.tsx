@@ -56,7 +56,8 @@ const styles = StyleSheet.create({
   },
   touchable: {
     borderRadius: 100,
-    padding: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

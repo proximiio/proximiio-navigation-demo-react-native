@@ -7,6 +7,7 @@ const ColorsBase = {
   black: '#000000',
   blue: '#08aee6',
   blueLight2: '#4F86C3',
+  blueLight3: '#71D9DE',
   blueDark: '#0783AC',
   blueDark2: '#004B8A',
   red: '#ED246C',
@@ -16,6 +17,8 @@ const ColorsBase = {
   offWhite: '#eeeeee',
   white: '#ffffff',
   pink: '#DB62B2',
+  yellow: '#E2CE19',
+  purple: '#8C62B6',
 };
 
 /**

@@ -286,7 +286,7 @@ export default class MapScreen extends React.Component<Props, State> {
             underlayColor="#eeeeee"
             onPress={() => this.openSearch()}>
             <View style={styles.searchCardContent}>
-              <FontAwesome5Icon name="search" light={true} size={20} style={styles.searchIcon} />
+              <Image style={styles.searchIcon} source={require('../../images/ic_search.png')} />
               <Text style={styles.searchText}>
                 {i18n.t('common.search_hint')}
               </Text>
@@ -627,6 +627,8 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     paddingHorizontal: 8,
+    width: 24,
+    height: 24,
   },
   searchText: {
     color: Colors.gray,

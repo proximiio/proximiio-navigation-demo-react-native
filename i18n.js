@@ -30,7 +30,8 @@ const resources = {
       'common.meters': '{{count}} meter',
       'common.meters_plural': '{{count}} meters',
 
-      'searchscreen.no_items': 'There are no items!',
+      'searchscreen.no_items': 'No results',
+      'searchscreen.no_items_less_specific': 'Try a less specific search or\nbrowse available rooms and items.',
       'searchscreen.end_of_results': 'End of results',
       'searchscreen.results': '{{count}} result found',
       'searchscreen.results_plural': '{{count}} results found',

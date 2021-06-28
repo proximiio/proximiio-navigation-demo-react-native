@@ -104,7 +104,8 @@ export default class SearchScreen extends React.Component<Props, State> {
     return (
       <CardView style={styles.searchInputCard}>
         <View style={styles.searchInputCardContent}>
-          <FontAwesome5Icon name="search" light={true} size={20} style={styles.searchIcon} />
+          <Image style={styles.searchIcon} source={require('../../images/ic_search.png')} />
+          {/*<FontAwesome5Icon name="search" light={true} size={20} style={styles.searchIcon} />*/}
           {this.state.featureCategoryFilter && (
             <TouchableHighlight
               activeOpacity={0.5}
@@ -342,7 +343,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchItemHeader: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     fontSize: 16,
     paddingTop: 4,
     paddingBottom: 12,
@@ -360,6 +361,8 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     paddingHorizontal: 8,
+    width: 24,
+    height: 24,
   },
   searchInput: {
     flex: 1,

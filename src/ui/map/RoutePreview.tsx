@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   summaryEstimates: {
-    color: Colors.blueDark,
+    color: Colors.blueDark2,
     marginBottom: 2,
   },
   buttonStart: {

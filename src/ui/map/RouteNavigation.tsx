@@ -1,10 +1,5 @@
 import * as React from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
 import {Colors} from '../../Style';
 import ProximiioMapbox, {
@@ -21,6 +16,9 @@ interface Props {
 }
 interface State {}
 
+/**
+ * Component displaying navigation message
+ */
 export default class RouteNavigation extends React.Component<Props, State> {
   state = {};
 
@@ -28,17 +26,18 @@ export default class RouteNavigation extends React.Component<Props, State> {
     if (this.props.routeUpdate === undefined) {
       return null;
     }
+    const hazardStyle = !this.props.segment ? {...styles.rowHazard,  ...styles.topRow} : styles.rowHazard;
     return (
       <MapCardView style={styles.container} onClosePressed={() => ProximiioMapbox.route.cancel()}>
         {this.props.segment && (
-          <View style={styles.rowSegment}>
+          <View style={{...styles.rowSegment, ...styles.topRow}}>
             <Text style={styles.rowText}>
               {i18n.t('navigation.you_are_in') + ' ' + this.props.segment.getTitle()}
             </Text>
           </View>
         )}
         {this.props.hazard && (
-          <View style={styles.rowHazard}>
+          <View style={hazardStyle}>
             <Text style={styles.rowText}>
               {i18n.t('navigation.watch_out_for') + ' ' + this.props.hazard.properties.getTitle()}
             </Text>
@@ -70,29 +69,34 @@ const styles = StyleSheet.create({
   row: {
     alignItems: 'center',
     flexDirection: 'row',
-    // padding: 16,
   },
   rowNavigation: {
     alignItems: 'center',
     flexDirection: 'row',
-    // padding: 16,
-  },
-  rowBearing: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    padding: 16,
   },
   rowHazard: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginLeft: -12,
+    marginRight: -12,
+    marginTop: -12,
     backgroundColor: Colors.hazardBackground,
   },
   rowSegment: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginLeft: -12,
+    marginRight: -12,
+    marginTop: -12,
     backgroundColor: Colors.segmentBackground,
+  },
+  topRow: {
+    borderTopStartRadius: 16,
+    borderTopEndRadius: 16,
   },
   rowText: {
     color: Colors.black,

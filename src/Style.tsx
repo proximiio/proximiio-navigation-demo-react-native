@@ -29,7 +29,7 @@ export const Colors = {
   primary: ColorsBase.blue,
   primaryDark: ColorsBase.blueDark,
   hazardBackground: ColorsBase.red,
-  segmentBackground: ColorsBase.gray,
+  segmentBackground: ColorsBase.blue,
   background: ColorsBase.offWhite,
   navigationContentColor: ColorsBase.white,
   floorSelectorBackground: ColorsBase.blueDark,

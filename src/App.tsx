@@ -22,7 +22,7 @@ import {Appbar} from 'react-native-paper';
 import MapScreen from './ui/map/MapScreen';
 import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import SearchScreen from './ui/search/SearchScreen';
-import {SearchCategory} from './ui/search/SearchCategories';
+import {SearchCategory} from './utils/SearchCategories';
 import PolicyScreen from "./ui/policy/PolicyScreen";
 import {createStackNavigator} from "@react-navigation/stack";
 import {NavigationContainer} from "@react-navigation/native";

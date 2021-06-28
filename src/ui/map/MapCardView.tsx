@@ -1,9 +1,8 @@
 import * as React from 'react';
 import CardView from '../../utils/CardView';
-import {StyleProp, StyleSheet, TouchableOpacity} from 'react-native';
-import ProximiioMapbox from 'react-native-proximiio-mapbox';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import {Image, StyleProp, StyleSheet,  View} from 'react-native';
 import {Colors, Shadow} from '../../Style';
+import {TouchableHighlight} from 'react-native-gesture-handler';
 
 interface Props {
   onClosePressed: () => any;
@@ -11,15 +10,27 @@ interface Props {
 }
 interface State {}
 
+/**
+ * CardView used in mapScreen, with cancel button in top right.
+ */
 export default class MapCardView extends React.Component<Props, State> {
   render() {
     return (
       <CardView style={{...styles.cardView, ...this.props.style}}>
-        <TouchableOpacity
-          style={styles.closeButton}
-          onPress={() => this.props.onClosePressed()}>
-          <FontAwesome5Icon name={'times'} color={Colors.white} size={16} />
-        </TouchableOpacity>
+        <View style={styles.closeButtonAbsoluteWrapper}>
+          <TouchableHighlight
+            activeOpacity={0.5}
+            style={styles.closeButtonHighlight}
+            onPress={() => this.props.onClosePressed()}
+            underlayColor={Colors.gray}>
+            <View style={styles.closeButton}>
+              <Image
+                source={require('../../images/ic_close.png')}
+                style={styles.closeButtonImage}
+              />
+            </View>
+          </TouchableHighlight>
+        </View>
         {this.props.children}
       </CardView>
     );
@@ -33,17 +44,25 @@ const styles = StyleSheet.create({
     margin: 12,
     borderRadius: 24,
   },
-  closeButton: {
+  closeButtonAbsoluteWrapper: {
     ...Shadow,
-    backgroundColor: Colors.red,
-    padding: 8,
     borderRadius: 100,
-    width: 48,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
     position: 'absolute',
-    right: 20,
-    top: -26,
+    right: 24,
+    top: -20,
+  },
+  closeButtonHighlight: {
+    borderRadius: 100,
+  },
+  closeButton: {
+    backgroundColor: Colors.red,
+    borderRadius: 100,
+    padding: 8,
+  },
+  closeButtonImage: {
+    aspectRatio: 1,
+    width: 24,
+    height: 24,
+    tintColor: Colors.white,
   },
 });

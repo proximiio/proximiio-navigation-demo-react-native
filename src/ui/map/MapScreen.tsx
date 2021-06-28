@@ -37,12 +37,12 @@ import {Colors} from '../../Style';
 import {ProximiioFloor} from 'react-native-proximiio';
 import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
 import i18n from 'i18next';
-import {categoryList, SearchCategory} from '../search/SearchCategories';
+import {categoryList, SearchCategory} from '../../utils/SearchCategories';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {RouteProp} from '@react-navigation/native';
 import PreferenceHelper from '../../utils/PreferenceHelper';
 import MapCardView from './MapCardView';
-import {TouchableHighlight} from "react-native-gesture-handler";
+import {TouchableHighlight} from 'react-native-gesture-handler';
 
 interface Props {
   onOpenSearch: (searchCategory?: SearchCategory) => void;

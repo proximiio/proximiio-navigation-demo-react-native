@@ -14,7 +14,7 @@ import ProximiioMapbox, {
   Feature,
   ProximiioMapboxEvents,
 } from 'react-native-proximiio-mapbox';
-import {SearchCategory} from './SearchCategories';
+import {SearchCategory} from '../../utils/SearchCategories';
 import SearchEmptyItem from './SearchEmptyItem';
 import {IconButton} from 'react-native-paper';
 import {TouchableHighlight} from 'react-native-gesture-handler';

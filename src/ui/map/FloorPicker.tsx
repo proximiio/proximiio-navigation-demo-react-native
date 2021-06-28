@@ -58,7 +58,7 @@ export default class FloorPicker extends React.Component<Props, State> {
             <Image style={currentFloorLevelImageWithRotation} source={require('../../images/ic_floor_spinner.png')} />
           </View>
         </TouchableOpacity>
-        {this.state.open && <FlatList style={styles.list} data={this.state.levelList} keyExtractor={(item, index) => '' + index} renderItem={this.renderLevelItem} />}
+        {this.state.open && <FlatList style={styles.floorList} data={this.state.levelList} keyExtractor={(item, index) => '' + index} renderItem={this.renderLevelItem} />}
       </View>
     );
   }
@@ -67,7 +67,7 @@ export default class FloorPicker extends React.Component<Props, State> {
     const floorLevelKey = 'common.floor_' + renderItem.item;
     return (
       <TouchableOpacity onPress={() => this.onFloorSelected(renderItem.item)} activeOpacity={0.8}>
-        <Text style={styles.listItem}>
+        <Text style={styles.floorListItem}>
           {i18n.t(floorLevelKey)}
         </Text>
       </TouchableOpacity>
@@ -102,7 +102,7 @@ export default class FloorPicker extends React.Component<Props, State> {
   }
 
   /**
-   * Helper method for filtering out only unique floors
+   * Helper method for filtering out only unique floor levels
    * @param value {number}
    * @param index {number}
    * @param self {Array<number>}
@@ -141,13 +141,13 @@ const styles = StyleSheet.create({
     height: 12,
     width: 12,
   },
-  list: {
+  floorList: {
     flex: 0,
     alignSelf: 'flex-end',
     paddingStart: 24,
     maxHeight: 156,
   },
-  listItem: {
+  floorListItem: {
     ...Shadow,
     alignSelf: 'flex-end',
     backgroundColor: Colors.blueDark,

@@ -17,31 +17,31 @@ export class SearchCategory {
  */
 export const categoryList: SearchCategory[] = [
   {
-    amenityId: 'c1eaab1a-3f02-4491-a515-af8d628f74fb:20b56e81-a640-4d59-aaab-9cdbe2b353d1',
+    amenityId: 'e25990bd-4019-4b65-a84f-b7aed0bd66aa:1e86ea0a-cbf2-4fdc-a9a0-802ffea95fee',
     color: Colors.blueDark2,
     title: 'common.category.washroom',
     image: require('../images/search_categories/ic_explore_nearby_bathroom.png'),
   },
   {
-    amenityId: 'c1eaab1a-3f02-4491-a515-af8d628f74fb:109c0242-6346-4333-b6a9-8315841a82a9',
+    amenityId: 'e25990bd-4019-4b65-a84f-b7aed0bd66aa:3b2624ab-3d34-4a32-8d95-60a1a50561a8',
     color: Colors.pink,
     title: 'common.category.cafeteria',
     image: require('../images/search_categories/ic_explore_nearby_cafe.png'),
   },
   {
-    amenityId: 'c1eaab1a-3f02-4491-a515-af8d628f74fb:9da478a4-b0ce-47ba-8b44-32a4b31150a8',
+    amenityId: 'e25990bd-4019-4b65-a84f-b7aed0bd66aa:086a0d59-0696-442b-b8d7-2928c3847de4',
     color: Colors.blueLight2,
     title: 'common.category.parking',
     image: require('../images/search_categories/ic_explore_nearby_parking.png'),
   },
   {
-    amenityId: 'c1eaab1a-3f02-4491-a515-af8d628f74fb:b2b59e42-de48-442c-b591-a5f8fbc5031d',
+    amenityId: 'e25990bd-4019-4b65-a84f-b7aed0bd66aa:ef811677-1245-4348-aa96-dfc4cb888af5',
     color: Colors.purple,
     title: 'common.category.entrance',
     image: require('../images/search_categories/ic_explore_nearby_exits.png'),
   },
   {
-    amenityId: 'c1eaab1a-3f02-4491-a515-af8d628f74fb:65a02cc9-2c78-4ace-8105-5cf5b27f4a6e',
+    amenityId: 'eventspace',
     color: Colors.blueLight3,
     title: 'common.category.meeting_room',
     image: require('../images/search_categories/ic_explore_nearby_meeting_room.png'),

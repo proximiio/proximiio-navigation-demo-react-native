@@ -21,7 +21,6 @@ import {TouchableHighlight} from 'react-native-gesture-handler';
 import {Colors} from '../../Style';
 import {LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
 import i18n from 'i18next';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {RouteProp} from '@react-navigation/native';
 
 interface Props {
@@ -105,7 +104,13 @@ export default class SearchScreen extends React.Component<Props, State> {
       <CardView style={styles.searchInputCard}>
         <View style={styles.searchInputCardContent}>
           <Image style={styles.searchIcon} source={require('../../images/ic_search.png')} />
-          {/*<FontAwesome5Icon name="search" light={true} size={20} style={styles.searchIcon} />*/}
+          <View style={styles.searchInput}>
+            <TextInput
+              placeholder={i18n.t('common.search_hint')}
+              onChangeText={(title) => this.updateSearchFilter(title)}
+              autoFocus
+            />
+          </View>
           {this.state.featureCategoryFilter && (
             <TouchableHighlight
               activeOpacity={0.5}
@@ -117,13 +122,6 @@ export default class SearchScreen extends React.Component<Props, State> {
               </View>
             </TouchableHighlight>
           )}
-          <View style={styles.searchInput}>
-            <TextInput
-              placeholder={i18n.t('common.search_hint')}
-              onChangeText={(title) => this.updateSearchFilter(title)}
-              autoFocus
-            />
-          </View>
         </View>
       </CardView>
     );
@@ -281,28 +279,9 @@ export default class SearchScreen extends React.Component<Props, State> {
    * @private
    */
   private getLevelString(feature) {
-    let overrideLevel = LEVEL_OVERRIDE_MAP[feature.properties.level];
-    let level = '';
-    switch (overrideLevel) {
-      case 0:
-        level = i18n.t('common.floor_0');
-        break;
-      case 1:
-        level = i18n.t('common.floor_1');
-        break;
-      case 2:
-        level = i18n.t('common.floor_2');
-        break;
-      case 3:
-        level = i18n.t('common.floor_3');
-        break;
-      case 4:
-        level = i18n.t('common.floor_4');
-        break;
-      default:
-        level = i18n.t('common.floor_n', {count: (feature.properties.level + 1)});
-    }
-    return level;
+    let overrideLevel = LEVEL_OVERRIDE_MAP.get(feature.properties.level);
+    let levelString = i18n.t('common.floor_' + overrideLevel);
+    return levelString;
   }
 }
 

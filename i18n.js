@@ -12,12 +12,13 @@ const resources = {
       'app.loading': 'Loading...',
 
       'common.search_hint': 'Where do you want to go?',
+      'common.floor_-1': '-1st Floor',
       'common.floor_0': 'Ground Floor',
-      'common.floor_1': 'First Floor',
-      'common.floor_2': 'Second Floor',
-      'common.floor_3': 'Third Floor',
-      'common.floor_4': 'Fourth Floor',
-      'common.floor_5': 'Fifth Floor',
+      'common.floor_1': '1st Floor',
+      'common.floor_2': '2nd Floor',
+      'common.floor_3': '3rd Floor',
+      'common.floor_4': '4th Floor',
+      'common.floor_5': '5th Floor',
       'common.floor_n': '{{count}}nth Floor',
 
       'common.category.cafeteria': 'Cafeteria',

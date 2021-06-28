@@ -32,15 +32,16 @@ export default class FloorPicker extends React.Component<Props, State> {
     levelList: [],
     open: false,
   } as State;
-  floorChangedSubscription = undefined;
 
   componentDidMount() {
     this.refreshFloorList();
     Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChanged);
+    Proximiio.subscribe(ProximiioEvents.Initialized, this.onFloorChanged);
   }
 
   componentWillUnmount() {
     Proximiio.unsubscribe(ProximiioEvents.FloorChanged, this.onFloorChanged);
+    Proximiio.unsubscribe(ProximiioEvents.Initialized, this.onFloorChanged);
   }
 
   render() {

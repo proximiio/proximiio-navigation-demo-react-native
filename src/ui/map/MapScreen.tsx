@@ -142,7 +142,7 @@ export default class MapScreen extends React.Component<Props, State> {
       <View style={styles.container}>
         {this.renderMap()}
         {this.renderSearch()}
-        <View style={styles.fabWrapper}>
+        <View style={styles.controlsWrapper}>
           {this.renderFloorSelector()}
           <FAB
             color={this.state.followUserHeading ? Colors.primary : Colors.gray}
@@ -157,7 +157,7 @@ export default class MapScreen extends React.Component<Props, State> {
             onPress={() => this.showAndFollowCurrentUserLocation()}
           />
         </View>
-        <View style={{left: 0, right:0, bottom: 0, position: 'absolute'}}>
+        <View style={styles.overlaysWrapper}>
           {this.renderRoutePreview()}
           {this.renderCategories()}
           {this.renderRouteCalculation()}
@@ -308,7 +308,7 @@ export default class MapScreen extends React.Component<Props, State> {
   }
 
   private renderCategories() {
-    if (!this.showSearchCategories()) {
+    if (this.state.started || this.state.route || this.state.routeUpdate) {
       return;
     }
     return (
@@ -349,10 +349,6 @@ export default class MapScreen extends React.Component<Props, State> {
         onLevelChanged={this.onLevelChanged}
       />
     );
-  }
-
-  private showSearchCategories() {
-    return !this.state.started && !this.state.route && !this.state.routeUpdate;
   }
 
   private openSearch = (searchCategory?: SearchCategory) => {
@@ -596,12 +592,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
   },
-  fabWrapper: {
+  controlsWrapper: {
     alignItems: 'flex-end',
     flex: 0,
     flexDirection: 'column',
-    justifyContent: 'flex-end',
     width: 'auto',
+  },
+  overlaysWrapper: {
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+    position: 'absolute',
+    justifyContent: 'flex-end',
   },
   fab: {
     backgroundColor: Colors.white,

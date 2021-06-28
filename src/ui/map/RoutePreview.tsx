@@ -8,7 +8,7 @@ import {
   ListRenderItemInfo,
   TouchableOpacity,
   Linking,
-  Dimensions,
+  Dimensions, ScrollView,
 } from 'react-native';
 import ProximiioMapbox, {
   Feature,
@@ -54,12 +54,14 @@ export default class RoutePreview extends React.Component<Props, State> {
 
   render() {
     return (
-      <MapCardView onClosePressed={() => ProximiioMapbox.route.cancel()}>
-        {this.renderImageGallery()}
-        {this.renderTripSummary()}
-        {this.renderExternalLink()}
-        {this.renderTripSteps()}
-        {this.renderTripButtons()}
+      <MapCardView onClosePressed={() => ProximiioMapbox.route.cancel()} style={styles.mapCardView}>
+        <ScrollView style={styles.scrollView}>
+          {this.renderImageGallery()}
+          {this.renderTripSummary()}
+          {this.renderExternalLink()}
+          {this.renderTripSteps()}
+          {this.renderTripButtons()}
+        </ScrollView>
       </MapCardView>
     );
   }
@@ -144,17 +146,18 @@ export default class RoutePreview extends React.Component<Props, State> {
     if (!this.state.showTripDetails) {
       return null;
     }
-    return (
-      <>
-        <Text>Detail Trip Directions</Text>
-        <FlatList
-          style={styles.tripSteps}
-          data={this.props.route.steps}
-          renderItem={(item) => this.renderTripStep(item)}
-          keyExtractor={(item, index) => 'index_' + index}
-        />
-      </>
-    );
+    return this.props.route.steps.map((it, index) => this.renderTripStep(it, index));
+    // return (
+    //   <>
+    //     <Text>Detail Trip Directions</Text>
+    //     <FlatList
+    //       style={styles.tripSteps}
+    //       data={this.props.route.steps}
+    //       renderItem={(item) => this.renderTripStep(item)}
+    //       keyExtractor={(item, index) => 'index_' + index}
+    //     />
+    //   </>
+    // );
   }
 
   private renderTripButtons() {
@@ -196,11 +199,11 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  private renderTripStep(item: ListRenderItemInfo<RouteStepDescriptor>) {
-    const instruction = item.index === 0 ? i18n.t('preview.start_navigation') : item.item.instruction;
+  private renderTripStep(item: RouteStepDescriptor, index: number) {
+    const instruction = index === 0 ? i18n.t('preview.start_navigation') : item.instruction;
     let distance = undefined;
-    if (item.index > 0 && item.item.distanceFromLastStep !== undefined) {
-      distance = UnitConversionHelper.getDistanceInPreferredUnits(item.item.distanceFromLastStep);
+    if (index > 0 && item.distanceFromLastStep !== undefined) {
+      distance = UnitConversionHelper.getDistanceInPreferredUnits(item.distanceFromLastStep);
     }
 
     if (instruction === undefined) return <View />;
@@ -208,7 +211,7 @@ export default class RoutePreview extends React.Component<Props, State> {
       <View style={styles.tripRow}>
         <Image
           style={styles.tripRowImage}
-          source={importDirectionImage(item.item.symbol)}
+          source={importDirectionImage(item.symbol)}
         />
         <View style={styles.tripRowText}>
           <Text>{instruction}</Text>
@@ -341,12 +344,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.greenLight,
   },
   buttonParking: {
-    flex: 2,
     backgroundColor: Colors.blueLight2,
+    flex: 2,
+    marginEnd: 4,
   },
   buttonTrip: {
     backgroundColor: Colors.grayLight,
     flex: 1,
+    marginStart: 4,
   },
   link: {
     flexDirection: 'row',
@@ -366,13 +371,17 @@ const styles = StyleSheet.create({
   },
   slider: {
     aspectRatio: 1.7666,
-    backgroundColor: 'red',
-    borderTopStartRadius: 8,
-    borderTopEndRadius: 8,
     flex: 0,
     flexGrow: 0,
   },
   sliderWrapper: {
     marginBottom: 4,
+  },
+  scrollView: {
+    maxHeight: '100%',
+  },
+  mapCardView: {
+    elevation: 10,
+    maxHeight: '100%',
   },
 });

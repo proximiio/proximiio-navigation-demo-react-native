@@ -4,12 +4,13 @@ import {
   View,
   Image,
   Text,
-  TouchableHighlight,
   ActivityIndicator,
   BackHandler,
-  TouchableNativeFeedback, FlatList, ListRenderItem, ListRenderItemInfo, TouchableOpacity,
+  FlatList,
+  ListRenderItemInfo,
+  TouchableOpacity,
 } from 'react-native';
-import MapboxGL, {SymbolLayerStyle} from '@react-native-mapbox-gl/maps';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {
   ProximiioContextProvider,
   ProximiioEvents,
@@ -24,7 +25,8 @@ import ProximiioMapbox, {
   ProximiioMapboxRoute,
   ProximiioFeatureType,
   ProximiioRouteEvent,
-  ProximiioRouteUpdateType, Feature,
+  ProximiioRouteUpdateType,
+  Feature,
 } from 'react-native-proximiio-mapbox';
 import RoutePreview from './RoutePreview';
 import {FAB} from 'react-native-paper';
@@ -37,11 +39,10 @@ import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
 import i18n from 'i18next';
 import {categoryList, SearchCategory} from '../search/SearchCategories';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
-import LinearGradient from 'react-native-linear-gradient';
-import {white} from "react-native-paper/lib/typescript/styles/colors";
-import {RouteProp} from "@react-navigation/native";
-import PreferenceHelper from "../../utils/PreferenceHelper";
-import MapCardView from "./MapCardView";
+import {RouteProp} from '@react-navigation/native';
+import PreferenceHelper from '../../utils/PreferenceHelper';
+import MapCardView from './MapCardView';
+import {TouchableHighlight} from "react-native-gesture-handler";
 
 interface Props {
   onOpenSearch: (searchCategory?: SearchCategory) => void;
@@ -136,25 +137,6 @@ export default class MapScreen extends React.Component<Props, State> {
     BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
   }
 
-  // shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
-  //   if (
-  //     this.state.followUser === nextState.followUser
-  //     && this.state.hazard === nextState.hazard
-  //     && this.state.mapLoaded === nextState.mapLoaded
-  //     && this.state.mapLevel === nextState.mapLevel
-  //     && this.state.route === nextState.route
-  //     && this.state.routeUpdate === nextState.routeUpdate
-  //     && this.state.started === nextState.started
-  //     && this.state.userLevel === nextState.userLevel
-  //   ) {
-  //     console.log('should component update', false);
-  //     return false;
-  //   } else {
-  //     console.log('should component update', true);
-  //     return true;
-  //   }
-  // }
-
   render() {
     return (
       <View style={styles.container}>
@@ -193,33 +175,20 @@ export default class MapScreen extends React.Component<Props, State> {
             </ProximiioContextProvider>
           )}
         </MapboxGL.MapView>
-        {/* Route preview */}
         {this.renderSearch()}
         <View style={styles.fabWrapper}>
-          {/*<FAB*/}
-          {/*    color={Colors.primary}*/}
-          {/*    icon="plus"*/}
-          {/*    style={styles.fab}*/}
-          {/*    onPress={() => this.zoomIn()}*/}
-          {/*/>*/}
-          {/*<FAB*/}
-          {/*    color={Colors.primary}*/}
-          {/*    icon="minus"*/}
-          {/*    style={styles.fab}*/}
-          {/*    onPress={() => this.zoomOut()}*/}
-          {/*/>*/}
           {this.renderFloorSelector()}
           <FAB
-              color={this.state.followUserHeading ? Colors.primary : Colors.gray}
-              icon="compass"
-              style={styles.fab}
-              onPress={() => this.toggleFollowUserHeading()}
+            color={this.state.followUserHeading ? Colors.primary : Colors.gray}
+            icon="compass"
+            style={styles.fab}
+            onPress={() => this.toggleFollowUserHeading()}
           />
           <FAB
-              color={Colors.primary}
-              icon="crosshairs-gps"
-              style={styles.fab}
-              onPress={() => this.showAndFollowCurrentUserLocation()}
+            color={Colors.primary}
+            icon="crosshairs-gps"
+            style={styles.fab}
+            onPress={() => this.showAndFollowCurrentUserLocation()}
           />
         </View>
         <View style={{left: 0, right:0, bottom: 0, position: 'absolute'}}>
@@ -552,7 +521,7 @@ export default class MapScreen extends React.Component<Props, State> {
 
   /**
    * Listener for segment feature warning for navigation.
-   * @param segment
+   * @param event
    * @private
    */
   private onSegment = (event) => {

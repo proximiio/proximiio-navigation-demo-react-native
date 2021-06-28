@@ -69,17 +69,6 @@ const resources = {
 
       'mapscreen.calculating': 'Calculating...',
 
-      'poiscreen.no_description': 'No description available.',
-      'poiscreen.start_my_trip': 'Start My Trip',
-      'poiscreen.calculating_steps': 'Calculating distance...',
-      'poiscreen.calculating_steps_failed': 'Could not calculate steps!',
-      'poiscreen.calculating_steps_result': '{{count}} step',
-      'poiscreen.calculating_steps_result_plural': '{{count}} steps',
-      'poiscreen.trip': 'Trip',
-      'poiscreen.description': 'Description',
-      'poiscreen.no_image_available': 'Description',
-      'poiscreen.no_image': 'No+Image+Available',
-
       'preferencescreen.route_options': 'Route options',
       'preferencescreen.avoid_stairs': 'Avoid stairs',
       'preferencescreen.avoid_elevators': 'Avoid elevators',

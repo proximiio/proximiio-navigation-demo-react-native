@@ -3,18 +3,16 @@ import {
   Image,
   StyleSheet,
   Text,
-  TouchableNativeFeedback,
   View,
 } from 'react-native';
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
 import {Colors} from '../../Style';
 import ProximiioMapbox, {
   Feature,
-  ProximiioFeatureType,
   ProximiioRouteEvent,
 } from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
-import MapCardView from "./MapCardView";
+import MapCardView from './MapCardView';
 
 interface Props {
   routeUpdate: ProximiioRouteEvent;

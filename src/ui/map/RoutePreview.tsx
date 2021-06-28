@@ -21,10 +21,9 @@ import {Colors} from '../../Style';
 import i18n from 'i18next';
 import {UnitConversionHelper} from '../../utils/UnitConversionHelper';
 import RoundedButton from '../../utils/RoundedButton';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {PROXIMIIO_TOKEN} from '../../utils/Constants';
 import MapCardView from './MapCardView';
-import PreferenceHelper from "../../utils/PreferenceHelper";
+import PreferenceHelper from '../../utils/PreferenceHelper';
 
 interface Props {
   route: ProximiioMapboxRoute;
@@ -38,7 +37,7 @@ interface State {
 }
 
 /**
- * Screen previewing steps of displayed route.
+ * Screen previewing steps of displayed route and basic route and destination information.
  */
 export default class RoutePreview extends React.Component<Props, State> {
   state = {
@@ -73,12 +72,11 @@ export default class RoutePreview extends React.Component<Props, State> {
     if (!url || !title) {
       return null;
     }
-    // TODO: extract into transparent button component?
     return (
       <TouchableOpacity
         style={styles.link}
         onPress={() => Linking.openURL(url)}>
-        <FontAwesome5Icon name="link" color={Colors.pink} />
+        <Image source={require('../../images/ic_link.png')} style={styles.linkIcon} />
         <Text style={styles.linkText}>{title}</Text>
       </TouchableOpacity>
     );
@@ -131,8 +129,8 @@ export default class RoutePreview extends React.Component<Props, State> {
     return (
       <View style={styles.summary}>
         <Text style={styles.summaryTitle}>{title}</Text>
+        {estimates && <Text style={styles.summaryEstimates}>{estimates}</Text>}
         {description && <Text style={styles.summaryDescription}>{description}</Text>}
-        {estimates && <Text style={styles.summaryEstimates}>{}</Text>}
       </View>
     );
   }
@@ -354,11 +352,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
   linkText: {
     marginStart: 4,
     color: Colors.pink,
+  },
+  linkIcon: {
+    height: 24,
+    width: 24,
+    tintColor: Colors.pink,
   },
   slider: {
     aspectRatio: 1.7666,

@@ -140,41 +140,7 @@ export default class MapScreen extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
-        <MapboxGL.MapView
-          ref={(map) => (this.map = map)}
-          style={StyleSheet.absoluteFillObject}
-          scrollEnabled={true}
-          compassEnabled={false}
-          styleURL={ProximiioMapbox.styleURL}
-          onRegionWillChange={this.onRegionWillChange}
-          onDidFinishLoadingMap={() => this.setState({mapLoaded: true})}>
-          <MapboxGL.Camera
-            ref={(camera) => {
-              this.camera = camera;
-            }}
-            minZoomLevel={1}
-            maxZoomLevel={24}
-            animationMode={'flyTo'}
-            animationDuration={250}
-            bounds={MAP_STARTING_BOUNDS}
-          />
-          {this.state.mapLoaded && (
-            <ProximiioContextProvider>
-              <AmenitySource />
-              <GeoJSONSource
-                level={this.state.mapLevel}
-                onPress={this.onMapPress}>
-                <RoutingSource level={this.state.mapLevel} />
-                <UserLocationSource
-                  showHeadingIndicator={false}
-                  onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
-                  onHeadingChanged={this.onHeadingChanged}
-                  visible={this.state.mapLevel === this.state.userLevel}
-                />
-              </GeoJSONSource>
-            </ProximiioContextProvider>
-          )}
-        </MapboxGL.MapView>
+        {this.renderMap()}
         {this.renderSearch()}
         <View style={styles.fabWrapper}>
           {this.renderFloorSelector()}
@@ -199,6 +165,46 @@ export default class MapScreen extends React.Component<Props, State> {
           {this.renderNavigation()}
         </View>
       </View>
+    );
+  }
+
+  private renderMap() {
+    return (
+      <MapboxGL.MapView
+        ref={(map) => (this.map = map)}
+        style={StyleSheet.absoluteFillObject}
+        scrollEnabled={true}
+        compassEnabled={false}
+        styleURL={ProximiioMapbox.styleURL}
+        onRegionWillChange={this.onRegionWillChange}
+        onDidFinishLoadingMap={() => this.setState({mapLoaded: true})}>
+        <MapboxGL.Camera
+          ref={(camera) => {
+            this.camera = camera;
+          }}
+          minZoomLevel={1}
+          maxZoomLevel={24}
+          animationMode={'flyTo'}
+          animationDuration={250}
+          bounds={MAP_STARTING_BOUNDS}
+        />
+        {this.state.mapLoaded && (
+          <ProximiioContextProvider>
+            <AmenitySource />
+            <GeoJSONSource
+              level={this.state.mapLevel}
+              onPress={this.onMapPress}>
+              <RoutingSource level={this.state.mapLevel} />
+              <UserLocationSource
+                showHeadingIndicator={false}
+                onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
+                onHeadingChanged={this.onHeadingChanged}
+                visible={this.state.mapLevel === this.state.userLevel}
+              />
+            </GeoJSONSource>
+          </ProximiioContextProvider>
+        )}
+      </MapboxGL.MapView>
     );
   }
 
@@ -586,15 +592,9 @@ export default class MapScreen extends React.Component<Props, State> {
 }
 
 const styles = StyleSheet.create({
-  map: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     justifyContent: 'flex-start',
-  },
-  bottomContent: {
-    flex: 0,
   },
   fabWrapper: {
     alignItems: 'flex-end',
@@ -670,18 +670,6 @@ const styles = StyleSheet.create({
   searchCategoriesItemText: {
     color: 'white',
     fontSize: 14,
-  },
-  floorPickerWrapper: {
-    // position: 'absolute',
-    // top: 24,
-    // left: 24,
-    // right: 24,
-    backgroundColor: 'green',
-    padding: 16,
-    flex: 0,
-    height: 'auto',
-    alignItems: 'center',
-    maxHeight: 100,
   },
   calculationRow: {
     alignItems: 'center',

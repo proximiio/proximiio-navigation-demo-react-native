@@ -1,6 +1,6 @@
 import * as React from 'react';
 import CardView from '../../utils/CardView';
-import {Image, StyleProp, StyleSheet,  View} from 'react-native';
+import {Image, StyleProp, StyleSheet, View} from 'react-native';
 import {Colors, Shadow} from '../../Style';
 import {TouchableHighlight} from 'react-native-gesture-handler';
 

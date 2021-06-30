@@ -13,7 +13,6 @@ import Proximiio, {ProximiioEvents} from 'react-native-proximiio';
 import {Colors, Shadow} from '../../Style';
 import i18n from 'i18next';
 import {LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
-import {TouchableHighlight} from 'react-native-gesture-handler';
 
 interface Props {
   mapLevel: number;
@@ -36,12 +35,12 @@ export default class FloorPicker extends React.Component<Props, State> {
   componentDidMount() {
     this.refreshFloorList();
     Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChanged);
-    Proximiio.subscribe(ProximiioEvents.Initialized, this.onFloorChanged);
+    Proximiio.subscribe(ProximiioEvents.ItemsChanged, this.onFloorChanged);
   }
 
   componentWillUnmount() {
     Proximiio.unsubscribe(ProximiioEvents.FloorChanged, this.onFloorChanged);
-    Proximiio.unsubscribe(ProximiioEvents.Initialized, this.onFloorChanged);
+    Proximiio.unsubscribe(ProximiioEvents.ItemsChanged, this.onFloorChanged);
   }
 
   render() {

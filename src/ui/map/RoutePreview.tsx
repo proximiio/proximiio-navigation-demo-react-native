@@ -250,7 +250,6 @@ export default class RoutePreview extends React.Component<Props, State> {
       let timeInMinutes = Math.max(1, Math.round(this.props.route.distanceMeters / 1.4 / 60));
       let distance = UnitConversionHelper.getDistanceInPreferredUnits(this.props.route.distanceMeters);
       let duration = i18n.t('preview.summary_minutes', {count: timeInMinutes});
-      console.log(this.props.route);
       let destination = ProximiioMapbox.getFeatures().find(it => it.id === this.props.route.destination.id);
       let hasWaypoint = !!this.props.route.steps.find(it => it.isWaypoint);
       this.setState({

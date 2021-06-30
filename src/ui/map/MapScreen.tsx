@@ -301,7 +301,6 @@ export default class MapScreen extends React.Component<Props, State> {
     if (this.state.started || !this.state.route) {
       return null;
     }
-    console.log(this.state.route);
     return (
       <RoutePreview route={this.state.route} />
     );
@@ -352,7 +351,6 @@ export default class MapScreen extends React.Component<Props, State> {
   }
 
   private openSearch = (searchCategory?: SearchCategory) => {
-    console.log('ioebn search', searchCategory);
     this.props.navigation.navigate('SearchScreen', {
       searchCategory: searchCategory,
     });
@@ -374,7 +372,6 @@ export default class MapScreen extends React.Component<Props, State> {
    * Update map when user posiiton is updated.
    */
   private onPositionUpdate = async (location: ProximiioLocation) => {
-    console.log('location updated: ', location, this.state.location);
     if (!location) {
       return;
     }
@@ -504,7 +501,6 @@ export default class MapScreen extends React.Component<Props, State> {
    */
   private onRegionWillChange = (event) => {
     if (this.state.followUser && event.properties.isUserInteraction === true) {
-      console.log('rotating?');
       this.setState({
         followUser: false,
         followUserHeading: false,
@@ -578,7 +574,6 @@ export default class MapScreen extends React.Component<Props, State> {
     });
     let currentZoom = await this.map.getZoom();
     let newZoom = Math.max(currentZoom, 18);
-    console.log('zoom:', currentZoom, newZoom);
     this.camera.setCamera({
       centerCoordinate: [this.state.location.lng, this.state.location.lat],
       zoomLevel: newZoom,

@@ -86,7 +86,6 @@ export default class FloorPicker extends React.Component<Props, State> {
   };
 
   private onFloorChanged = (floorChange) => {
-    console.log(floorChange);
     this.refreshFloorList();
   };
 

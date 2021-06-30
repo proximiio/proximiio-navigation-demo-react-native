@@ -75,7 +75,6 @@ export default class SearchScreen extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    console.log('component will unmount');
     if (this.featureSubscription) {
       this.featureSubscription.remove();
     }

@@ -230,7 +230,6 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @private
    */
   private renderSwitch(value, onValueChange, disabled: false) {
-    console.log('disabled ', disabled);
     return (
       <Switch disabled={disabled} value={value} onValueChange={onValueChange} />
     );
@@ -351,7 +350,6 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    */
   private getOptionNameById(option, id) {
     let result = Object.entries(option).filter(it => it[1].id === id);
-    console.log('option', Object.entries(option), result);
     if (result.length > 0) {
       return i18n.t(result[0][1].name);
     } else {

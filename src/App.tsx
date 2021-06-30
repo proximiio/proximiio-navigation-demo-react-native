@@ -50,11 +50,11 @@ interface Props {}
  * RNComponent state
  */
 interface State {
-  mapLoaded: Boolean;
-  proximiioReady: Boolean;
-  showSearch: Boolean;
-  showPreferences: Boolean;
-  policyAccepted: Boolean;
+  mapLoaded: boolean;
+  proximiioReady: boolean;
+  showSearch: boolean;
+  showPreferences: boolean;
+  policyAccepted?: boolean;
 }
 
 /**
@@ -66,7 +66,7 @@ export default class App extends React.Component<Props, State> {
     proximiioReady: false,
     showSearch: false,
     showPreferences: false,
-    policyAccepted: false,
+    policyAccepted: undefined,
   };
   private syncListener = undefined;
   private policyAccepted = false;
@@ -148,6 +148,12 @@ export default class App extends React.Component<Props, State> {
             name="PreferenceScreen"
             component={PreferenceScreen}
             options={{title: i18n.t('app.title_settings')}}
+          />
+          <Stack.Screen
+            name="PolicyScreen"
+            component={PolicyScreen}
+            initialParams={{policyAccepted: this.state.policyAccepted}}
+            options={{title: i18n.t('app.title_policy')}}
           />
         </Stack.Navigator>
       </NavigationContainer>

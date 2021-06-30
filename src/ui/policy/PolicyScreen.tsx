@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
   BackHandler,
-  Linking,
+  Linking, Route,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,8 +11,11 @@ import i18n from 'i18next';
 import WebView from 'react-native-webview';
 import RoundedButton from '../../utils/RoundedButton';
 import {Colors, Shadow} from '../../Style';
+import Proximiio from 'react-native-proximiio';
 
 interface Props {
+  policyAccepted?: boolean;
+  route?: Route;
   onPolicyAccepted?: () => any;
 }
 interface State {}
@@ -37,22 +40,25 @@ export default class PolicyScreen extends React.Component<Props, State> {
           onNavigationStateChange={this.onWebViewNavigationStateChange}
           style={{margin: 16}}
           source={{html: this.getWebviewBody(i18n.t('policyscreen.privacy-policy-text'))}} />
-        <View style={styles.buttons}>
-          <RoundedButton
-            buttonStyle={styles.acceptButton}
-            title={i18n.t('policyscreen.accept')}
-            onPress={this.onAccepted}
-          />
-          <TouchableOpacity onPress={this.onDeclined} style={styles.declineButton}>
-            <Text style={styles.declineButtonText}>
-              {i18n.t('policyscreen.decline')}
-            </Text>
-          </TouchableOpacity>
-        </View>
-        {/*TODO: obtain visitor ID from SDK */}
-        {/*<Text>*/}
-        {/*  {i18n.t('policyscreen.visitor-id') + Proximiio.visitorId}*/}
-        {/*</Text>*/}
+        {!(this.props.route && this.props.route.params.policyAccepted) && (
+          <View style={styles.buttons}>
+            <RoundedButton
+              buttonStyle={styles.acceptButton}
+              title={i18n.t('policyscreen.accept')}
+              onPress={this.onAccepted}
+            />
+            <TouchableOpacity onPress={this.onDeclined} style={styles.declineButton}>
+              <Text style={styles.declineButtonText}>
+                {i18n.t('policyscreen.decline')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        {(this.props.route && this.props.route.params.policyAccepted) && (
+          <Text style={styles.visitorId}>
+            {i18n.t('policyscreen.visitor-id') + Proximiio.state.visitorId}
+          </Text>
+        )}
       </View>
     );
   }
@@ -74,7 +80,7 @@ export default class PolicyScreen extends React.Component<Props, State> {
 
   private getWebviewBody(content: String) {
     const textColor = '#444';
-    const backgroundColor = '#fbfbfb';
+    const backgroundColor = '#f2f2f2';
     return '' +
       "<body style=\"background-color: " + backgroundColor + "; color: " + textColor + "; font-size: 0.9em; margin: 0 0 0 0; padding: 0 0 0 0;\">" +
         "<style>" +
@@ -110,5 +116,9 @@ const styles = StyleSheet.create({
   declineButtonText: {
     color: Colors.blue,
   },
-  content: {},
+  visitorId: {
+    color: Colors.blueDark2,
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
 });

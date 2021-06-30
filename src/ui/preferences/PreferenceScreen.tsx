@@ -217,6 +217,10 @@ export default class PreferenceScreen extends React.Component<Props, State> {
     this.setState({routeConfirmationDistanceDialogVisible: false});
   }
 
+  private openPolicy = () => {
+    this.props.navigation.navigate('PolicyScreen');
+  };
+
   /**
    * Generates switch view.
    * @param value value of switch
@@ -321,6 +325,16 @@ export default class PreferenceScreen extends React.Component<Props, State> {
             title: i18n.t('preferencescreen.accessibility_guidance'),
             subtitle: this.getOptionNameById(AccessibilityGuidanceOption, this.state.ACCESSIBILITY_GUIDANCE),
             onPress: this.showAccessibilityDialog.bind(this),
+          },
+        ],
+      },
+      {
+        type: 'SECTION',
+        // header: null,
+        rows: [
+          {
+            title: i18n.t('preferencescreen.privacy_policy'),
+            onPress: this.openPolicy,
           },
         ],
       },

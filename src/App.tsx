@@ -55,6 +55,7 @@ interface State {
   showSearch: boolean;
   showPreferences: boolean;
   policyAccepted?: boolean;
+  defaultScreen: String;
 }
 
 /**
@@ -67,13 +68,17 @@ export default class App extends React.Component<Props, State> {
     showSearch: false,
     showPreferences: false,
     policyAccepted: undefined,
-  };
+    defaultScreen: 'PolicyScreen',
+  } as State;
   private syncListener = undefined;
   private policyAccepted = false;
 
   componentDidMount() {
     PreferenceHelper.getPrivacyPolicyAccepted().then((accepted) => {
-      this.setState({policyAccepted: accepted});
+      this.setState({
+        policyAccepted: accepted,
+        defaultScreen: accepted ? 'MapScreen' : 'PolicyScreen',
+      });
       if (accepted) {
         this.initProximiio();
       }
@@ -90,12 +95,8 @@ export default class App extends React.Component<Props, State> {
     if (this.state.policyAccepted === undefined) {
       this.renderLoadingOverlay();
     }
-    // Preference loaded, policy not accepted
-    if (this.state.policyAccepted === false) {
-      return this.renderPolicyScreen();
-    }
-    // Init proximi.io libs
-    if (!this.state.proximiioReady) {
+    // Initializing Proximi.io libs
+    if (this.state.policyAccepted && !this.state.proximiioReady) {
       return this.renderLoadingOverlay();
     }
     // Render main app content
@@ -116,18 +117,10 @@ export default class App extends React.Component<Props, State> {
     );
   }
 
-  private renderPolicyScreen() {
-    return (
-      <SafeAreaView style={{flex: 1}}>
-        <PolicyScreen onPolicyAccepted={this.onPolicyAccepted} />
-      </SafeAreaView>
-    );
-  }
-
   private renderScreenStack() {
     return (
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName={this.state.defaultScreen}>
           <Stack.Screen
             name="MapScreen"
             component={MapScreen}
@@ -152,29 +145,19 @@ export default class App extends React.Component<Props, State> {
           <Stack.Screen
             name="PolicyScreen"
             component={PolicyScreen}
-            initialParams={{policyAccepted: this.state.policyAccepted}}
+            initialParams={{policyAccepted: this.state.policyAccepted, onPolicyAccepted: this.onPolicyAccepted }}
             options={{title: i18n.t('app.title_policy')}}
           />
         </Stack.Navigator>
       </NavigationContainer>
-      // <NavigationContainer>
-      //   <Stack.Navigator>
-      //     {/*<Stack.Screen*/}
-      //     {/*  name="PolicyScreen"*/}
-      //     {/*  component={PolicyScreen}*/}
-      //     {/*  initialParams={{onPolicyAccepted: this.onPolicyAccepted}}*/}
-      //     {/*/>*/}
-      //     <Stack.Screen name="MapScreen" component={MapScreen} />
-      //     <Stack.Screen name="PreferenceScreen" component={PreferenceScreen} />
-      //     {/*<Stack.Screen name="AboutScreen" component={AboutScreen} />*/}
-      //   </Stack.Navigator>
-      // </NavigationContainer>
     );
   }
 
   private onPolicyAccepted = () => {
-    console.log('privacy policy accepted');
-    this.setState({policyAccepted: true});
+    this.setState({
+      policyAccepted: true,
+      defaultScreen: 'MapScreen',
+    });
     PreferenceHelper.setPrivacyPolicyAccepted();
     this.initProximiio();
   };

@@ -64,7 +64,7 @@ const AMENITY_PARKING_ID = 'c1eaab1a-3f02-4491-a515-af8d628f74fb:9da478a4-b0ce-4
  */
 class PreferenceHelper {
 
-  static getPrivacyPolicyAccepted(): Promise<Boolean> {
+  static getPrivacyPolicyAccepted(): Promise<boolean> {
     return new Promise(async (resolve, _) => {
       const acceptedPreference = await DefaultPreference.get(Preference.PRIVACY_POLICY_ACCEPTED);
       const accepted = acceptedPreference ? JSON.parse(acceptedPreference) : false;

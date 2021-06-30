@@ -14,9 +14,7 @@ import {Colors, Shadow} from '../../Style';
 import Proximiio from 'react-native-proximiio';
 
 interface Props {
-  policyAccepted?: boolean;
   route?: Route;
-  onPolicyAccepted?: () => any;
 }
 interface State {}
 
@@ -30,9 +28,6 @@ export default class PolicyScreen extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>
-          {i18n.t('policyscreen.privacy-policy')}
-        </Text>
         <WebView
           ref={(ref) => {this.webViewReference = ref;}}
           automaticallyAdjustContentInsets={false}
@@ -64,7 +59,7 @@ export default class PolicyScreen extends React.Component<Props, State> {
   }
 
   private onAccepted = async () => {
-    this.props.onPolicyAccepted();
+    this.props.route.params.onPolicyAccepted();
   };
 
   private onDeclined = () => {

@@ -38,7 +38,6 @@ import {ProximiioFloor} from 'react-native-proximiio';
 import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
 import i18n from 'i18next';
 import {categoryList, SearchCategory} from '../../utils/SearchCategories';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {RouteProp} from '@react-navigation/native';
 import PreferenceHelper from '../../utils/PreferenceHelper';
 import MapCardView from './MapCardView';
@@ -55,10 +54,10 @@ interface State {
   followUser: boolean;
   followUserHeading: boolean;
   hazard?: Feature;
-  userLocationSourceStyle?: Object;
   location?: ProximiioLocation;
   mapLoaded: boolean;
   mapLevel: number;
+  overrideUserLocationStyle: boolean;
   route?: ProximiioMapboxRoute;
   routeUpdate?: ProximiioRouteEvent;
   segment?: Feature;
@@ -79,13 +78,7 @@ const userLocationSourceStyleOverride = {
   heading: {iconSize: 1.8},
   outerRing: {circleRadius: 24},
   middleRing: {circleRadius: 23},
-  innerRing: {circleColor: '#ff0000', circleRadius: 15},
-};
-const userLocationSourceStyleNoOverride = {
-  heading: {},
-  outerRing: {},
-  middleRing: {},
-  innerRing: {},
+  innerRing: {circleRadius: 15},
 };
 
 export default class MapScreen extends React.Component<Props, State> {
@@ -95,16 +88,16 @@ export default class MapScreen extends React.Component<Props, State> {
     followUser: true,
     followUserHeading: false,
     hazard: undefined,
-    userLocationSourceStyle: userLocationSourceStyleNoOverride,
     location: undefined,
     mapLoaded: false,
     mapLevel: 0,
+    overrideUserLocationStyle: false,
     route: undefined,
     routeUpdate: undefined,
     segment: undefined,
     started: false,
     userLevel: 0,
-  };
+  } as State;
 
   componentDidMount() {
     this.onFloorChange(Proximiio.floor);
@@ -196,8 +189,12 @@ export default class MapScreen extends React.Component<Props, State> {
               onPress={this.onMapPress}>
               <RoutingSource level={this.state.mapLevel} />
               <UserLocationSource
-                showHeadingIndicator={false}
+                showHeadingIndicator={this.state.followUserHeading}
                 onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
+                headingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.heading : null}
+                markerOuterRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.outerRing : null}
+                markerMiddleRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.middleRing : null}
+                markerInnerRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.innerRing : null}
                 onHeadingChanged={this.onHeadingChanged}
                 visible={this.state.mapLevel === this.state.userLevel}
               />
@@ -372,15 +369,16 @@ export default class MapScreen extends React.Component<Props, State> {
    * Update map when user posiiton is updated.
    */
   private onPositionUpdate = async (location: ProximiioLocation) => {
+    console.log(location);
     if (!location) {
       return;
     }
     let firstLocationUpdate = this.state.location == null;
     let followUser = this.state.followUser;
-    let overrideUserLocationMarkerStyle = location.sourceType === 'native';
+    let overrideUserLocationStyle = location.sourceType === 'native';
     let stateUpdate = {
       location: location,
-      userLocationSourceStyle: overrideUserLocationMarkerStyle ? userLocationSourceStyleOverride : userLocationSourceStyleNoOverride,
+      overrideUserLocationStyle: overrideUserLocationStyle,
     };
     let currentZoom = await this.map.getZoom();
     this.setState(stateUpdate);

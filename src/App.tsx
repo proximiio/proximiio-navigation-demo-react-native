@@ -93,7 +93,7 @@ export default class App extends React.Component<Props, State> {
   render() {
     // Wait for preference to be loaded
     if (this.state.policyAccepted === undefined) {
-      this.renderLoadingOverlay();
+      return this.renderLoadingOverlay();
     }
     // Initializing Proximi.io libs
     if (this.state.policyAccepted && !this.state.proximiioReady) {

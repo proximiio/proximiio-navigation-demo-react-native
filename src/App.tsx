@@ -201,12 +201,11 @@ export default class App extends React.Component<Props, State> {
         }
       },
     );
+    Proximiio.setNotificationMode(NotificationMode.Disabled);
     // Authorize libraries with token
     await Proximiio.authorize(PROXIMIIO_TOKEN);
     Proximiio.setPdr(true, 4);
     Proximiio.setSnapToRoute(true, 20);
-    Proximiio.setNotificationMode(NotificationMode.Disabled);
-    Proximiio.updateOptions();
     await ProximiioMapbox.authorize(PROXIMIIO_TOKEN);
     ProximiioMapbox.setRerouteEnabled(true);
     ProximiioMapbox.setReRouteThreshold(3);

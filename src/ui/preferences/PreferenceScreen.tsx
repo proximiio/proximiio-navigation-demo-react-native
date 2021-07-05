@@ -244,6 +244,18 @@ export default class PreferenceScreen extends React.Component<Props, State> {
     this.setState({VOICE_GUIDANCE: value}, () => this.refreshSettingsData());
   }
 
+  private setAvoidStairs = (enabled: boolean) => {
+    const stairs = enabled;
+    const elevator = stairs && this.state.AVOID_ELEVATORS ? false : this.state.AVOID_ELEVATORS;
+    this.setState({AVOID_ELEVATORS: elevator, AVOID_STAIRS: stairs});
+  };
+
+  private setAvoidElevator = (enabled: boolean) => {
+    const elevator = enabled;
+    const stairs = elevator && this.state.AVOID_STAIRS ? false : this.state.AVOID_STAIRS;
+    this.setState({AVOID_ELEVATORS: elevator, AVOID_STAIRS: stairs});
+  };
+
   /**
    * Forces update of the UI by re-generating settings data. This a a workaround due to settings screen not refreshing properly.
    * @private
@@ -256,11 +268,11 @@ export default class PreferenceScreen extends React.Component<Props, State> {
         rows: [
           {
             title: i18n.t('preferencescreen.avoid_stairs'),
-            renderAccessory: () => this.renderSwitch(this.state.AVOID_STAIRS, (value) => this.setState({AVOID_STAIRS: value})),
+            renderAccessory: () => this.renderSwitch(this.state.AVOID_STAIRS, (value) => this.setAvoidStairs(value)),
           },
           {
             title: i18n.t('preferencescreen.avoid_elevators'),
-            renderAccessory: () => this.renderSwitch(this.state.AVOID_ELEVATORS, (value) => this.setState({AVOID_ELEVATORS: value})),
+            renderAccessory: () => this.renderSwitch(this.state.AVOID_ELEVATORS, (value) => this.setAvoidElevator(value)),
           },
           {
             title: i18n.t('preferencescreen.avoid_revolving_doors'),

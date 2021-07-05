@@ -1,32 +1,33 @@
 import * as React from 'react';
 import {
-  StyleSheet,
-  View,
-  Image,
-  Text,
   ActivityIndicator,
   BackHandler,
   FlatList,
+  Image,
   ListRenderItemInfo,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {
   ProximiioContextProvider,
   ProximiioEvents,
+  ProximiioFloor,
   ProximiioLocation,
 } from 'react-native-proximiio';
 import ProximiioMapbox, {
-  ProximiioMapboxEvents,
-  UserLocationSource,
   AmenitySource,
+  Feature,
   GeoJSONSource,
-  RoutingSource,
-  ProximiioMapboxRoute,
   ProximiioFeatureType,
+  ProximiioMapboxEvents,
+  ProximiioMapboxRoute,
   ProximiioRouteEvent,
   ProximiioRouteUpdateType,
-  Feature,
+  RoutingSource,
+  UserLocationSource,
 } from 'react-native-proximiio-mapbox';
 import RoutePreview from './RoutePreview';
 import {FAB} from 'react-native-paper';
@@ -34,7 +35,6 @@ import RouteNavigation from './RouteNavigation';
 import CardView from '../../utils/CardView';
 import FloorPicker from './FloorPicker';
 import {Colors} from '../../Style';
-import {ProximiioFloor} from 'react-native-proximiio';
 import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
 import i18n from 'i18next';
 import {categoryList, SearchCategory} from '../../utils/SearchCategories';
@@ -60,6 +60,7 @@ interface State {
   overrideUserLocationStyle: boolean;
   route?: ProximiioMapboxRoute;
   routeUpdate?: ProximiioRouteEvent;
+  routeUpdateTimestamp: number;
   segment?: Feature;
   started: Boolean;
   userLevel: number;
@@ -94,6 +95,7 @@ export default class MapScreen extends React.Component<Props, State> {
     overrideUserLocationStyle: false,
     route: undefined,
     routeUpdate: undefined,
+    routeUpdateTimestamp: 0,
     segment: undefined,
     started: false,
     userLevel: 0,
@@ -447,21 +449,29 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param event
    */
   private onRouteUpdate = (event: ProximiioRouteEvent) => {
+    const newTimestamp = new Date().getTime();
+    let stateUpdate;
     if (
       event.eventType === ProximiioRouteUpdateType.FINISHED ||
       event.eventType === ProximiioRouteUpdateType.CANCELED ||
       event.eventType === ProximiioRouteUpdateType.ROUTE_NOT_FOUND ||
       event.eventType === ProximiioRouteUpdateType.ROUTE_OSRM_NETWORK_ERROR
     ) {
-      this.setState({route: null, routeUpdate: event, started: false});
+      stateUpdate = {route: null, routeUpdate: event, routeUpdateTimestamp: newTimestamp, started: false};
+    } else if (
+      event.eventType === ProximiioRouteUpdateType.DIRECTION_UPDATE
+      && this.state.routeUpdate.eventType === ProximiioRouteUpdateType.DIRECTION_NEW
+      && newTimestamp < this.state.routeUpdateTimestamp + 4000
+    ) {
+      // Suppress basic route confirmation updates to ensure user sees 'new direction' update long enough
+      return;
+    } else if (event.eventType === ProximiioRouteUpdateType.CALCULATING) {
+      this.showAndFollowCurrentUserLocation();
+      this.setState({routeUpdate: event, routeUpdateTimestamp: newTimestamp, started: false, route: null});
     } else {
-      if (event.eventType === ProximiioRouteUpdateType.CALCULATING) {
-        this.showAndFollowCurrentUserLocation();
-        this.setState({routeUpdate: event, started: false, route: null});
-      } else {
-        this.setState({routeUpdate: event, started: true});
-      }
+      stateUpdate = {routeUpdate: event, routeUpdateTimestamp: newTimestamp, started: true};
     }
+    this.setState(stateUpdate);
   };
 
   private clearRoute = () => {

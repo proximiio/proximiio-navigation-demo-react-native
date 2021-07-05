@@ -97,7 +97,7 @@ class PreferenceHelper {
             HAZARDS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[8]), false),
             LANDMARKS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[9]), false),
             SEGMENTS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[10]), true),
-            REASSURANCE_ENABLED: this.getPreferenceOrDefault(JSON.parse(preferenceResults[11]), true),
+            REASSURANCE_ENABLED: this.getPreferenceOrDefault(JSON.parse(preferenceResults[11]), false),
             REASSURANCE_DISTANCE: this.getPreferenceOrDefault(preferenceResults[12], ReassuranceDistanceOption.METERS_15.id),
             ACCESSIBILITY_GUIDANCE: this.getPreferenceOrDefault(preferenceResults[13], AccessibilityGuidanceOption.NONE.id),
           };

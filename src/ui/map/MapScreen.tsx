@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   ActivityIndicator,
+  AppState,
   BackHandler,
   FlatList,
   Image,
@@ -115,6 +116,7 @@ export default class MapScreen extends React.Component<Props, State> {
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_HAZARD, this.onHazard);
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_SEGMENT, this.onSegment);
     BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
+    AppState.addEventListener('change', this.onAppStateChange);
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
@@ -134,6 +136,7 @@ export default class MapScreen extends React.Component<Props, State> {
     ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ON_HAZARD, this.onHazard);
     ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ON_SEGMENT, this.onSegment);
     BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
+    AppState.removeEventListener('change', this.onAppStateChange);
   }
 
   render() {
@@ -402,7 +405,7 @@ export default class MapScreen extends React.Component<Props, State> {
     let zoomChange = 0;
     if (
       (firstLocationUpdate && location.sourceType === 'native')
-      || (this.state.location.sourceType !== 'native' && location.sourceType === 'native')
+      || (!firstLocationUpdate && this.state.location.sourceType !== 'native' && location.sourceType === 'native')
     ) {
       // first location update + its outside
       // or location update going from inside out
@@ -460,6 +463,16 @@ export default class MapScreen extends React.Component<Props, State> {
       return true;
     } else {
       return false;
+    }
+  };
+
+  /**
+   * App state listener, will force render as mapbox is blank after returning from background state.
+   * @param event
+   */
+  private onAppStateChange = (event) => {
+    if (event === 'active') {
+      this.forceUpdate();
     }
   };
 

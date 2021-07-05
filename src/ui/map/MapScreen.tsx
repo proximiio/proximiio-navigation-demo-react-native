@@ -14,7 +14,7 @@ import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {
   ProximiioContextProvider,
   ProximiioEvents,
-  ProximiioFloor,
+  ProximiioFloor, ProximiioGeofence,
   ProximiioLocation,
 } from 'react-native-proximiio';
 import ProximiioMapbox, {
@@ -35,7 +35,7 @@ import RouteNavigation from './RouteNavigation';
 import CardView from '../../utils/CardView';
 import FloorPicker from './FloorPicker';
 import {Colors} from '../../Style';
-import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
+import {COVERED_LOCATION_GEOFENCE_ID, MAP_STARTING_BOUNDS} from '../../utils/Constants';
 import i18n from 'i18next';
 import {categoryList, SearchCategory} from '../../utils/SearchCategories';
 import {RouteProp} from '@react-navigation/native';
@@ -54,6 +54,7 @@ interface State {
   followUser: boolean;
   followUserHeading: boolean;
   hazard?: Feature;
+  inCoveredArea: boolean;
   location?: ProximiioLocation;
   mapLoaded: boolean;
   mapLevel: number;
@@ -89,6 +90,7 @@ export default class MapScreen extends React.Component<Props, State> {
     followUser: true,
     followUserHeading: false,
     hazard: undefined,
+    inCoveredArea: false,
     location: undefined,
     mapLoaded: false,
     mapLevel: 0,
@@ -106,6 +108,8 @@ export default class MapScreen extends React.Component<Props, State> {
     this.onPositionUpdate(Proximiio.location);
     Proximiio.subscribe(ProximiioEvents.PositionUpdated, this.onPositionUpdate);
     Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChange);
+    Proximiio.subscribe(ProximiioEvents.EnteredGeofence, this.onGeofenceEntered);
+    Proximiio.subscribe(ProximiioEvents.ExitedGeofence, this.onGeofenceExited);
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE, this.onRoute);
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE_UPDATE, this.onRouteUpdate);
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_HAZARD, this.onHazard);
@@ -198,7 +202,7 @@ export default class MapScreen extends React.Component<Props, State> {
                 markerMiddleRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.middleRing : null}
                 markerInnerRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.innerRing : null}
                 onHeadingChanged={this.onHeadingChanged}
-                visible={this.state.mapLevel === this.state.userLevel}
+                visible={this.state.inCoveredArea && this.state.mapLevel === this.state.userLevel}
               />
             </GeoJSONSource>
           </ProximiioContextProvider>
@@ -349,6 +353,17 @@ export default class MapScreen extends React.Component<Props, State> {
     );
   }
 
+  private onGeofenceEntered = (geofence: ProximiioGeofence) => {
+    if (geofence.id === COVERED_LOCATION_GEOFENCE_ID) {
+      this.setState({inCoveredArea: true});
+    }
+  };
+  private onGeofenceExited = (geofence: ProximiioGeofence) => {
+    if (geofence.id === COVERED_LOCATION_GEOFENCE_ID) {
+      this.setState({inCoveredArea: false});
+    }
+  };
+
   private openSearch = (searchCategory?: SearchCategory) => {
     this.props.navigation.navigate('SearchScreen', {
       searchCategory: searchCategory,
@@ -375,6 +390,7 @@ export default class MapScreen extends React.Component<Props, State> {
     if (!location) {
       return;
     }
+    let inCoveredArea = this.state.inCoveredArea;
     let firstLocationUpdate = this.state.location == null;
     let followUser = this.state.followUser;
     let overrideUserLocationStyle = location.sourceType === 'native';
@@ -384,7 +400,7 @@ export default class MapScreen extends React.Component<Props, State> {
     };
     let currentZoom = await this.map.getZoom();
     this.setState(stateUpdate);
-    if (followUser || firstLocationUpdate) {
+    if (inCoveredArea || followUser || firstLocationUpdate) {
       this.camera?.setCamera({
         centerCoordinate: [location.lng, location.lat],
         animationDuration: cameraAnimationDuration,
@@ -573,7 +589,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * @private
    */
   private async showAndFollowCurrentUserLocation() {
-    if (!this.state.location) {
+    if (!this.state.location || !this.state.inCoveredArea) {
       return;
     }
     this.setState({

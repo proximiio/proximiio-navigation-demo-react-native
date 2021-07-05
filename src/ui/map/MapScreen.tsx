@@ -399,15 +399,26 @@ export default class MapScreen extends React.Component<Props, State> {
       overrideUserLocationStyle: overrideUserLocationStyle,
     };
     let currentZoom = await this.map.getZoom();
+    let zoomChange = 0;
+    if (
+      (firstLocationUpdate && location.sourceType === 'native')
+      || (this.state.location.sourceType !== 'native' && location.sourceType === 'native')
+    ) {
+      // first location update + its outside
+      // or location update going from inside out
+      zoomChange = -1;
+    } else if (!firstLocationUpdate && this.state.location.sourceType === 'native' && location.sourceType !== 'native') {
+      // not a first location update going from outside -> inside
+      zoomChange = 1;
+    }
+    let zoomLevel = (firstLocationUpdate ? Math.max(currentZoom, 18) : currentZoom) + zoomChange;
     this.setState(stateUpdate);
     if (inCoveredArea || followUser || firstLocationUpdate) {
       this.camera?.setCamera({
         centerCoordinate: [location.lng, location.lat],
         animationDuration: cameraAnimationDuration,
         animationMode: 'flyTo',
-        zoomLevel: firstLocationUpdate
-          ? Math.max(currentZoom, 18)
-          : currentZoom,
+        zoomLevel: zoomLevel,
       });
     }
   };

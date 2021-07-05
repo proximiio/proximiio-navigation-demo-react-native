@@ -5,6 +5,8 @@ import {Colors} from '../../Style';
 import ProximiioMapbox, {
   Feature,
   ProximiioRouteEvent,
+  ProximiioRouteUpdateType,
+  RouteStepSymbol,
 } from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
 import MapCardView from './MapCardView';
@@ -27,6 +29,7 @@ export default class RouteNavigation extends React.Component<Props, State> {
       return null;
     }
     const hazardStyle = !this.props.segment ? {...styles.rowHazard,  ...styles.topRow} : styles.rowHazard;
+    const stepDirection = this.props.routeUpdate.eventType === ProximiioRouteUpdateType.DIRECTION_UPDATE ? RouteStepSymbol.STRAIGHT : this.props.routeUpdate.data.stepDirection;
     return (
       <MapCardView style={styles.container} onClosePressed={() => ProximiioMapbox.route.cancel()}>
         {this.props.segment && (
@@ -47,7 +50,7 @@ export default class RouteNavigation extends React.Component<Props, State> {
           <View style={styles.rowNavigation}>
             <Image
               style={styles.image}
-              source={importDirectionImage(this.props.routeUpdate.data.stepDirection, true)}
+              source={importDirectionImage(stepDirection, true)}
             />
             <Text style={styles.rowText}>{this.props.routeUpdate.text}</Text>
           </View>

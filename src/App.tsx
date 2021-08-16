@@ -2,7 +2,6 @@ import * as React from 'react';
 import {
   ActivityIndicator,
   Image,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -18,19 +17,12 @@ import ProximiioMapbox, {
   ProximiioMapboxSyncStatus,
 } from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
-import {Appbar} from 'react-native-paper';
 import MapScreen from './ui/map/MapScreen';
 import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import SearchScreen from './ui/search/SearchScreen';
-import {SearchCategory} from './utils/SearchCategories';
-import PolicyScreen from "./ui/policy/PolicyScreen";
-import {createStackNavigator} from "@react-navigation/stack";
-import {NavigationContainer} from "@react-navigation/native";
-
-/**
- * Create UI stack to manage screens.
- */
-// const Stack = createStackNavigator();
+import PolicyScreen from './ui/policy/PolicyScreen';
+import {createStackNavigator} from '@react-navigation/stack';
+import {NavigationContainer} from '@react-navigation/native';
 
 /**
  * Call necessary to init mapbox.
@@ -208,7 +200,7 @@ export default class App extends React.Component<Props, State> {
     Proximiio.setSnapToRoute(true, 20);
     await ProximiioMapbox.authorize(PROXIMIIO_TOKEN);
     ProximiioMapbox.setRerouteEnabled(true);
-    ProximiioMapbox.setReRouteThreshold(3);
+    ProximiioMapbox.setReRouteThreshold(6);
     ProximiioMapbox.setRouteFinishThreshold(2.5);
     ProximiioMapbox.setStepImmediateThreshold(3.5);
     ProximiioMapbox.setStepPreparationThreshold(3.0);

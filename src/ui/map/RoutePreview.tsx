@@ -170,7 +170,7 @@ export default class RoutePreview extends React.Component<Props, State> {
             iconStyle={{tintColor: Colors.blueDark}}
             title={i18n.t('preview.start')}
             titleStyle={{color: Colors.blueDark}}
-            onPress={() => ProximiioMapbox.route.start()}
+            onPress={this.startRoute}
           />
         </View>
         <View style={styles.buttonBar}>
@@ -238,6 +238,10 @@ export default class RoutePreview extends React.Component<Props, State> {
 
   private toggleParking = () => {
     PreferenceHelper.routeFindWithPreferences(this.props.route.destination.id, !this.state.hasWaypoint);
+  };
+
+  private startRoute = () => {
+    ProximiioMapbox.route.start();
   };
 
   private async updateEstimates() {

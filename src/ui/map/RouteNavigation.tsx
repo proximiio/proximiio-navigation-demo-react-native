@@ -28,6 +28,9 @@ export default class RouteNavigation extends React.Component<Props, State> {
     if (this.props.routeUpdate === undefined) {
       return null;
     }
+    if (this.props.routeUpdate.data === undefined) {
+      return null;
+    }
     const hazardStyle = !this.props.segment ? {...styles.rowHazard,  ...styles.topRow} : styles.rowHazard;
     const stepDirection = this.props.routeUpdate.eventType === ProximiioRouteUpdateType.DIRECTION_UPDATE ? RouteStepSymbol.STRAIGHT : this.props.routeUpdate.data.stepDirection;
     return (

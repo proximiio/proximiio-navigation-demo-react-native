@@ -15,7 +15,8 @@ import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {
   ProximiioContextProvider,
   ProximiioEvents,
-  ProximiioFloor, ProximiioGeofence,
+  ProximiioFloor,
+  ProximiioGeofence,
   ProximiioLocation,
 } from 'react-native-proximiio';
 import ProximiioMapbox, {
@@ -36,7 +37,10 @@ import RouteNavigation from './RouteNavigation';
 import CardView from '../../utils/CardView';
 import FloorPicker from './FloorPicker';
 import {Colors} from '../../Style';
-import {COVERED_LOCATION_GEOFENCE_ID, MAP_STARTING_BOUNDS} from '../../utils/Constants';
+import {
+  COVERED_LOCATION_GEOFENCE_ID,
+  MAP_STARTING_BOUNDS,
+} from '../../utils/Constants';
 import i18n from 'i18next';
 import {categoryList, SearchCategory} from '../../utils/SearchCategories';
 import {RouteProp} from '@react-navigation/native';
@@ -57,6 +61,7 @@ interface State {
   hazard?: Feature;
   inCoveredArea: boolean;
   location?: ProximiioLocation;
+  locationTimestamp?: Date;
   mapLoaded: boolean;
   mapLevel: number;
   overrideUserLocationStyle: boolean;
@@ -93,6 +98,7 @@ export default class MapScreen extends React.Component<Props, State> {
     hazard: undefined,
     inCoveredArea: false,
     location: undefined,
+    locationTimestamp: undefined,
     mapLoaded: false,
     mapLevel: 0,
     overrideUserLocationStyle: false,
@@ -107,6 +113,8 @@ export default class MapScreen extends React.Component<Props, State> {
   componentDidMount() {
     this.onFloorChange(Proximiio.floor);
     this.onPositionUpdate(Proximiio.location);
+    this.testCoverageGeofence();
+    Proximiio.subscribe(ProximiioEvents.ItemsChanged, this.testCoverageGeofence);
     Proximiio.subscribe(ProximiioEvents.PositionUpdated, this.onPositionUpdate);
     Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChange);
     Proximiio.subscribe(ProximiioEvents.EnteredGeofence, this.onGeofenceEntered);
@@ -166,6 +174,20 @@ export default class MapScreen extends React.Component<Props, State> {
           {this.renderRouteEnded()}
           {this.renderNavigation()}
         </View>
+        {/*<View style={{...styles.overlaysWrapper, paddingBottom: 96}}>*/}
+        {/*  {this.renderDebug()}*/}
+        {/*</View>*/}
+      </View>
+    );
+  }
+
+  private renderDebug() {
+    return (
+      <View>
+        <Text>Location source: {this.state.location?.sourceType || 'none'}</Text>
+        <Text>Location time: {this.state.locationTimestamp?.toLocaleString()}</Text>
+        <Text>Geofence entered: {JSON.stringify(this.state.inCoveredArea)}</Text>
+        <Text>Current level (map / user): {this.state.mapLevel} / {this.state.userLevel}</Text>
       </View>
     );
   }
@@ -628,6 +650,15 @@ export default class MapScreen extends React.Component<Props, State> {
       animationDuration: cameraAnimationDuration,
     });
   }
+
+  private testCoverageGeofence = () => {
+    Proximiio.currentGeofences().then((geofences) => {
+      const coverageGeofence = geofences.find(
+        (geofence) => geofence.id === COVERED_LOCATION_GEOFENCE_ID,
+      );
+      this.setState({inCoveredArea: !!coverageGeofence});
+    });
+  };
 }
 
 const styles = StyleSheet.create({

@@ -1,8 +1,18 @@
 import * as React from 'react';
-import {View, StyleSheet} from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
-import Proximiio, {ProximiioEvents, ProximiioFloor} from 'react-native-proximiio';
-import {Colors} from '../../Style';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Text,
+  Image,
+  ListRenderItemInfo,
+  TouchableOpacity,
+  StyleProp,
+} from 'react-native';
+import Proximiio, {ProximiioEvents} from 'react-native-proximiio';
+import {Colors, Shadow} from '../../Style';
+import i18n from 'i18next';
+import {LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
 
 interface Props {
   mapLevel: number;
@@ -10,125 +20,141 @@ interface Props {
   onLevelChanged: (newMapLevel: number) => void;
 }
 interface State {
-  floorList: [];
+  currentFloor: number;
+  levelList: number[];
+  open: boolean;
 }
 
 export default class FloorPicker extends React.Component<Props, State> {
-  dropdown = null;
   state = {
-    floorList: null,
-  };
-  floorChangedSubscription = undefined;
+    currentFloor: 0,
+    levelList: [],
+    open: false,
+  } as State;
 
   componentDidMount() {
     this.refreshFloorList();
-    this.floorChangedSubscription = Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChanged.bind(this));
+    Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChanged);
+    Proximiio.subscribe(ProximiioEvents.ItemsChanged, this.onFloorChanged);
   }
 
   componentWillUnmount() {
-    this.floorChangedSubscription.remove();
+    Proximiio.unsubscribe(ProximiioEvents.FloorChanged, this.onFloorChanged);
+    Proximiio.unsubscribe(ProximiioEvents.ItemsChanged, this.onFloorChanged);
   }
 
   render() {
-    if (!this.state.floorList) {
-      this.dropdown = null;
-      return <View />;
+    const currentFloorLevelKey = 'common.floor_' + LEVEL_OVERRIDE_MAP.get(this.props.mapLevel);
+    const currentFloorLevelImageWithRotation = {...styles.currentFloorLevelImage} as StyleProp<any>;
+    if (this.state.open) {
+      currentFloorLevelImageWithRotation.transform = [{rotate: '180deg'}];
     }
     return (
-      <DropDownPicker
-        controller={(instance) => (this.dropdown = instance)}
-        items={this.state.floorList}
-        arrowColor={'#ffffff'}
-        style={styles.main}
-        dropDownStyle={styles.dropdown}
-        itemStyle={styles.item}
-        labelStyle={styles.label}
-        selectedLabelStyle={styles.selectedLabel}
-        placeholderStyle={styles.selectedLabel}
-        defaultValue={this.props.mapLevel}
-        onChangeItem={(newLevel) => this.onFloorSelected(newLevel)}
-      />
+      <View style={styles.container}>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={this.toggleOpen}>
+          <View style={styles.currentFloorLevel}>
+            <Text style={styles.currentFloorLevelText}>{i18n.t(currentFloorLevelKey)}</Text>
+            <Image style={currentFloorLevelImageWithRotation} source={require('../../images/ic_floor_spinner.png')} />
+          </View>
+        </TouchableOpacity>
+        {this.state.open && <FlatList style={styles.floorList} data={this.state.levelList} keyExtractor={(item, index) => '' + index} renderItem={this.renderLevelItem} />}
+      </View>
     );
   }
 
-  private onFloorSelected(selectedFloor) {
-    this.props.onLevelChanged(selectedFloor.value);
-  }
+  private renderLevelItem = (renderItem: ListRenderItemInfo<any>) => {
+    const floorLevelStringKey = 'common.floor_' + LEVEL_OVERRIDE_MAP.get(renderItem.item);
+    return (
+      <TouchableOpacity onPress={() => this.onFloorSelected(renderItem.item)} activeOpacity={0.8}>
+        <Text style={styles.floorListItem}>
+          {i18n.t(floorLevelStringKey)}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
-  private onFloorChanged(floorChange) {
-    console.log(floorChange);
+  private toggleOpen = () => {
+    this.setState({open: !this.state.open});
+  };
+
+  private onFloorSelected = (selectedFloorLevel) => {
+    this.props.onLevelChanged(selectedFloorLevel);
+    this.toggleOpen();
+  };
+
+  private onFloorChanged = (floorChange) => {
     this.refreshFloorList();
-  }
+  };
 
   private async refreshFloorList() {
     let floor = Proximiio.floor;
-
-    // No current floor selected, user is outside
-    if (!floor) {
-      this.setState({floorList: null});
-      return;
-    }
-    let placeId = floor.place_id;
     let floors = await Proximiio.floors();
-    let newFloorList = floors
-      .filter((item) => item.place_id === placeId)
+    let newLevelList = floors
+      .map((it) => it.level)
       .filter(this.filterUnique)
-      .map((item) => {
-        return {
-          label: item.name,
-          value: item.level,
-        };
-      })
-      .sort((a, b) => a.value - b.value);
-    this.setState({floorList: newFloorList});
+      .sort((a, b) => a - b);
+    this.setState({
+      levelList: newLevelList,
+      currentFloor: floor?.level || 0,
+    });
   }
 
   /**
-   * Helper method for filtering out only unique floors
-   * @param value {ProximiioFloor}
-   * @param index {Number}
-   * @param self {Array}
+   * Helper method for filtering out only unique floor levels
+   * @param value {number}
+   * @param index {number}
+   * @param self {Array<number>}
    * @returns {boolean}
    * @private
    */
-  private filterUnique(value, index, self: ProximiioFloor[]) {
-    let firstIndex = self.findIndex((it) => it.id === value.id);
-    return self.indexOf(value) === firstIndex;
+  private filterUnique(value: number, index: number, self: number[]) {
+    let firstIndex = self.findIndex((it) => it === value);
+    return index === firstIndex;
   }
 }
 
 const styles = StyleSheet.create({
-  main: {
-    backgroundColor: Colors.floorSelectorBackground,
-    borderWidth: 0,
-    width: 256,
-  },
   container: {
-    backgroundColor: Colors.floorSelectorBackground,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    marginTop: 16,
+    marginEnd: 16,
+    marginBottom: 8,
   },
-  selectedLabel: {
-    textAlign: 'left',
-    color: Colors.floorSelectorText,
-    backgroundColor: Colors.floorSelectorBackground,
+  currentFloorLevel: {
+    ...Shadow,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.greenLight,
+    borderRadius: 100,
+    flexDirection: 'row',
+    marginBottom: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  label: {
-    textAlign: 'left',
-    color: Colors.floorSelectorText,
-    paddingVertical: 8,
+  currentFloorLevelText: {
+    color: Colors.blueDark2,
+    fontSize: 16,
+    marginEnd: 8,
   },
-  item: {
-    justifyContent: 'flex-start',
-    padding: 12,
+  currentFloorLevelImage: {
+    height: 12,
+    width: 12,
   },
-  dropdown: {
-    backgroundColor: Colors.floorSelectorBackground,
-    width: 256,
+  floorList: {
+    flex: 0,
+    alignSelf: 'flex-end',
+    maxHeight: 156,
+  },
+  floorListItem: {
+    ...Shadow,
+    alignSelf: 'flex-end',
+    backgroundColor: Colors.blueDark,
+    borderRadius: 100,
+    color: Colors.white,
+    fontSize: 12,
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
 });

@@ -1,13 +1,16 @@
 import DefaultPreference from 'react-native-default-preference';
 import ProximiioMapbox, {
   ProximiioWayfindingOptions,
-  ProximiioRouteConfiguration,
+  ProximiioRouteConfiguration, Feature,
 } from 'react-native-proximiio-mapbox';
 import {
   MetersUnitConversion,
   StepUnitConversion,
-  UnitConversionHelper,
 } from './UnitConversions';
+import {UnitConversionHelper} from './UnitConversionHelper';
+import {PreferenceOptionItem} from '../ui/preferences/PreferenceOptionItem';
+import {DistanceUnitOption} from '../ui/preferences/DistanceUnitOption';
+import * as turf from '@turf/turf';
 
 /**
  * Preference values (keys).
@@ -27,13 +30,9 @@ export const Preference = {
   REASSURANCE_ENABLED: 'REASSURANCE_ENABLED',
   REASSURANCE_DISTANCE: 'REASSURANCE_DISTANCE',
   ACCESSIBILITY_GUIDANCE: 'ACCESSIBILITY_GUIDANCE',
+  // Privacy policy
+  PRIVACY_POLICY_ACCEPTED: 'PRIVACY_POLICY_ACCEPTED',
 };
-
-export class PreferenceOptionItem {
-  id: String;
-  name: String;
-  value?: number;
-}
 
 /**
  * Options for accessibility.
@@ -43,13 +42,7 @@ export const AccessibilityGuidanceOption = {
   VISUALLY_IMPAIRED: {id: 'visually_impaired', name: 'preferencescreen.accessibility_option_visual'} as PreferenceOptionItem,
 };
 
-/**
- * Options for units used in navigation guidance.
- */
-export const DistanceUnitOption = {
-  METERS: {id: 'meters', name: 'preferencescreen.unit_meters'} as PreferenceOptionItem,
-  STEPS: {id: 'steps', name: 'preferencescreen.unit_steps'} as PreferenceOptionItem,
-};
+
 
 /**
  * Options for reassuring user about current route each X meters.
@@ -62,9 +55,27 @@ export const ReassuranceDistanceOption = {
 };
 
 /**
+ * ID of amenity for parking spaces. Used to add a parking as a waypoint for navigation.
+ */
+const AMENITY_PARKING_ID = 'c1eaab1a-3f02-4491-a515-af8d628f74fb:9da478a4-b0ce-47ba-8b44-32a4b31150a8';
+
+/**
  * Helper class to manage user preferences.
  */
 class PreferenceHelper {
+
+  static getPrivacyPolicyAccepted(): Promise<boolean> {
+    return new Promise(async (resolve, _) => {
+      const acceptedPreference = await DefaultPreference.get(Preference.PRIVACY_POLICY_ACCEPTED);
+      const accepted = acceptedPreference ? JSON.parse(acceptedPreference) : false;
+      resolve(accepted);
+    });
+  }
+
+  static async setPrivacyPolicyAccepted() {
+    await DefaultPreference.set(Preference.PRIVACY_POLICY_ACCEPTED, JSON.stringify(true));
+  }
+
   /**
    * Returns object with all preference values.
    * @returns {Promise<unknown>}
@@ -86,7 +97,7 @@ class PreferenceHelper {
             HAZARDS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[8]), false),
             LANDMARKS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[9]), false),
             SEGMENTS: this.getPreferenceOrDefault(JSON.parse(preferenceResults[10]), true),
-            REASSURANCE_ENABLED: this.getPreferenceOrDefault(JSON.parse(preferenceResults[11]), true),
+            REASSURANCE_ENABLED: this.getPreferenceOrDefault(JSON.parse(preferenceResults[11]), false),
             REASSURANCE_DISTANCE: this.getPreferenceOrDefault(preferenceResults[12], ReassuranceDistanceOption.METERS_15.id),
             ACCESSIBILITY_GUIDANCE: this.getPreferenceOrDefault(preferenceResults[13], AccessibilityGuidanceOption.NONE.id),
           };
@@ -135,7 +146,7 @@ class PreferenceHelper {
     ProximiioMapbox.ttsReassuranceInstructionEnabled(preferences[Preference.REASSURANCE_ENABLED]);
     ProximiioMapbox.ttsReassuranceInstructionDistance(reassuranceDistanceOption);
     ProximiioMapbox.setUnitConversion(unitConversion);
-    UnitConversionHelper.refreshPreferenceDistanceUnit();
+    UnitConversionHelper.refreshPreferenceDistanceUnit(preferences);
   }
 
   /**
@@ -172,9 +183,10 @@ class PreferenceHelper {
   /**
    * Helper method to find route while applying restrictions set by user in preference screen.
    * @param destinationFeatureId
+   * @param withParking
    * @returns {Promise<void>}
    */
-  static async routeFindWithPreferences(destinationFeatureId) {
+  static async routeFindWithPreferences(destinationFeatureId: String, withParking: boolean = false) {
     let preferences = this.getPreferences();
     let wayfindingOptions: ProximiioWayfindingOptions = {
       avoidElevators: preferences[Preference.AVOID_ELEVATORS],
@@ -187,7 +199,23 @@ class PreferenceHelper {
       destinationFeatureId: destinationFeatureId,
       wayfindingOptions: wayfindingOptions,
     };
+    if (withParking) {
+      const destination = ProximiioMapbox.getFeatures().find((it) => it.id === destinationFeatureId);
+      const parkingFeatures = ProximiioMapbox.getFeatures().filter((it) => it.properties.amenity === AMENITY_PARKING_ID);
+      const bestParking = parkingFeatures.reduce((prev, curr) => this.returnFeatureNearerToDestination(destination, curr, prev));
+      routeConfiguration.waypointFeatureIdList = [[bestParking.id]];
+    }
     ProximiioMapbox.route.findAndPreview(routeConfiguration);
+  }
+
+  private static returnFeatureNearerToDestination(destination: Feature, featureA: Feature, featureB?: Feature): Feature {
+    const distanceA = turf.distance(featureA, destination, {units: 'meters'});
+    const distanceB = featureB ? turf.distance(featureB, destination, {units: 'meters'}) : null;
+    if (!distanceB || distanceA < distanceB) {
+      return featureA;
+    } else {
+      return featureB;
+    }
   }
 }
 

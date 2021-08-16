@@ -4,18 +4,26 @@ import {
   Image,
   StyleSheet,
   Text,
-  Button,
   View,
   ListRenderItemInfo,
+  TouchableOpacity,
+  Linking,
+  Dimensions, ScrollView,
 } from 'react-native';
 import ProximiioMapbox, {
+  Feature,
   ProximiioMapboxRoute,
   RouteStepDescriptor,
 } from 'react-native-proximiio-mapbox';
+import {SliderBox} from 'react-native-image-slider-box';
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
 import {Colors} from '../../Style';
 import i18n from 'i18next';
-import {UnitConversionHelper} from '../../utils/UnitConversions';
+import {UnitConversionHelper} from '../../utils/UnitConversionHelper';
+import RoundedButton from '../../utils/RoundedButton';
+import {PROXIMIIO_TOKEN} from '../../utils/Constants';
+import MapCardView from './MapCardView';
+import PreferenceHelper from '../../utils/PreferenceHelper';
 
 interface Props {
   route: ProximiioMapboxRoute;
@@ -24,16 +32,20 @@ interface State {
   showTripDetails: boolean;
   tripDistance: String;
   tripDuration: String;
+  hasWaypoint: boolean;
+  destination?: Feature;
 }
 
 /**
- * Screen previewing steps of displayed route.
+ * Screen previewing steps of displayed route and basic route and destination information.
  */
 export default class RoutePreview extends React.Component<Props, State> {
   state = {
     showTripDetails: false,
     tripDistance: undefined,
     tripDuration: undefined,
+    hasWaypoint: false,
+    destination: undefined,
   };
 
   componentDidMount() {
@@ -42,64 +54,55 @@ export default class RoutePreview extends React.Component<Props, State> {
 
   render() {
     return (
-      <View style={styles.container}>
-        {this.renderTripStartEnd()}
-        {this.renderTripSummary(this.props.route.distanceMeters)}
-        {this.renderTripSteps()}
-        <View style={styles.buttonBar}>
-          <View style={styles.button}>
-            <Button
-              color={'#777'}
-              title={i18n.t(this.state.showTripDetails ? 'preview.hide_trip' : 'preview.show_trip')}
-              onPress={() => this.setState({showTripDetails: !this.state.showTripDetails})}
-            />
-          </View>
-          <View style={styles.button}>
-            <Button
-              color={'#cc0000'}
-              title={i18n.t('preview.cancel')}
-              onPress={() => ProximiioMapbox.route.cancel()}
-            />
-          </View>
-        </View>
-        <View style={{padding: 8}}>
-          <Button
-            title={i18n.t('preview.start')}
-            onPress={() => ProximiioMapbox.route.start()}
-          />
-        </View>
-      </View>
+      <MapCardView onClosePressed={() => ProximiioMapbox.route.cancel()} style={styles.mapCardView}>
+        <ScrollView style={styles.scrollView}>
+          {this.renderImageGallery()}
+          {this.renderTripSummary()}
+          {this.renderExternalLink()}
+          {this.renderTripSteps()}
+          {this.renderTripButtons()}
+        </ScrollView>
+      </MapCardView>
     );
   }
 
-  /**
-   * Renders info about trip start and end.
-   * @returns {boolean|JSX.Element}
-   * @private
-   */
-  private renderTripStartEnd() {
-    return (this.state.showTripDetails === false && (
-        <>
-          <View style={styles.tripRow}>
-            <Image
-              style={styles.tripRowImage}
-              source={require('../../images/ic_current_position.png')}
-            />
-            <Text style={styles.tripRowText}>
-              {i18n.t('preview.your_location')}
-            </Text>
-          </View>
-          <View style={styles.tripRow}>
-            <Image
-              style={styles.tripRowImage}
-              source={require('../../images/ic_preview_destination.png')}
-            />
-            <Text style={styles.tripRowText}>
-              {this.props.route.destination.properties.title ? this.props.route.destination.properties.title : i18n.t('preview.destination') }
-            </Text>
-          </View>
-        </>
-    ));
+  private renderExternalLink() {
+    const metadata = this.state.destination?.properties?.metadata;
+    const linkData = metadata?.link;
+    const url = linkData?.link;
+    const title = linkData?.title?.get(i18n.language);
+    if (!url || !title) {
+      return null;
+    }
+    return (
+      <TouchableOpacity
+        style={styles.link}
+        onPress={() => Linking.openURL(url)}>
+        <Image source={require('../../images/ic_link.png')} style={styles.linkIcon} />
+        <Text style={styles.linkText}>{title}</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  private renderImageGallery() {
+    if (!this.state.destination) {
+      return null;
+    }
+    const images = this.getItemImages(this.state.destination);
+    if (!images || images.length === 0) {
+      return null;
+    }
+    const width = Dimensions.get('screen').width - 48;
+    return (
+      <View style={styles.sliderWrapper}>
+        <SliderBox
+          images={images}
+          style={styles.slider}
+          parentWidth={width}
+          disableOnPress
+        />
+      </View>
+    );
   }
 
   /**
@@ -110,24 +113,27 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @private
    */
   private renderTripSummary() {
-    // if (distanceInMeters == undefined) {
-    //   return <View />;
-    // }
+    if (!this.state.destination) {
+      return null;
+    }
+    const title = this.state.destination.getTitle(i18n.language);
+    const descriptionMetadata: Object = this.state.destination?.properties?.metadata?.description;
+    let description = null;
+    if (descriptionMetadata != null) {
+      if (descriptionMetadata.hasOwnProperty(i18n.language)) {
+        description = descriptionMetadata[i18n.language];
+      } else {
+        description = descriptionMetadata['en'];
+      }
+    }
+    const estimates = this.state.tripDuration + ' | ' + this.state.tripDistance;
+
     return (
-      <>
-        {this.state.showTripDetails === false && <View style={styles.tripSummarySeparatorVertical} />}
-        <View style={styles.tripSummary}>
-          <View style={styles.tripSummaryItem}>
-            <Image style={styles.tripSummaryItemImage} source={require('../../images/ic_steps.png')} />
-            <Text>{this.state.tripDistance}</Text>
-          </View>
-          <View style={styles.tripSummarySeparator}/>
-          <View style={styles.tripSummaryItem}>
-            <Image style={styles.tripSummaryItemImage} source={require('../../images/ic_time.png')} />
-            <Text>{this.state.tripDuration}</Text>
-          </View>
-        </View>
-      </>
+      <View style={styles.summary}>
+        <Text style={styles.summaryTitle}>{title}</Text>
+        {estimates && <Text style={styles.summaryEstimates}>{estimates}</Text>}
+        {description && <Text style={styles.summaryDescription}>{description}</Text>}
+      </View>
     );
   }
 
@@ -137,15 +143,53 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @private
    */
   private renderTripSteps() {
+    if (!this.state.showTripDetails) {
+      return null;
+    }
+    return this.props.route.steps.map((it, index) => this.renderTripStep(it, index));
+    // return (
+    //   <>
+    //     <Text>Detail Trip Directions</Text>
+    //     <FlatList
+    //       style={styles.tripSteps}
+    //       data={this.props.route.steps}
+    //       renderItem={(item) => this.renderTripStep(item)}
+    //       keyExtractor={(item, index) => 'index_' + index}
+    //     />
+    //   </>
+    // );
+  }
+
+  private renderTripButtons() {
     return (
-      this.state.showTripDetails &&
-      <Text>Detail Trip Directions</Text> &&
-      <FlatList
-        style={styles.tripSteps}
-        data={this.props.route.steps}
-        renderItem={(item, index) => this.renderTripStep(item)}
-        keyExtractor={(item, index) => 'index_' + index}
-      />
+      <>
+        <View>
+          <RoundedButton
+            buttonStyle={styles.buttonStart}
+            icon={require('../../images/ic_navigate.png')}
+            iconStyle={{tintColor: Colors.blueDark}}
+            title={i18n.t('preview.start')}
+            titleStyle={{color: Colors.blueDark}}
+            onPress={this.startRoute}
+          />
+        </View>
+        <View style={styles.buttonBar}>
+          <RoundedButton
+            buttonStyle={styles.buttonParking}
+            icon={require('../../images/ic_parking.png')}
+            title={i18n.t(this.state.hasWaypoint ? 'preview.nearest_parking_remove' : 'preview.nearest_parking')}
+            onPress={this.toggleParking}
+          />
+          <RoundedButton
+            buttonStyle={styles.buttonTrip}
+            icon={require('../../images/ic_route.png')}
+            iconStyle={{tintColor: Colors.blueDark}}
+            titleStyle={{color: Colors.blueDark}}
+            title={i18n.t(this.state.showTripDetails ? 'preview.hide_trip' : 'preview.show_trip')}
+            onPress={() => this.setState({showTripDetails: !this.state.showTripDetails})}
+          />
+        </View>
+      </>
     );
   }
 
@@ -155,11 +199,11 @@ export default class RoutePreview extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  private renderTripStep(item: ListRenderItemInfo<RouteStepDescriptor>) {
-    const instruction = item.index === 0 ? i18n.t('preview.start_navigation') : item.item.instruction;
+  private renderTripStep(item: RouteStepDescriptor, index: number) {
+    const instruction = index === 0 ? i18n.t('preview.start_navigation') : item.instruction;
     let distance = undefined;
-    if (item.index > 0 && item.item.distanceFromLastStep !== undefined) {
-      distance = UnitConversionHelper.getDistanceInPreferredUnits(item.item.distanceFromLastStep);
+    if (index > 0 && item.distanceFromLastStep !== undefined) {
+      distance = UnitConversionHelper.getDistanceInPreferredUnits(item.distanceFromLastStep);
     }
 
     if (instruction === undefined) return <View />;
@@ -167,7 +211,7 @@ export default class RoutePreview extends React.Component<Props, State> {
       <View style={styles.tripRow}>
         <Image
           style={styles.tripRowImage}
-          source={importDirectionImage(item.item.symbol)}
+          source={importDirectionImage(item.symbol)}
         />
         <View style={styles.tripRowText}>
           <Text>{instruction}</Text>
@@ -176,6 +220,29 @@ export default class RoutePreview extends React.Component<Props, State> {
       </View>
     );
   }
+
+  /**
+   * Get array of image URLs or dummy placeholder if none exist.
+   * @param feature
+   * @returns {string[]}
+   * @private
+   */
+  private getItemImages(feature: Feature) {
+    let imageList = feature.getImageUrls(PROXIMIIO_TOKEN);
+    if (!imageList || imageList.length === 0) {
+      return null;
+    } else {
+      return imageList;
+    }
+  }
+
+  private toggleParking = () => {
+    PreferenceHelper.routeFindWithPreferences(this.props.route.destination.id, !this.state.hasWaypoint);
+  };
+
+  private startRoute = () => {
+    ProximiioMapbox.route.start();
+  };
 
   private async updateEstimates() {
     if (!this.props.route) {
@@ -187,9 +254,13 @@ export default class RoutePreview extends React.Component<Props, State> {
       let timeInMinutes = Math.max(1, Math.round(this.props.route.distanceMeters / 1.4 / 60));
       let distance = UnitConversionHelper.getDistanceInPreferredUnits(this.props.route.distanceMeters);
       let duration = i18n.t('preview.summary_minutes', {count: timeInMinutes});
+      let destination = ProximiioMapbox.getFeatures().find(it => it.id === this.props.route.destination.id);
+      let hasWaypoint = !!this.props.route.steps.find(it => it.isWaypoint);
       this.setState({
         tripDistance: distance,
         tripDuration: duration,
+        hasWaypoint: hasWaypoint,
+        destination: destination,
       });
     }
   }
@@ -200,8 +271,7 @@ const styles = StyleSheet.create({
     maxHeight: 256,
   },
   tripSummary: {
-    flexDirection: 'row',
-    marginVertical: 8,
+    padding: 12,
   },
   tripSummaryItem: {
     alignItems: 'center',
@@ -250,19 +320,71 @@ const styles = StyleSheet.create({
     marginTop: 4,
     padding: 8,
   },
-  container: {
-    borderTopColor: 'green',
-    borderTopWidth: 2,
-    borderStyle: 'solid',
-    backgroundColor: Colors.background,
-    width: '100%',
-    padding: 16,
-  },
   buttonBar: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignContent: 'stretch',
+    alignItems: 'stretch',
   },
-  button: {
-    flex: 1,
+  summary: {
     padding: 8,
+  },
+  summaryTitle: {
+    color: Colors.black,
+    fontWeight: 'bold',
+    fontSize: 20,
+    marginBottom: 2,
+  },
+  summaryDescription: {
+    color: Colors.gray,
+    marginBottom: 2,
+  },
+  summaryEstimates: {
+    color: Colors.blueDark2,
+    marginBottom: 2,
+  },
+  buttonStart: {
+    backgroundColor: Colors.greenLight,
+  },
+  buttonParking: {
+    backgroundColor: Colors.blueLight2,
+    flex: 2,
+    marginEnd: 4,
+  },
+  buttonTrip: {
+    backgroundColor: Colors.grayLight,
+    flex: 1,
+    marginStart: 4,
+  },
+  link: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  linkText: {
+    marginStart: 4,
+    color: Colors.pink,
+  },
+  linkIcon: {
+    height: 24,
+    width: 24,
+    tintColor: Colors.pink,
+  },
+  slider: {
+    aspectRatio: 1.7666,
+    flex: 0,
+    flexGrow: 0,
+  },
+  sliderWrapper: {
+    marginBottom: 4,
+  },
+  scrollView: {
+    maxHeight: '100%',
+  },
+  mapCardView: {
+    elevation: 10,
+    maxHeight: '100%',
   },
 });

@@ -11,7 +11,7 @@ import i18n from "i18next";
  * Length of a single step in meters.
  * @type {number}
  */
-const STEP_LENGTH = 0.65;
+export const STEP_LENGTH = 0.65;
 
 /**
  * Step unit conversion. Uses:
@@ -70,41 +70,3 @@ export const MetersUnitConversion: ProximiioUnitConversion = {
     },
   ],
 };
-
-// var preferredDistanceUnit = DistanceUnitOption.METERS.id;
-//
-// export const refreshPreferenceDistanceUnit = async () => {
-//   let preferences = await PreferenceHelper.getPreferences();
-//   preferredDistanceUnit = preferences[Preference.DISTANCE_UNIT];
-// };
-//
-// export const getDistanceInPreferredUnits = (distanceInMeters: number) => {
-//   if (preferredDistanceUnit === DistanceUnitOption.STEPS.id) {
-//     let steps = Math.round(distanceInMeters / STEP_LENGTH);
-//     return i18n.t('common.steps', {count: steps});
-//   } else {
-//     let meters = Math.round(distanceInMeters);
-//     return i18n.t('common.meters', {count: meters});
-//   }
-// };
-
-class UnitConversionHelperClass {
-  private preferredDistanceUnit = DistanceUnitOption.METERS.id;
-
-  public refreshPreferenceDistanceUnit = async () => {
-    let preferences = await PreferenceHelper.getPreferences();
-    this.preferredDistanceUnit = preferences[Preference.DISTANCE_UNIT];
-  };
-
-  public getDistanceInPreferredUnits = (distanceInMeters: number) => {
-    if (this.preferredDistanceUnit === DistanceUnitOption.STEPS.id) {
-      let steps = Math.round(distanceInMeters / STEP_LENGTH);
-      return i18n.t('common.steps', {count: steps});
-    } else {
-      let meters = Math.round(distanceInMeters);
-      return i18n.t('common.meters', {count: meters});
-    }
-  };
-}
-// const UnitConversionHelper = new UnitConversionHelperClass();
-export const UnitConversionHelper = new UnitConversionHelperClass();

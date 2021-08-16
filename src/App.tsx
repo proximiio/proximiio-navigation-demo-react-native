@@ -1,28 +1,38 @@
 import * as React from 'react';
-import {ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {NotificationMode} from 'react-native-proximiio';
-import MapScreen from './ui/map/MapScreen';
-import PoiScreen from './ui/poi/PoiScreen';
-import SearchScreen from './ui/search/SearchScreen';
 import {Colors} from './Style';
-import PreferenceScreen from './ui/preferences/PreferenceScreen';
 import PreferenceHelper from './utils/PreferenceHelper';
 import {LEVEL_OVERRIDE_MAP, PROXIMIIO_TOKEN} from './utils/Constants';
-import ProximiioMapbox, {ProximiioMapboxEvents, ProximiioMapboxSyncStatus,} from 'react-native-proximiio-mapbox';
+import ProximiioMapbox, {
+  ProximiioMapboxEvents,
+  ProximiioMapboxSyncStatus,
+} from 'react-native-proximiio-mapbox';
 import i18n from 'i18next';
-
-/**
- * Create UI stack to manage screens.
- */
-const Stack = createStackNavigator();
+import MapScreen from './ui/map/MapScreen';
+import PreferenceScreen from './ui/preferences/PreferenceScreen';
+import SearchScreen from './ui/search/SearchScreen';
+import PolicyScreen from './ui/policy/PolicyScreen';
+import {createStackNavigator} from '@react-navigation/stack';
+import {NavigationContainer} from '@react-navigation/native';
 
 /**
  * Call necessary to init mapbox.
  */
 MapboxGL.setAccessToken('');
+
+/**
+ * Create stack for screen navigation
+ */
+const Stack = createStackNavigator();
 
 /**
  * RNComponent properties
@@ -32,9 +42,12 @@ interface Props {}
  * RNComponent state
  */
 interface State {
-  mapLoaded: Boolean;
-  mapLevel: Number;
-  proximiioReady: Boolean;
+  mapLoaded: boolean;
+  proximiioReady: boolean;
+  showSearch: boolean;
+  showPreferences: boolean;
+  policyAccepted?: boolean;
+  defaultScreen: String;
 }
 
 /**
@@ -43,53 +56,73 @@ interface State {
 export default class App extends React.Component<Props, State> {
   state = {
     mapLoaded: false,
-    mapLevel: 0,
     proximiioReady: false,
-  };
+    showSearch: false,
+    showPreferences: false,
+    policyAccepted: undefined,
+    defaultScreen: 'PolicyScreen',
+  } as State;
   private syncListener = undefined;
+  private policyAccepted = false;
 
   componentDidMount() {
-    this.initProximiio();
+    PreferenceHelper.getPrivacyPolicyAccepted().then((accepted) => {
+      this.setState({
+        policyAccepted: accepted,
+        defaultScreen: accepted ? 'MapScreen' : 'PolicyScreen',
+      });
+      if (accepted) {
+        this.initProximiio();
+      }
+    });
   }
 
   componentWillUnmount() {
     // Cancel sync status listener
-    this.syncListener.remove();
+    this.syncListener?.remove();
   }
 
   render() {
-    if (!this.state.proximiioReady) {
-      return (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator
-            size="large"
-            color={Colors.primary}
-            style={{marginBottom: 8}}
-            animating
-          />
-          <Text>{i18n.t('app.loading')}</Text>
-        </View>
-      );
+    // Wait for preference to be loaded
+    if (this.state.policyAccepted === undefined) {
+      return this.renderLoadingOverlay();
     }
+    // Initializing Proximi.io libs
+    if (this.state.policyAccepted && !this.state.proximiioReady) {
+      return this.renderLoadingOverlay();
+    }
+    // Render main app content
+    return this.renderScreenStack();
+  }
+
+  private renderLoadingOverlay() {
+    return (
+      <View style={styles.loadingOverlay}>
+        <ActivityIndicator
+          size="large"
+          color={Colors.primary}
+          style={{marginBottom: 8}}
+          animating
+        />
+        <Text>{i18n.t('app.loading')}</Text>
+      </View>
+    );
+  }
+
+  private renderScreenStack() {
     return (
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName={this.state.defaultScreen}>
           <Stack.Screen
-            name="Main"
+            name="MapScreen"
             component={MapScreen}
             options={({navigation}) => {
-              console.log('navigation', navigation);
               return {
                 title: i18n.t('app.title_map'),
                 headerRight: (tintColor) =>
                   this.getSettingsButton(tintColor, navigation),
               };
             }}
-          />
-          <Stack.Screen
-            name="ItemDetail"
-            component={PoiScreen}
-            options={{title: ''}}
           />
           <Stack.Screen
             name="SearchScreen"
@@ -101,8 +134,44 @@ export default class App extends React.Component<Props, State> {
             component={PreferenceScreen}
             options={{title: i18n.t('app.title_settings')}}
           />
+          <Stack.Screen
+            name="PolicyScreen"
+            component={PolicyScreen}
+            initialParams={{policyAccepted: this.state.policyAccepted, onPolicyAccepted: this.onPolicyAccepted }}
+            options={{title: i18n.t('app.title_policy')}}
+          />
         </Stack.Navigator>
       </NavigationContainer>
+    );
+  }
+
+  private onPolicyAccepted = () => {
+    this.setState({
+      policyAccepted: true,
+      defaultScreen: 'MapScreen',
+    });
+    PreferenceHelper.setPrivacyPolicyAccepted();
+    this.initProximiio();
+  };
+
+  /**
+   * Create appbar settings button.
+   * @param tintColor
+   * @param navigation
+   * @returns {JSX.Element}
+   * @private
+   */
+  private getSettingsButton(tintColor, navigation) {
+    return (
+      <TouchableOpacity
+        style={styles.appbarButton}
+        onPress={() => navigation.navigate('PreferenceScreen')}
+        activeOpacity={0.5}>
+        <Image
+          style={styles.appBarButtonImage}
+          source={require('./images/ic_settings.png')}
+        />
+      </TouchableOpacity>
     );
   }
 
@@ -124,15 +193,14 @@ export default class App extends React.Component<Props, State> {
         }
       },
     );
+    Proximiio.setNotificationMode(NotificationMode.Disabled);
     // Authorize libraries with token
     await Proximiio.authorize(PROXIMIIO_TOKEN);
     Proximiio.setPdr(true, 4);
     Proximiio.setSnapToRoute(true, 20);
-    Proximiio.setNotificationMode(NotificationMode.Disabled);
-    Proximiio.updateOptions();
     await ProximiioMapbox.authorize(PROXIMIIO_TOKEN);
     ProximiioMapbox.setRerouteEnabled(true);
-    ProximiioMapbox.setReRouteThreshold(3);
+    ProximiioMapbox.setReRouteThreshold(6);
     ProximiioMapbox.setRouteFinishThreshold(2.5);
     ProximiioMapbox.setStepImmediateThreshold(3.5);
     ProximiioMapbox.setStepPreparationThreshold(3.0);
@@ -148,27 +216,6 @@ export default class App extends React.Component<Props, State> {
     await this.setState({
       proximiioReady: true,
     });
-  }
-
-  /**
-   * Create appbar settings button.
-   * @param tintColor
-   * @param navigation
-   * @returns {JSX.Element}
-   * @private
-   */
-  private getSettingsButton(tintColor, navigation) {
-    return (
-      <TouchableOpacity
-        style={styles.appbarButton}
-        onPress={() => navigation.navigate('PreferenceScreen')}
-        activeOpacity={0.5}>
-        <Image
-          style={styles.appBarButtonImage}
-          source={require('./images/ic_settings.png')}
-        />
-      </TouchableOpacity>
-    );
   }
 }
 

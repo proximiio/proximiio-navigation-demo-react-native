@@ -1,11 +1,10 @@
 import * as React from 'react';
 import {
-  Dimensions,
   FlatList,
   Image,
   StyleSheet,
   Text,
-  TextInput,
+  TextInput, TouchableOpacity,
   View,
 } from 'react-native';
 import CardView from '../../utils/CardView';
@@ -15,19 +14,17 @@ import ProximiioMapbox, {
   Feature,
   ProximiioMapboxEvents,
 } from 'react-native-proximiio-mapbox';
-import SearchCategories, {SearchCategory} from './SearchCategories';
+import {SearchCategory} from '../../utils/SearchCategories';
 import SearchEmptyItem from './SearchEmptyItem';
 import {IconButton} from 'react-native-paper';
 import {TouchableHighlight} from 'react-native-gesture-handler';
-import SearchFooter from './SearchFooter';
 import {Colors} from '../../Style';
-import {PROXIMIIO_TOKEN, LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
+import {LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
 import i18n from 'i18next';
-
-const numColumns = Math.round(Dimensions.get('window').width / 200);
-const searchItemFlex = 1 / numColumns;
+import {RouteProp} from '@react-navigation/native';
 
 interface Props {
+  route: RouteProp<any, any>;
   navigation: any;
 }
 interface State {
@@ -73,11 +70,11 @@ export default class SearchScreen extends React.Component<Props, State> {
 
   componentDidMount() {
     this.loadAmenitiesAndFeatures();
+    this.state.featureCategoryFilter = this.props.route.params.searchCategory;
     this.featureSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.FEATURES_CHANGED, () => this.loadAmenitiesAndFeatures());
   }
 
   componentWillUnmount() {
-    console.log('component will unmount');
     if (this.featureSubscription) {
       this.featureSubscription.remove();
     }
@@ -86,40 +83,55 @@ export default class SearchScreen extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
-        <CardView style={styles.searchInputCard}>
-          <View style={styles.searchInputCardContent}>
-            {this.state.featureCategoryFilter && (
-              <TouchableHighlight
-                activeOpacity={0.5}
-                underlayColor="#fff"
-                onPress={() => this.updateCategoryFilter(undefined)}>
-                <View style={styles.categoryFilter}>
-                  <Text>{i18n.t(this.state.featureCategoryFilter.title)}</Text>
-                  <IconButton icon="close" size={16} style={styles.categoryFilterClose}/>
-                </View>
-              </TouchableHighlight>
-            )}
-            <View style={styles.searchInput}>
-              <TextInput
-                placeholder={i18n.t('common.search_hint')}
-                onChangeText={(title) => this.updateSearchFilter(title)}
-                autoFocus
-              />
-            </View>
-          </View>
-        </CardView>
+        {this.renderSearchInputCard()}
         <FlatList
           contentContainerStyle={styles.scrollviewContent}
           data={this.state.filteredFeatureList}
-          numColumns={numColumns}
+          // numColumns={numColumns}
           ListEmptyComponent={<SearchEmptyItem/>}
-          ListFooterComponent={this.state.currentItemCount > 0 && <SearchFooter/>}
-          ListHeaderComponent={this.state.featureListFilterTitle === '' && !this.state.featureCategoryFilter && this.state.featureList.length > 0 &&
-          <SearchCategories onCategorySelected={this.updateCategoryFilter.bind(this)}/>}
+          // ListFooterComponent={this.state.currentItemCount > 0 && <SearchFooter/>}
+          ListHeaderComponent={this.renderSearchHeader()}
           renderItem={({item}) => this.renderSearchItem(item)}
           style={styles.searchItemList}
         />
       </View>
+    );
+  }
+
+  private renderSearchInputCard() {
+    return (
+      <CardView style={styles.searchInputCard}>
+        <View style={styles.searchInputCardContent}>
+          <Image style={styles.searchIcon} source={require('../../images/ic_search.png')} />
+          <View style={styles.searchInput}>
+            <TextInput
+              placeholder={i18n.t('common.search_hint')}
+              onChangeText={(title) => this.updateSearchFilter(title)}
+              autoFocus
+            />
+          </View>
+          {this.state.featureCategoryFilter && (
+            <TouchableHighlight
+              activeOpacity={0.5}
+              underlayColor="#fff"
+              onPress={() => this.updateCategoryFilter(undefined)}>
+              <View style={styles.categoryFilter}>
+                <Text>{i18n.t(this.state.featureCategoryFilter.title)}</Text>
+                <IconButton icon="close" size={16} style={styles.categoryFilterClose}/>
+              </View>
+            </TouchableHighlight>
+          )}
+        </View>
+      </CardView>
+    );
+  }
+
+  private renderSearchHeader() {
+    if (this.state.filteredFeatureList.length === 0) {
+      return;
+    }
+    return (
+      <Text style={styles.searchItemHeader}>{i18n.t('searchscreen.results', {count: this.state.filteredFeatureList.length})}</Text>
     );
   }
 
@@ -131,31 +143,29 @@ export default class SearchScreen extends React.Component<Props, State> {
    */
   private renderSearchItem(poiFeature) {
     return (
-      <View style={styles.searchItem}>
-        <CardView style={styles.searchItemCard} key={poiFeature.properties.id}>
-          <TouchableHighlight
-            activeOpacity={0.5}
-            underlayColor="#eee"
-            onPress={() => {
-              this.props.navigation.navigate('ItemDetail', {item: poiFeature});
-            }}
-            style={styles.searchItemTouch}>
-            <View>
-              <Image
-                source={this.getCoverImage(poiFeature)}
-                style={styles.searchItemImage}
-              />
-              <Text style={styles.searchItemTitle} numberOfLines={1}>
-                {poiFeature.getTitle(i18n.language)}
-              </Text>
-              <Text style={styles.searchItemFloor}>
-                {this.getLevelString(poiFeature)}
-              </Text>
-            </View>
-          </TouchableHighlight>
-        </CardView>
-      </View>
+      <TouchableOpacity
+        activeOpacity={0.4}
+        onPress={() => this.openPoi(poiFeature)}>
+        <View style={styles.searchItem}>
+          <Image
+            source={this.getFeatureImage(poiFeature)}
+            style={styles.searchItemImage}
+          />
+          <View style={styles.searchItemDescription}>
+            <Text style={styles.searchItemTitle} numberOfLines={1}>
+              {poiFeature.getTitle(i18n.language)}
+            </Text>
+            <Text style={styles.searchItemFloor}>
+              {this.getLevelString(poiFeature)}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
+  }
+
+  private openPoi(feature: Feature) {
+    this.props.navigation.navigate('MapScreen', {feature: feature});
   }
 
   /**
@@ -232,10 +242,7 @@ export default class SearchScreen extends React.Component<Props, State> {
    */
   private matchesSearchItemTitle(item: Feature, title: String, category: SearchCategory) {
     if (category) {
-      if (
-        !this.state.amenityMap.has(item.properties.amenity)
-        || this.state.amenityMap.get(item.properties.amenity).category_id !== category.amenityCategoryId
-      ) {
+      if (item.properties.amenity !== category.amenityId) {
         return false;
       }
     }
@@ -259,15 +266,9 @@ export default class SearchScreen extends React.Component<Props, State> {
    * @returns {null|{uri: string}}
    * @private
    */
-  private getCoverImage(feature) {
-    let imageUrlList = feature.getImageUrls(PROXIMIIO_TOKEN);
-    if (!imageUrlList || imageUrlList.length === 0) {
-      return null;
-    } else {
-      return {
-        uri: imageUrlList[0],
-      };
-    }
+  private getFeatureImage(feature) {
+    let amenity: Amenity = this.state.amenityMap.has(feature.properties.amenity) ? this.state.amenityMap.get(feature.properties.amenity) : null;
+    return amenity ? {uri: amenity.icon} : null;
   }
 
   /**
@@ -277,28 +278,9 @@ export default class SearchScreen extends React.Component<Props, State> {
    * @private
    */
   private getLevelString(feature) {
-    let overrideLevel = LEVEL_OVERRIDE_MAP[feature.properties.level] | feature.properties.level | 0;
-    let level = '';
-    switch (overrideLevel) {
-      case 0:
-        level = i18n.t('common.floor_0');
-        break;
-      case 1:
-        level = i18n.t('common.floor_1');
-        break;
-      case 2:
-        level = i18n.t('common.floor_2');
-        break;
-      case 3:
-        level = i18n.t('common.floor_3');
-        break;
-      case 4:
-        level = i18n.t('common.floor_4');
-        break;
-      default:
-        level = i18n.t('common.floor_n', {count: (feature.properties.level + 1)});
-    }
-    return level;
+    let overrideLevel = LEVEL_OVERRIDE_MAP.get(feature.properties.level);
+    let levelString = i18n.t('common.floor_' + overrideLevel);
+    return levelString;
   }
 }
 
@@ -309,52 +291,56 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchItemTouch: {
-    flex: 1,
-    borderRadius: 8,
+    backgroundColor: 'red',
   },
   searchItem: {
-    flex: searchItemFlex,
-  },
-  searchItemCard: {
-    margin: 8,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
+    // flex: searchItemFlex,
+    flexDirection: 'row',
+    paddingHorizontal: 8,
   },
   searchItemImage: {
-    aspectRatio: 1.766,
+    aspectRatio: 1,
     flexDirection: 'row',
     backgroundColor: Colors.gray,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    margin: 0,
+    borderRadius: 48,
+    margin: 8,
+    width: 48,
+  },
+  searchItemDescription: {
+    alignSelf: 'center',
   },
   searchItemTitle: {
-    backgroundColor: Colors.primary,
-    textAlign: 'center',
-    color: Colors.white,
-    justifyContent: 'center',
-    padding: 8,
-    flex: 1,
+    paddingHorizontal: 8,
   },
   searchItemFloor: {
-    textAlign: 'center',
+    color: Colors.gray,
     justifyContent: 'center',
-    padding: 8,
-    flex: 1,
+    paddingHorizontal: 8,
   },
   searchItemList: {
     flex: 1,
   },
+  searchItemHeader: {
+    paddingHorizontal: 16,
+    fontSize: 16,
+    paddingTop: 4,
+    paddingBottom: 12,
+  },
   scrollviewContent: {
-    padding: 8,
     flexGrow: 1,
   },
   searchInputCard: {
     margin: 16,
+    borderRadius: 100,
   },
   searchInputCardContent: {
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  searchIcon: {
+    paddingHorizontal: 8,
+    width: 24,
+    height: 24,
   },
   searchInput: {
     flex: 1,

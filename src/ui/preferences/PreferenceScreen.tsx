@@ -12,12 +12,14 @@ import {Dialog} from 'react-native-paper';
 import PreferenceHelper, {
   AccessibilityGuidanceOption,
   ReassuranceDistanceOption,
-  DistanceUnitOption,
 } from '../../utils/PreferenceHelper';
 import {SettingsData} from 'react-native-settings-screen';
 import i18n from 'i18next';
+import {DistanceUnitOption} from './DistanceUnitOption';
 
-interface Props {
+interface Props {}
+
+interface State {
   /** Unit selection dialog visibility state toggle */
   unitDialogVisible: Boolean;
   /** Accessibility selection dialog visibility state toggle */
@@ -42,7 +44,6 @@ interface Props {
   /** Settings data structure, describes screen content. */
   settingsData: SettingsData;
 }
-interface State {}
 
 /**
  * Screen providing management of user preferences.
@@ -68,7 +69,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
     REASSURANCE_DISTANCE: ReassuranceDistanceOption.METERS_15.id,
     ACCESSIBILITY_GUIDANCE: AccessibilityGuidanceOption.NONE.id,
     settingsData: [],
-  };
+  } as State;
 
   componentDidMount() {
     // Load stored preferences
@@ -101,8 +102,8 @@ export default class PreferenceScreen extends React.Component<Props, State> {
 
   render() {
     return (
-      <View style={styles.container}>
-        <StatusBar />
+      <View style={StyleSheet.absoluteFill}>
+      {/*<StatusBar />*/}
         <SettingsScreen data={this.state.settingsData} style={styles.settings} />
         {this.optionsDialog(
           DistanceUnitOption,
@@ -216,6 +217,10 @@ export default class PreferenceScreen extends React.Component<Props, State> {
     this.setState({routeConfirmationDistanceDialogVisible: false});
   }
 
+  private openPolicy = () => {
+    this.props.navigation.navigate('PolicyScreen');
+  };
+
   /**
    * Generates switch view.
    * @param value value of switch
@@ -225,7 +230,6 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @private
    */
   private renderSwitch(value, onValueChange, disabled: false) {
-    console.log('disabled ', disabled);
     return (
       <Switch disabled={disabled} value={value} onValueChange={onValueChange} />
     );
@@ -240,6 +244,18 @@ export default class PreferenceScreen extends React.Component<Props, State> {
     this.setState({VOICE_GUIDANCE: value}, () => this.refreshSettingsData());
   }
 
+  private setAvoidStairs = (enabled: boolean) => {
+    const stairs = enabled;
+    const elevator = stairs && this.state.AVOID_ELEVATORS ? false : this.state.AVOID_ELEVATORS;
+    this.setState({AVOID_ELEVATORS: elevator, AVOID_STAIRS: stairs});
+  };
+
+  private setAvoidElevator = (enabled: boolean) => {
+    const elevator = enabled;
+    const stairs = elevator && this.state.AVOID_STAIRS ? false : this.state.AVOID_STAIRS;
+    this.setState({AVOID_ELEVATORS: elevator, AVOID_STAIRS: stairs});
+  };
+
   /**
    * Forces update of the UI by re-generating settings data. This a a workaround due to settings screen not refreshing properly.
    * @private
@@ -252,11 +268,11 @@ export default class PreferenceScreen extends React.Component<Props, State> {
         rows: [
           {
             title: i18n.t('preferencescreen.avoid_stairs'),
-            renderAccessory: () => this.renderSwitch(this.state.AVOID_STAIRS, (value) => this.setState({AVOID_STAIRS: value})),
+            renderAccessory: () => this.renderSwitch(this.state.AVOID_STAIRS, (value) => this.setAvoidStairs(value)),
           },
           {
             title: i18n.t('preferencescreen.avoid_elevators'),
-            renderAccessory: () => this.renderSwitch(this.state.AVOID_ELEVATORS, (value) => this.setState({AVOID_ELEVATORS: value})),
+            renderAccessory: () => this.renderSwitch(this.state.AVOID_ELEVATORS, (value) => this.setAvoidElevator(value)),
           },
           {
             title: i18n.t('preferencescreen.avoid_revolving_doors'),
@@ -323,6 +339,16 @@ export default class PreferenceScreen extends React.Component<Props, State> {
           },
         ],
       },
+      {
+        type: 'SECTION',
+        // header: null,
+        rows: [
+          {
+            title: i18n.t('preferencescreen.privacy_policy'),
+            onPress: this.openPolicy,
+          },
+        ],
+      },
     ];
     this.setState({settingsData: data});
   }
@@ -336,7 +362,6 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    */
   private getOptionNameById(option, id) {
     let result = Object.entries(option).filter(it => it[1].id === id);
-    console.log('option', Object.entries(option), result);
     if (result.length > 0) {
       return i18n.t(result[0][1].name);
     } else {

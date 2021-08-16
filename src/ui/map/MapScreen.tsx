@@ -1,30 +1,35 @@
 import * as React from 'react';
 import {
-  StyleSheet,
-  View,
-  Image,
-  Text,
-  TouchableHighlight,
   ActivityIndicator,
+  AppState,
   BackHandler,
-  TouchableNativeFeedback,
+  FlatList,
+  Image,
+  ListRenderItemInfo,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import MapboxGL, {SymbolLayerStyle} from '@react-native-mapbox-gl/maps';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {
   ProximiioContextProvider,
   ProximiioEvents,
+  ProximiioFloor,
+  ProximiioGeofence,
   ProximiioLocation,
 } from 'react-native-proximiio';
 import ProximiioMapbox, {
-  ProximiioMapboxEvents,
-  UserLocationSource,
   AmenitySource,
+  Feature,
   GeoJSONSource,
-  RoutingSource,
-  ProximiioMapboxRoute,
   ProximiioFeatureType,
+  ProximiioMapboxEvents,
+  ProximiioMapboxRoute,
   ProximiioRouteEvent,
-  ProximiioRouteUpdateType, Feature,
+  ProximiioRouteUpdateType,
+  RoutingSource,
+  UserLocationSource,
 } from 'react-native-proximiio-mapbox';
 import RoutePreview from './RoutePreview';
 import {FAB} from 'react-native-paper';
@@ -32,24 +37,37 @@ import RouteNavigation from './RouteNavigation';
 import CardView from '../../utils/CardView';
 import FloorPicker from './FloorPicker';
 import {Colors} from '../../Style';
-import {ProximiioFloor} from 'react-native-proximiio';
-import {MAP_STARTING_BOUNDS} from '../../utils/Constants';
+import {
+  COVERED_LOCATION_GEOFENCE_ID,
+  MAP_STARTING_BOUNDS,
+} from '../../utils/Constants';
 import i18n from 'i18next';
+import {categoryList, SearchCategory} from '../../utils/SearchCategories';
+import {RouteProp} from '@react-navigation/native';
+import PreferenceHelper from '../../utils/PreferenceHelper';
+import MapCardView from './MapCardView';
+import {TouchableHighlight} from 'react-native-gesture-handler';
 
 interface Props {
+  onOpenSearch: (searchCategory?: SearchCategory) => void;
+  onOpenPoi: (poi: Feature) => void;
   navigation: any;
+  route: RouteProp<any, any>;
 }
 
 interface State {
   followUser: boolean;
   followUserHeading: boolean;
   hazard?: Feature;
-  userLocationSourceStyle?: Object;
+  inCoveredArea: boolean;
   location?: ProximiioLocation;
+  locationTimestamp?: Date;
   mapLoaded: boolean;
   mapLevel: number;
+  overrideUserLocationStyle: boolean;
   route?: ProximiioMapboxRoute;
   routeUpdate?: ProximiioRouteEvent;
+  routeUpdateTimestamp: number;
   segment?: Feature;
   started: Boolean;
   userLevel: number;
@@ -68,13 +86,7 @@ const userLocationSourceStyleOverride = {
   heading: {iconSize: 1.8},
   outerRing: {circleRadius: 24},
   middleRing: {circleRadius: 23},
-  innerRing: {circleColor: '#ff0000', circleRadius: 15},
-};
-const userLocationSourceStyleNoOverride = {
-  heading: {},
-  outerRing: {},
-  middleRing: {},
-  innerRing: {},
+  innerRing: {circleRadius: 15},
 };
 
 export default class MapScreen extends React.Component<Props, State> {
@@ -84,27 +96,44 @@ export default class MapScreen extends React.Component<Props, State> {
     followUser: true,
     followUserHeading: false,
     hazard: undefined,
-    userLocationSourceStyle: userLocationSourceStyleNoOverride,
+    inCoveredArea: false,
     location: undefined,
+    locationTimestamp: undefined,
     mapLoaded: false,
     mapLevel: 0,
+    overrideUserLocationStyle: false,
     route: undefined,
     routeUpdate: undefined,
+    routeUpdateTimestamp: 0,
     segment: undefined,
     started: false,
     userLevel: 0,
-  };
+  } as State;
 
   componentDidMount() {
     this.onFloorChange(Proximiio.floor);
     this.onPositionUpdate(Proximiio.location);
+    this.testCoverageGeofence();
+    Proximiio.subscribe(ProximiioEvents.ItemsChanged, this.testCoverageGeofence);
     Proximiio.subscribe(ProximiioEvents.PositionUpdated, this.onPositionUpdate);
     Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChange);
+    Proximiio.subscribe(ProximiioEvents.EnteredGeofence, this.onGeofenceEntered);
+    Proximiio.subscribe(ProximiioEvents.ExitedGeofence, this.onGeofenceExited);
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE, this.onRoute);
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE_UPDATE, this.onRouteUpdate);
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_HAZARD, this.onHazard);
     ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_SEGMENT, this.onSegment);
     BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
+    AppState.addEventListener('change', this.onAppStateChange);
+  }
+
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+    if (this.props.route.params && this.props.route.params.feature) {
+      const feature = this.props.route.params.feature;
+      PreferenceHelper.routeFindWithPreferences(feature.id);
+      // clear params
+      this.props.navigation.setParams({feature: undefined});
+    }
   }
 
   componentWillUnmount() {
@@ -115,78 +144,16 @@ export default class MapScreen extends React.Component<Props, State> {
     ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ON_HAZARD, this.onHazard);
     ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ON_SEGMENT, this.onSegment);
     BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
+    AppState.removeEventListener('change', this.onAppStateChange);
   }
-
-  // shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
-  //   if (
-  //     this.state.followUser === nextState.followUser
-  //     && this.state.hazard === nextState.hazard
-  //     && this.state.mapLoaded === nextState.mapLoaded
-  //     && this.state.mapLevel === nextState.mapLevel
-  //     && this.state.route === nextState.route
-  //     && this.state.routeUpdate === nextState.routeUpdate
-  //     && this.state.started === nextState.started
-  //     && this.state.userLevel === nextState.userLevel
-  //   ) {
-  //     console.log('should component update', false);
-  //     return false;
-  //   } else {
-  //     console.log('should component update', true);
-  //     return true;
-  //   }
-  // }
 
   render() {
     return (
       <View style={styles.container}>
-        <MapboxGL.MapView
-          ref={(map) => (this.map = map)}
-          style={StyleSheet.absoluteFillObject}
-          scrollEnabled={true}
-          compassEnabled={false}
-          styleURL={ProximiioMapbox.styleURL}
-          onRegionWillChange={this.onRegionWillChange}
-          onDidFinishLoadingMap={() => this.setState({mapLoaded: true})}>
-          <MapboxGL.Camera
-            ref={(camera) => {
-              this.camera = camera;
-            }}
-            minZoomLevel={1}
-            maxZoomLevel={24}
-            animationMode={'flyTo'}
-            animationDuration={250}
-            bounds={MAP_STARTING_BOUNDS}
-          />
-          {this.state.mapLoaded && (
-            <ProximiioContextProvider>
-              <AmenitySource />
-              <GeoJSONSource
-                level={this.state.mapLevel}
-                onPress={this.onMapPress}>
-                <RoutingSource level={this.state.mapLevel} />
-                <UserLocationSource
-                  showHeadingIndicator={false}
-                  onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
-                  onHeadingChanged={this.onHeadingChanged}
-                  visible={this.state.mapLevel === this.state.userLevel}
-                />
-              </GeoJSONSource>
-            </ProximiioContextProvider>
-          )}
-        </MapboxGL.MapView>
-        <View style={styles.fabWrapper}>
-          <FAB
-            color={Colors.primary}
-            icon="plus"
-            style={styles.fab}
-            onPress={() => this.zoomIn()}
-          />
-          <FAB
-            color={Colors.primary}
-            icon="minus"
-            style={styles.fab}
-            onPress={() => this.zoomOut()}
-          />
+        {this.renderMap()}
+        {this.renderSearch()}
+        <View style={styles.controlsWrapper}>
+          {this.renderFloorSelector()}
           <FAB
             color={this.state.followUserHeading ? Colors.primary : Colors.gray}
             icon="compass"
@@ -200,16 +167,72 @@ export default class MapScreen extends React.Component<Props, State> {
             onPress={() => this.showAndFollowCurrentUserLocation()}
           />
         </View>
-        {/* Route preview */}
-        {!this.state.started && this.state.route && (
-          <RoutePreview style={styles.routePreview} route={this.state.route} />
-        )}
-        {this.renderRouteCalculation()}
-        {this.renderRouteEnded()}
-        {this.renderNavigation()}
-        {this.renderSearch()}
-        {this.renderFloorSelector()}
+        <View style={styles.overlaysWrapper}>
+          {this.renderRoutePreview()}
+          {this.renderCategories()}
+          {this.renderRouteCalculation()}
+          {this.renderRouteEnded()}
+          {this.renderNavigation()}
+        </View>
+        {/*<View style={{...styles.overlaysWrapper, paddingBottom: 96}}>*/}
+        {/*  {this.renderDebug()}*/}
+        {/*</View>*/}
       </View>
+    );
+  }
+
+  private renderDebug() {
+    return (
+      <View>
+        <Text>Location source: {this.state.location?.sourceType || 'none'}</Text>
+        <Text>Location time: {this.state.locationTimestamp?.toLocaleString()}</Text>
+        <Text>Geofence entered: {JSON.stringify(this.state.inCoveredArea)}</Text>
+        <Text>Current level (map / user): {this.state.mapLevel} / {this.state.userLevel}</Text>
+      </View>
+    );
+  }
+
+  private renderMap() {
+    return (
+      <MapboxGL.MapView
+        ref={(map) => (this.map = map)}
+        style={StyleSheet.absoluteFillObject}
+        scrollEnabled={true}
+        compassEnabled={false}
+        styleURL={ProximiioMapbox.styleURL}
+        onRegionWillChange={this.onRegionWillChange}
+        onDidFinishLoadingMap={() => this.setState({mapLoaded: true})}>
+        <MapboxGL.Camera
+          ref={(camera) => {
+            this.camera = camera;
+          }}
+          minZoomLevel={1}
+          maxZoomLevel={24}
+          animationMode={'flyTo'}
+          animationDuration={250}
+          bounds={MAP_STARTING_BOUNDS}
+        />
+        {this.state.mapLoaded && (
+          <ProximiioContextProvider>
+            <AmenitySource />
+            <GeoJSONSource
+              level={this.state.mapLevel}
+              onPress={this.onMapPress}>
+              <RoutingSource level={this.state.mapLevel} />
+              <UserLocationSource
+                showHeadingIndicator={this.state.followUserHeading}
+                onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
+                headingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.heading : null}
+                markerOuterRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.outerRing : null}
+                markerMiddleRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.middleRing : null}
+                markerInnerRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.innerRing : null}
+                onHeadingChanged={this.onHeadingChanged}
+                visible={this.state.inCoveredArea && this.state.mapLevel === this.state.userLevel}
+              />
+            </GeoJSONSource>
+          </ProximiioContextProvider>
+        )}
+      </MapboxGL.MapView>
     );
   }
 
@@ -218,17 +241,17 @@ export default class MapScreen extends React.Component<Props, State> {
    */
   private renderRouteCalculation() {
     if (
-      this.state.started === false ||
-      this.state.routeUpdate === null ||
-      (this.state.routeUpdate.eventType !==
-        ProximiioRouteUpdateType.CALCULATING &&
-        this.state.routeUpdate.eventType !==
-          ProximiioRouteUpdateType.RECALCULATING)
+      !!this.state.route
+      || !this.state.routeUpdate
+      || (
+        this.state.routeUpdate.eventType !== ProximiioRouteUpdateType.CALCULATING
+        && this.state.routeUpdate.eventType !== ProximiioRouteUpdateType.RECALCULATING
+      )
     ) {
       return null;
     }
     return (
-      <View style={styles.calculationRow}>
+      <MapCardView style={styles.calculationRow} onClosePressed={() => ProximiioMapbox.route.cancel()}>
         <ActivityIndicator
           size="large"
           color={Colors.primary}
@@ -236,9 +259,9 @@ export default class MapScreen extends React.Component<Props, State> {
           animating
         />
         <View style={styles.calculationRowText}>
-          <Text>{this.state.routeUpdate.text}</Text>
+          <Text>{i18n.t('mapscreen.calculating')}</Text>
         </View>
-      </View>
+      </MapCardView>
     );
   }
 
@@ -249,28 +272,15 @@ export default class MapScreen extends React.Component<Props, State> {
     ) {
       return null;
     }
-    let isFinish =
-      this.state.routeUpdate.eventType === ProximiioRouteUpdateType.FINISHED;
+    let isFinish = this.state.routeUpdate.eventType === ProximiioRouteUpdateType.FINISHED;
+    let icon = isFinish ? require('../../images/direction_icons/finish.png') : require('../../images/direction_icons/canceled.png');
     return (
-      <View style={styles.calculationRow}>
-        <Image
-          style={styles.calculationImage}
-          source={
-            isFinish
-              ? require('../../images/direction_icons/finish.png')
-              : require('../../images/dummy.png')
-          }
-        />
+      <MapCardView style={styles.calculationRow} onClosePressed={this.clearRoute}>
+        <Image style={styles.calculationImage} source={icon} />
         <View style={styles.calculationRowText}>
           <Text>{this.state.routeUpdate.text}</Text>
         </View>
-        <TouchableNativeFeedback onPress={this.clearRoute}>
-          <Image
-            style={styles.calculationRowCancel}
-            source={require('../../images/ic_close.png')}
-          />
-        </TouchableNativeFeedback>
-      </View>
+      </MapCardView>
     );
   }
 
@@ -299,41 +309,101 @@ export default class MapScreen extends React.Component<Props, State> {
       <View>
         <CardView style={styles.searchCard}>
           <TouchableHighlight
-            style={{borderRadius: 8}}
+            style={styles.searchCardTouchable}
             activeOpacity={0.9}
             underlayColor="#eeeeee"
-            onPress={() => {
-              this.props.navigation.navigate('SearchScreen');
-            }}>
-            <Text style={styles.searchText}>
-              {i18n.t('common.search_hint')}
-            </Text>
+            onPress={() => this.openSearch()}>
+            <View style={styles.searchCardContent}>
+              <Image style={styles.searchIcon} source={require('../../images/ic_search.png')} />
+              <Text style={styles.searchText}>
+                {i18n.t('common.search_hint')}
+              </Text>
+            </View>
           </TouchableHighlight>
         </CardView>
       </View>
     );
   }
 
-  private renderFloorSelector() {
+  private renderRoutePreview() {
+    if (this.state.started || !this.state.route) {
+      return null;
+    }
     return (
-      <View style={styles.floorPickerWrapper}>
-        <FloorPicker
-          mapLevel={this.state.mapLevel}
-          userLevel={this.state.userLevel}
-          onLevelChanged={this.onLevelChanged.bind(this)}
+      <RoutePreview route={this.state.route} />
+    );
+  }
+
+  private renderCategories() {
+    if (this.state.started || this.state.route || this.state.routeUpdate) {
+      return;
+    }
+    return (
+      <View style={styles.searchCategoriesWrapper}>
+        <Text style={styles.searchCategoriesLabel}>Explore nearby</Text>
+        <FlatList
+          style={styles.searchCategories}
+          data={categoryList}
+          keyExtractor={(item) => item.amenityId}
+          horizontal={true}
+          renderItem={(renderItem) => this.renderCategoriesItem(renderItem)}
         />
       </View>
     );
   }
 
+  private renderCategoriesItem(renderItem: ListRenderItemInfo<SearchCategory>) {
+    return (
+      <TouchableOpacity
+        onPress={() => this.openSearch(renderItem.item)}
+        activeOpacity={0.7}>
+        <CardView
+          style={{...styles.searchCategoriesItem, backgroundColor: renderItem.item.color}}>
+          <Image style={styles.searchCategoriesItemImage} source={renderItem.item.image} />
+          <Text style={styles.searchCategoriesItemText}>
+            {i18n.t(renderItem.item.title)}
+          </Text>
+        </CardView>
+      </TouchableOpacity>
+    );
+  }
+
+  private renderFloorSelector() {
+    return (
+      <FloorPicker
+        mapLevel={this.state.mapLevel}
+        userLevel={this.state.userLevel}
+        onLevelChanged={this.onLevelChanged}
+      />
+    );
+  }
+
+  private onGeofenceEntered = (geofence: ProximiioGeofence) => {
+    if (geofence.id === COVERED_LOCATION_GEOFENCE_ID) {
+      this.setState({inCoveredArea: true});
+    }
+  };
+  private onGeofenceExited = (geofence: ProximiioGeofence) => {
+    if (geofence.id === COVERED_LOCATION_GEOFENCE_ID) {
+      this.setState({inCoveredArea: false});
+    }
+  };
+
+  private openSearch = (searchCategory?: SearchCategory) => {
+    this.props.navigation.navigate('SearchScreen', {
+      searchCategory: searchCategory,
+    });
+  };
+
   /**
    * Find pressed POI on map.
    */
-  private onMapPress = (event: ProximiioFeatureType[]) => {
+  private onMapPress = (event: Feature[]) => {
     let pois = event.filter((it) => it.properties.type === 'poi');
     if (pois.length > 0) {
       ProximiioMapbox.route.cancel();
-      this.props.navigation.navigate('ItemDetail', {item: pois[0]});
+      // this.props.onOpenPoi(pois[0]);
+      PreferenceHelper.routeFindWithPreferences(pois[0].id);
     }
   };
 
@@ -341,27 +411,39 @@ export default class MapScreen extends React.Component<Props, State> {
    * Update map when user posiiton is updated.
    */
   private onPositionUpdate = async (location: ProximiioLocation) => {
-    console.log('location updated: ', location, this.state.location);
+    console.log(location);
     if (!location) {
       return;
     }
+    let inCoveredArea = this.state.inCoveredArea;
     let firstLocationUpdate = this.state.location == null;
     let followUser = this.state.followUser;
-    let overrideUserLocationMarkerStyle = location.sourceType === 'native';
+    let overrideUserLocationStyle = location.sourceType === 'native';
     let stateUpdate = {
       location: location,
-      userLocationSourceStyle: overrideUserLocationMarkerStyle ? userLocationSourceStyleOverride : userLocationSourceStyleNoOverride,
+      overrideUserLocationStyle: overrideUserLocationStyle,
     };
     let currentZoom = await this.map.getZoom();
+    let zoomChange = 0;
+    if (
+      (firstLocationUpdate && location.sourceType === 'native')
+      || (!firstLocationUpdate && this.state.location.sourceType !== 'native' && location.sourceType === 'native')
+    ) {
+      // first location update + its outside
+      // or location update going from inside out
+      zoomChange = -1;
+    } else if (!firstLocationUpdate && this.state.location.sourceType === 'native' && location.sourceType !== 'native') {
+      // not a first location update going from outside -> inside
+      zoomChange = 1;
+    }
+    let zoomLevel = (firstLocationUpdate ? Math.max(currentZoom, 18) : currentZoom) + zoomChange;
     this.setState(stateUpdate);
-    if (followUser || firstLocationUpdate) {
+    if (inCoveredArea || followUser || firstLocationUpdate) {
       this.camera?.setCamera({
         centerCoordinate: [location.lng, location.lat],
         animationDuration: cameraAnimationDuration,
         animationMode: 'flyTo',
-        zoomLevel: firstLocationUpdate
-          ? Math.max(currentZoom, 18)
-          : currentZoom,
+        zoomLevel: zoomLevel,
       });
     }
   };
@@ -407,6 +489,16 @@ export default class MapScreen extends React.Component<Props, State> {
   };
 
   /**
+   * App state listener, will force render as mapbox is blank after returning from background state.
+   * @param event
+   */
+  private onAppStateChange = (event) => {
+    if (event === 'active') {
+      this.forceUpdate();
+    }
+  };
+
+  /**
    * Listener for route object for navigation.
    * @param event
    */
@@ -419,26 +511,36 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param event
    */
   private onRouteUpdate = (event: ProximiioRouteEvent) => {
+    const newTimestamp = new Date().getTime();
+    let stateUpdate;
     if (
       event.eventType === ProximiioRouteUpdateType.FINISHED ||
       event.eventType === ProximiioRouteUpdateType.CANCELED ||
       event.eventType === ProximiioRouteUpdateType.ROUTE_NOT_FOUND ||
       event.eventType === ProximiioRouteUpdateType.ROUTE_OSRM_NETWORK_ERROR
     ) {
-      this.setState({route: null, routeUpdate: event, started: false});
+      stateUpdate = {route: null, routeUpdate: event, routeUpdateTimestamp: newTimestamp, started: false};
+    } else if (
+      event.eventType === ProximiioRouteUpdateType.DIRECTION_UPDATE
+      && this.state.routeUpdate.eventType === ProximiioRouteUpdateType.DIRECTION_NEW
+      && newTimestamp < this.state.routeUpdateTimestamp + 4000
+    ) {
+      // Suppress basic route confirmation updates to ensure user sees 'new direction' update long enough
+      return;
+    } else if (event.eventType === ProximiioRouteUpdateType.CALCULATING) {
+      this.showAndFollowCurrentUserLocation();
+      this.setState({routeUpdate: event, routeUpdateTimestamp: newTimestamp, started: false, route: null});
     } else {
-      if (event.eventType === ProximiioRouteUpdateType.CALCULATING) {
-        this.showAndFollowCurrentUserLocation();
-      } else {
-        this.setState({routeUpdate: event, started: true});
-      }
+      stateUpdate = {routeUpdate: event, routeUpdateTimestamp: newTimestamp, started: true};
     }
+    this.setState(stateUpdate);
   };
 
   private clearRoute = () => {
     this.setState({
-      route: undefined,
-      routeUpdate: undefined,
+      route: null,
+      routeUpdate: null,
+      started: false,
     });
   };
 
@@ -469,7 +571,6 @@ export default class MapScreen extends React.Component<Props, State> {
    */
   private onRegionWillChange = (event) => {
     if (this.state.followUser && event.properties.isUserInteraction === true) {
-      console.log('rotating?');
       this.setState({
         followUser: false,
         followUserHeading: false,
@@ -488,7 +589,7 @@ export default class MapScreen extends React.Component<Props, State> {
 
   /**
    * Listener for segment feature warning for navigation.
-   * @param segment
+   * @param event
    * @private
    */
   private onSegment = (event) => {
@@ -504,9 +605,9 @@ export default class MapScreen extends React.Component<Props, State> {
    * @param newLevel
    * @private
    */
-  private onLevelChanged(newLevel) {
+  private onLevelChanged = (newLevel) => {
     this.setState({mapLevel: newLevel});
-  }
+  };
 
   /**
    * Zooms map in.
@@ -534,7 +635,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * @private
    */
   private async showAndFollowCurrentUserLocation() {
-    if (!this.state.location) {
+    if (!this.state.location || !this.state.inCoveredArea) {
       return;
     }
     this.setState({
@@ -543,32 +644,41 @@ export default class MapScreen extends React.Component<Props, State> {
     });
     let currentZoom = await this.map.getZoom();
     let newZoom = Math.max(currentZoom, 18);
-    console.log('zoom:', currentZoom, newZoom);
     this.camera.setCamera({
       centerCoordinate: [this.state.location.lng, this.state.location.lat],
       zoomLevel: newZoom,
       animationDuration: cameraAnimationDuration,
     });
   }
+
+  private testCoverageGeofence = () => {
+    Proximiio.currentGeofences().then((geofences) => {
+      const coverageGeofence = geofences.find(
+        (geofence) => geofence.id === COVERED_LOCATION_GEOFENCE_ID,
+      );
+      this.setState({inCoveredArea: !!coverageGeofence});
+    });
+  };
 }
 
 const styles = StyleSheet.create({
-  map: {
-    flex: 1,
-  },
   container: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   },
-  bottomContent: {
-    flex: 0,
-  },
-  fabWrapper: {
+  controlsWrapper: {
     alignItems: 'flex-end',
     flex: 0,
     flexDirection: 'column',
-    justifyContent: 'flex-end',
     width: 'auto',
+  },
+  overlaysWrapper: {
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+    position: 'absolute',
+    justifyContent: 'flex-end',
   },
   fab: {
     backgroundColor: Colors.white,
@@ -576,29 +686,74 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   searchCard: {
-    marginBottom: 16,
+    borderRadius: 48,
+    marginTop: 16,
     marginHorizontal: 16,
     padding: 0,
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
-  searchText: {
-    color: Colors.gray,
+  searchCardTouchable: {
+    borderRadius: 48,
+  },
+  searchCardContent: {
     paddingHorizontal: 12,
     paddingVertical: 16,
-  },
-  floorPickerWrapper: {
-    position: 'absolute',
-    top: 24,
-    left: 24,
-    right: 24,
+    flexDirection: 'row',
     alignItems: 'center',
+  },
+  searchIcon: {
+    paddingHorizontal: 8,
+    width: 24,
+    height: 24,
+  },
+  searchText: {
+    color: Colors.gray,
+  },
+  searchCategoriesWrapper: {
+    bottom: 0,
+    end: 0,
+    height: 'auto',
+    paddingTop: 8,
+    position: 'absolute',
+    start: 0,
+    top: 'auto',
+  },
+  searchCategoriesLabel: {
+    color: 'white',
+    fontSize: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: {width: 1, height: 1},
+    textShadowRadius: 5,
+  },
+  searchCategories: {
+    paddingVertical: 4,
+  },
+  searchCategoriesItem: {
+    alignItems: 'center',
+    backgroundColor: '#eeaaaa',
+    borderRadius: 48,
+    flexDirection: 'row',
+    margin: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  searchCategoriesItemImage: {
+    height: 24,
+    marginEnd: 4,
+    width: 24,
+    tintColor: Colors.white,
+  },
+  searchCategoriesItemText: {
+    color: 'white',
+    fontSize: 14,
   },
   calculationRow: {
     alignItems: 'center',
-    backgroundColor: Colors.background,
     flexDirection: 'row',
-    padding: 8,
+    paddingHorizontal: 16,
     alignContent: 'center',
     justifyContent: 'space-around',
   },
@@ -615,15 +770,12 @@ const styles = StyleSheet.create({
   calculationRowText: {
     flex: 1,
     padding: 8,
+    marginStart: 4,
     alignItems: 'flex-start',
   },
   calculationRowCancel: {
     height: 32,
     tintColor: Colors.black,
     width: 32,
-  },
-  routePreview: {
-    flex: 1,
-    width: '100%',
   },
 });

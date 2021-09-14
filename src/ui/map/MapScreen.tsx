@@ -152,7 +152,7 @@ export default class MapScreen extends React.Component<Props, State> {
       <View style={styles.container}>
         {this.renderMap()}
         {this.renderSearch()}
-        <View style={styles.controlsWrapper}>
+        <View style={styles.controlsWrapper} pointerEvents="none">
           {this.renderFloorSelector()}
           <FAB
             color={this.state.followUserHeading ? Colors.primary : Colors.gray}
@@ -167,23 +167,23 @@ export default class MapScreen extends React.Component<Props, State> {
             onPress={() => this.showAndFollowCurrentUserLocation()}
           />
         </View>
-        <View style={styles.overlaysWrapper}>
+        <View style={{...styles.overlaysWrapper}} pointerEvents="box-none">
           {this.renderRoutePreview()}
           {this.renderCategories()}
           {this.renderRouteCalculation()}
           {this.renderRouteEnded()}
           {this.renderNavigation()}
         </View>
-        {/*<View style={{...styles.overlaysWrapper, paddingBottom: 96}}>*/}
-        {/*  {this.renderDebug()}*/}
-        {/*</View>*/}
+        {/* <View style={{...styles.overlaysWrapper, paddingBottom: 96}} pointerEvents="none">
+          {this.renderDebug()}
+        </View> */}
       </View>
     );
   }
 
   private renderDebug() {
     return (
-      <View>
+      <View pointerEvents="none">
         <Text>Location source: {this.state.location?.sourceType || 'none'}</Text>
         <Text>Location time: {this.state.locationTimestamp?.toLocaleString()}</Text>
         <Text>Geofence entered: {JSON.stringify(this.state.inCoveredArea)}</Text>
@@ -411,7 +411,6 @@ export default class MapScreen extends React.Component<Props, State> {
    * Update map when user posiiton is updated.
    */
   private onPositionUpdate = async (location: ProximiioLocation) => {
-    console.log(location);
     if (!location) {
       return;
     }
@@ -678,7 +677,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     top: 0,
     position: 'absolute',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-end'
   },
   fab: {
     backgroundColor: Colors.white,

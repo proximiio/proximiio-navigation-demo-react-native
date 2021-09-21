@@ -1,5 +1,5 @@
 PODS:
-  - Alamofire (5.4.3)
+  - Alamofire (5.4.4)
   - boost-for-react-native (1.63.0)
   - BVLinearGradient (2.5.6):
     - React
@@ -23,16 +23,16 @@ PODS:
   - OpenCombine (0.12.0)
   - OpenCombineDispatch (0.12.0):
     - OpenCombine (>= 0.10.2)
-  - Proximiio (5.1.5):
+  - Proximiio (5.2.6):
     - CrystDBCipher
     - DarklyEventSource
-  - ProximiioMapbox (5.1.11):
+  - ProximiioMapbox (5.1.12):
     - Alamofire
     - GRMustache.swift
     - Mapbox-iOS-SDK (= 5.9.0)
-    - Proximiio (= 5.1.5)
+    - Proximiio
     - SwiftyJSON
-  - ProximiioProcessor (0.1.14):
+  - ProximiioProcessor (0.1.16):
     - Proximiio
     - SwiftyJSON
   - RCT-Folly (2020.01.13.00):
@@ -245,14 +245,14 @@ PODS:
     - React
     - React-Core
   - react-native-proximiio (5.0.17):
-    - Proximiio (= 5.1.5)
-    - ProximiioProcessor (= 0.1.14)
+    - Proximiio (= 5.2.6)
+    - ProximiioProcessor (= 0.1.16)
     - React
   - react-native-proximiio-mapbox (5.0.37):
     - OpenCombine
     - OpenCombineDispatch
-    - ProximiioMapbox (= 5.1.11)
-    - ProximiioProcessor (= 0.1.14)
+    - ProximiioMapbox (= 5.1.12)
+    - ProximiioProcessor (= 0.1.16)
     - React
   - react-native-safe-area-context (3.2.0):
     - React-Core
@@ -494,7 +494,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  Alamofire: e447a2774a40c996748296fa2c55112fdbbc42f9
+  Alamofire: f3b09a368f1582ab751b3fff5460276e0d2cf5c9
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
   CrystDBCipher: 1aa65c16eac9086ec4924d3e231be73b7c8594cf
@@ -508,9 +508,9 @@ SPEC CHECKSUMS:
   MapboxMobileEvents: 2bc0ca2eedb627b73cf403258dce2b2fa98074a6
   OpenCombine: a8c52f249bc3c7e2bd5ffb75e8653e57a8e33d27
   OpenCombineDispatch: 68ed85ae5255d558a14434a802f65fb833b50d39
-  Proximiio: c9cd1b566661e3658d7900f63ab4a467efac9bee
-  ProximiioMapbox: 1211ddd101449bd4274fcc63a1843951abb8a99a
-  ProximiioProcessor: 7ce3924c16ec3a983ac1dedd34d5c71ff1c848fb
+  Proximiio: 3b13fcfc0038946488840a99b30f46a314df463d
+  ProximiioMapbox: a297a96ca4866364d17af5f0ef005683f31484b1
+  ProximiioProcessor: 98bbdefa2751c88605f7df4c3c870cf52eea1cf1
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: 2f8cb5b7533219bf4218a045f92768129cf7050a
   RCTTypeSafety: 512728b73549e72ad7330b92f3d42936f2a4de5b
@@ -524,8 +524,8 @@ SPEC CHECKSUMS:
   React-jsinspector: 0ae35a37b20d5e031eb020a69cc5afdbd6406301
   react-native-compass-heading: bb83f8472786ad730947624f2a75a6563aa80b27
   react-native-mapbox-gl: e0dea71cecc84e7a8744bf07bc8a3cc8dbef8894
-  react-native-proximiio: c3474575a61f6b472dd8af7943a021042febf493
-  react-native-proximiio-mapbox: 9b0fd3ed81a753d1faf28e1cd070ccb21f7a96e7
+  react-native-proximiio: 128249cb26a4d229d1ca7145dd029580d97a32ca
+  react-native-proximiio-mapbox: 1f0070d7f1e619bfe087c28eba81d236c1e184f8
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   react-native-webview: 133a6a5149f963259646e710b4545c67ef35d7c9
   React-perflogger: 9c547d8f06b9bf00cb447f2b75e8d7f19b7e02af

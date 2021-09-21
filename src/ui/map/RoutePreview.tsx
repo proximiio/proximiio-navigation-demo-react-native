@@ -30,8 +30,8 @@ interface Props {
 }
 interface State {
   showTripDetails: boolean;
-  tripDistance: String;
-  tripDuration: String;
+  tripDistance: string;
+  tripDuration: string;
   hasWaypoint: boolean;
   destination?: Feature;
 }

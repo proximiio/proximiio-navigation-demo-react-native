@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  StatusBar,
   StyleSheet,
   Switch,
   Text,
@@ -16,31 +15,40 @@ import PreferenceHelper, {
 import {SettingsData} from 'react-native-settings-screen';
 import i18n from 'i18next';
 import {DistanceUnitOption} from './DistanceUnitOption';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../../RootStack';
 
-interface Props {}
+// interface Props {}
+
+type Props = StackScreenProps<RootStackParamList, 'PreferenceScreen'>;
+
+export interface Option {
+  id: string;
+  name: string;
+}
 
 interface State {
   /** Unit selection dialog visibility state toggle */
-  unitDialogVisible: Boolean;
+  unitDialogVisible: boolean;
   /** Accessibility selection dialog visibility state toggle */
-  accessibilityDialogVisible: Boolean;
+  accessibilityDialogVisible: boolean;
   /** Route confirmation distance selection dialog visibility state toggle */
-  routeConfirmationDistanceDialogVisible: Boolean;
+  routeConfirmationDistanceDialogVisible: boolean;
   // Preference options
-  AVOID_STAIRS: Boolean;
-  AVOID_ELEVATORS: Boolean;
-  AVOID_REVOLVING_DOORS: Boolean;
-  AVOID_NARROW_ROUTES: Boolean;
-  DISTANCE_UNIT: String;
-  VOICE_GUIDANCE: Boolean;
-  HEADING_CORRECTION: Boolean;
-  DECISION_POINTS: Boolean;
-  HAZARDS: Boolean;
-  LANDMARKS: Boolean;
-  SEGMENTS: Boolean;
-  REASSURANCE_ENABLED: Boolean;
-  REASSURANCE_DISTANCE: String;
-  ACCESSIBILITY_GUIDANCE: String;
+  AVOID_STAIRS: boolean;
+  AVOID_ELEVATORS: boolean;
+  AVOID_REVOLVING_DOORS: boolean;
+  AVOID_NARROW_ROUTES: boolean;
+  DISTANCE_UNIT: string;
+  VOICE_GUIDANCE: boolean;
+  HEADING_CORRECTION: boolean;
+  DECISION_POINTS: boolean;
+  HAZARDS: boolean;
+  LANDMARKS: boolean;
+  SEGMENTS: boolean;
+  REASSURANCE_ENABLED: boolean;
+  REASSURANCE_DISTANCE: string;
+  ACCESSIBILITY_GUIDANCE: string;
   /** Settings data structure, describes screen content. */
   settingsData: SettingsData;
 }
@@ -138,7 +146,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    */
   private optionsDialog(options, visibility, onOptionSelected, onDismiss) {
     let optionViews = Object.entries(options).map((it) => {
-      let item = it[1];
+      let item = it[1] as any;
       return (
         <TouchableOpacity
           key={item.id}
@@ -229,7 +237,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @returns {JSX.Element}
    * @private
    */
-  private renderSwitch(value, onValueChange, disabled: false) {
+  private renderSwitch(value, onValueChange, disabled = false) {
     return (
       <Switch disabled={disabled} value={value} onValueChange={onValueChange} />
     );
@@ -349,7 +357,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
           },
         ],
       },
-    ];
+    ] as SettingsData;
     this.setState({settingsData: data});
   }
 
@@ -361,7 +369,7 @@ export default class PreferenceScreen extends React.Component<Props, State> {
    * @private
    */
   private getOptionNameById(option, id) {
-    let result = Object.entries(option).filter(it => it[1].id === id);
+    let result = Object.entries(option as Option).filter(it => it[1].id === id);
     if (result.length > 0) {
       return i18n.t(result[0][1].name);
     } else {

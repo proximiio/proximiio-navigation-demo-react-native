@@ -39,10 +39,12 @@
 	</dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Bluetooth is used for positioning</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Bluetooth is used for positioning</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Location is used for positioning</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Location is used for positioning</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

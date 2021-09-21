@@ -47,7 +47,7 @@ interface State {
   showSearch: boolean;
   showPreferences: boolean;
   policyAccepted?: boolean;
-  defaultScreen: String;
+  defaultScreen: string;
 }
 
 /**
@@ -193,7 +193,7 @@ export default class App extends React.Component<Props, State> {
         }
       },
     );
-    Proximiio.setNotificationMode(NotificationMode.Disabled);
+    Proximiio.setNotificationMode(NotificationMode.Enabled);
     // Authorize libraries with token
     await Proximiio.authorize(PROXIMIIO_TOKEN);
     Proximiio.setPdr(true, 4);
@@ -211,9 +211,9 @@ export default class App extends React.Component<Props, State> {
     // Apply user preferences, manageable in preference screen
     await PreferenceHelper.applyPreferences();
     // Request permissions needed for localization
-    await Proximiio.requestPermissions();
+    Proximiio.requestPermissions();
     // When ready, change state to show UI.
-    await this.setState({
+    this.setState({
       proximiioReady: true,
     });
   }

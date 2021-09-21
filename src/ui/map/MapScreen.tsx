@@ -127,7 +127,7 @@ export default class MapScreen extends React.Component<Props, State> {
     AppState.addEventListener('change', this.onAppStateChange);
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+  componentDidUpdate() {
     if (this.props.route.params && this.props.route.params.feature) {
       const feature = this.props.route.params.feature;
       PreferenceHelper.routeFindWithPreferences(feature.id);
@@ -152,7 +152,7 @@ export default class MapScreen extends React.Component<Props, State> {
       <View style={styles.container}>
         {this.renderMap()}
         {this.renderSearch()}
-        <View style={styles.controlsWrapper} pointerEvents="none">
+        <View style={styles.controlsWrapper} pointerEvents="box-none">
           {this.renderFloorSelector()}
           <FAB
             color={this.state.followUserHeading ? Colors.primary : Colors.gray}
@@ -193,6 +193,7 @@ export default class MapScreen extends React.Component<Props, State> {
   }
 
   private renderMap() {
+    console.log('in covered area', this.state.inCoveredArea, 'maplevel', this.state.mapLevel, 'userLevel', this.state.userLevel);
     return (
       <MapboxGL.MapView
         ref={(map) => (this.map = map)}
@@ -218,17 +219,18 @@ export default class MapScreen extends React.Component<Props, State> {
             <GeoJSONSource
               level={this.state.mapLevel}
               onPress={this.onMapPress}>
-              <RoutingSource level={this.state.mapLevel} />
-              <UserLocationSource
-                showHeadingIndicator={this.state.followUserHeading}
-                onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
-                headingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.heading : null}
-                markerOuterRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.outerRing : null}
-                markerMiddleRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.middleRing : null}
-                markerInnerRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.innerRing : null}
-                onHeadingChanged={this.onHeadingChanged}
-                visible={this.state.inCoveredArea && this.state.mapLevel === this.state.userLevel}
-              />
+                <RoutingSource level={this.state.mapLevel} />
+                <UserLocationSource
+                  showHeadingIndicator={this.state.followUserHeading}
+                  onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
+                  headingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.heading : null}
+                  markerOuterRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.outerRing : null}
+                  markerMiddleRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.middleRing : null}
+                  markerInnerRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.innerRing : null}
+                  onHeadingChanged={this.onHeadingChanged}
+                  visible={true}
+                  // visible={this.state.inCoveredArea && this.state.mapLevel === this.state.userLevel}
+                />
             </GeoJSONSource>
           </ProximiioContextProvider>
         )}
@@ -411,6 +413,7 @@ export default class MapScreen extends React.Component<Props, State> {
    * Update map when user posiiton is updated.
    */
   private onPositionUpdate = async (location: ProximiioLocation) => {
+    console.log('on position update', location);
     if (!location) {
       return;
     }
@@ -560,6 +563,7 @@ export default class MapScreen extends React.Component<Props, State> {
         userLevel: newUserLevel,
       };
     }
+
     this.setState(newState);
   };
 
@@ -677,7 +681,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     top: 0,
     position: 'absolute',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
   },
   fab: {
     backgroundColor: Colors.white,

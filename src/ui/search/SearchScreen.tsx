@@ -21,12 +21,11 @@ import {TouchableHighlight} from 'react-native-gesture-handler';
 import {Colors} from '../../Style';
 import {LEVEL_OVERRIDE_MAP} from '../../utils/Constants';
 import i18n from 'i18next';
-import {RouteProp} from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../../RootStack';
 
-interface Props {
-  route: RouteProp<any, any>;
-  navigation: any;
-}
+type Props = StackScreenProps<RootStackParamList, 'SearchScreen'>;
+
 interface State {
   /**
    * Map of amenityId => amenity.
@@ -70,7 +69,9 @@ export default class SearchScreen extends React.Component<Props, State> {
 
   componentDidMount() {
     this.loadAmenitiesAndFeatures();
-    this.state.featureCategoryFilter = this.props.route.params.searchCategory;
+    if (this.props.route && this.props.route.params && this.props.route.params.searchCategory) {
+      this.state.featureCategoryFilter = this.props.route.params.searchCategory;
+    }
     this.featureSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.FEATURES_CHANGED, () => this.loadAmenitiesAndFeatures());
   }
 
@@ -165,7 +166,7 @@ export default class SearchScreen extends React.Component<Props, State> {
   }
 
   private openPoi(feature: Feature) {
-    this.props.navigation.navigate('MapScreen', {feature: feature});
+    this.props.navigation.navigate('MapScreen', { feature });
   }
 
   /**

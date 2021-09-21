@@ -34,13 +34,23 @@ export default class FloorPicker extends React.Component<Props, State> {
 
   componentDidMount() {
     this.refreshFloorList();
+    Proximiio.subscribe(ProximiioEvents.Initialized, this.initialize);
     Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChanged);
-    Proximiio.subscribe(ProximiioEvents.ItemsChanged, this.onFloorChanged);
+    Proximiio.subscribe(ProximiioEvents.ItemsChanged, this.itemsChanged);
   }
 
   componentWillUnmount() {
+    Proximiio.unsubscribe(ProximiioEvents.Initialized, this.initialize);
     Proximiio.unsubscribe(ProximiioEvents.FloorChanged, this.onFloorChanged);
-    Proximiio.unsubscribe(ProximiioEvents.ItemsChanged, this.onFloorChanged);
+    Proximiio.unsubscribe(ProximiioEvents.ItemsChanged, this.itemsChanged);
+  }
+
+  initialize = () => {
+    this.refreshFloorList();
+  }
+
+  itemsChanged = () => {
+    this.refreshFloorList();
   }
 
   render() {
@@ -84,7 +94,7 @@ export default class FloorPicker extends React.Component<Props, State> {
     this.toggleOpen();
   };
 
-  private onFloorChanged = (floorChange) => {
+  private onFloorChanged = () => {
     this.refreshFloorList();
   };
 

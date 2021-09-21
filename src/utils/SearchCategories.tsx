@@ -5,10 +5,10 @@ import {Colors} from '../Style';
  */
 
 export class SearchCategory {
-  amenityId: String;
-  color: String;
-  title: String;
-  image: Object;
+  amenityId: string;
+  color: string;
+  title: string;
+  image: any;
 }
 
 /**

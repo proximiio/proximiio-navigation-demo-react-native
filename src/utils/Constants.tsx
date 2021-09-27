@@ -2,7 +2,6 @@
  * Proximi.io authentication token.
  */
 export const PROXIMIIO_TOKEN = '';
-
 /**
  * Initial map bounds, map will start showing area within these bounds.
  */
@@ -16,7 +15,7 @@ export const MAP_STARTING_BOUNDS = {
  * supported area.
  */
 export const COVERED_LOCATION_GEOFENCE_ID = '17b96737-0660-4209-8667-090fbc3329a9';
-
+export const IN_COVERED_AREAS_ONLY = false;
 /**
  * Override of map levels. Proximi.io considers '0th floor' to be 'ground floor', but
  * it is customary in some regions to use different system, e.g. counting from 1 ('ground floor' is '1st floor').
@@ -43,4 +42,5 @@ const generateLevelOverride = () => {
   levelOverrideMap.set(16, 17);
   return levelOverrideMap;
 };
+
 export const LEVEL_OVERRIDE_MAP = generateLevelOverride();

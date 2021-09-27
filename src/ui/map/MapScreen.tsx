@@ -39,6 +39,7 @@ import FloorPicker from './FloorPicker';
 import {Colors} from '../../Style';
 import {
   COVERED_LOCATION_GEOFENCE_ID,
+  IN_COVERED_AREAS_ONLY,
   MAP_STARTING_BOUNDS,
 } from '../../utils/Constants';
 import i18n from 'i18next';
@@ -47,6 +48,7 @@ import {RouteProp} from '@react-navigation/native';
 import PreferenceHelper from '../../utils/PreferenceHelper';
 import MapCardView from './MapCardView';
 import {TouchableHighlight} from 'react-native-gesture-handler';
+import constants from 'react-native-proximiio-mapbox/src/constants';
 
 interface Props {
   onOpenSearch: (searchCategory?: SearchCategory) => void;
@@ -94,9 +96,9 @@ export default class MapScreen extends React.Component<Props, State> {
   private camera: MapboxGL.Camera | null = null;
   state = {
     followUser: true,
-    followUserHeading: false,
+    followUserHeading: true,
     hazard: undefined,
-    inCoveredArea: false,
+    inCoveredArea: true,
     location: undefined,
     locationTimestamp: undefined,
     mapLoaded: false,
@@ -161,7 +163,7 @@ export default class MapScreen extends React.Component<Props, State> {
             onPress={() => this.toggleFollowUserHeading()}
           />
           <FAB
-            color={Colors.primary}
+            color={this.state.followUser ? Colors.primary : Colors.gray}
             icon="crosshairs-gps"
             style={styles.fab}
             onPress={() => this.showAndFollowCurrentUserLocation()}
@@ -219,7 +221,7 @@ export default class MapScreen extends React.Component<Props, State> {
             <GeoJSONSource
               level={this.state.mapLevel}
               onPress={this.onMapPress}>
-                <RoutingSource level={this.state.mapLevel} />
+                <RoutingSource level={this.state.mapLevel} aboveLayerID={constants.LAYER_POLYGONS_ABOVE_PATHS}/>
                 <UserLocationSource
                   showHeadingIndicator={this.state.followUserHeading}
                   onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
@@ -228,7 +230,7 @@ export default class MapScreen extends React.Component<Props, State> {
                   markerMiddleRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.middleRing : null}
                   markerInnerRingStyle={this.state.overrideUserLocationStyle ? userLocationSourceStyleOverride.innerRing : null}
                   onHeadingChanged={this.onHeadingChanged}
-                  visible={true}
+                  visible={this.state.mapLevel === this.state.userLevel}
                   // visible={this.state.inCoveredArea && this.state.mapLevel === this.state.userLevel}
                 />
             </GeoJSONSource>
@@ -381,12 +383,13 @@ export default class MapScreen extends React.Component<Props, State> {
   }
 
   private onGeofenceEntered = (geofence: ProximiioGeofence) => {
-    if (geofence.id === COVERED_LOCATION_GEOFENCE_ID) {
+    if (IN_COVERED_AREAS_ONLY && geofence.id === COVERED_LOCATION_GEOFENCE_ID) {
       this.setState({inCoveredArea: true});
     }
   };
+
   private onGeofenceExited = (geofence: ProximiioGeofence) => {
-    if (geofence.id === COVERED_LOCATION_GEOFENCE_ID) {
+    if (IN_COVERED_AREAS_ONLY && geofence.id === COVERED_LOCATION_GEOFENCE_ID) {
       this.setState({inCoveredArea: false});
     }
   };
@@ -413,10 +416,10 @@ export default class MapScreen extends React.Component<Props, State> {
    * Update map when user posiiton is updated.
    */
   private onPositionUpdate = async (location: ProximiioLocation) => {
-    console.log('on position update', location);
     if (!location) {
       return;
     }
+
     let inCoveredArea = this.state.inCoveredArea;
     let firstLocationUpdate = this.state.location == null;
     let followUser = this.state.followUser;
@@ -440,7 +443,7 @@ export default class MapScreen extends React.Component<Props, State> {
     }
     let zoomLevel = (firstLocationUpdate ? Math.max(currentZoom, 18) : currentZoom) + zoomChange;
     this.setState(stateUpdate);
-    if (inCoveredArea || followUser || firstLocationUpdate) {
+    if ((inCoveredArea || firstLocationUpdate) && followUser) {
       this.camera?.setCamera({
         centerCoordinate: [location.lng, location.lat],
         animationDuration: cameraAnimationDuration,
@@ -655,6 +658,10 @@ export default class MapScreen extends React.Component<Props, State> {
   }
 
   private testCoverageGeofence = () => {
+    if (!IN_COVERED_AREAS_ONLY) {
+      return;
+    }
+
     Proximiio.currentGeofences().then((geofences) => {
       const coverageGeofence = geofences.find(
         (geofence) => geofence.id === COVERED_LOCATION_GEOFENCE_ID,

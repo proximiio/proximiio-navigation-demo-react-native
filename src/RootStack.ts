@@ -1,4 +1,4 @@
-import { Feature } from 'react-native-proximiio-mapbox';
+import { Feature } from 'react-native-proximiio-library';
 import { SearchCategory } from './utils/SearchCategories';
 
 export type RootStackParamList = {

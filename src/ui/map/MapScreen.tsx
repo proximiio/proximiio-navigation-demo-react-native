@@ -14,23 +14,22 @@ import {
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Proximiio, {
   ProximiioContextProvider,
-  ProximiioEvents,
   ProximiioFloor,
   ProximiioGeofence,
   ProximiioLocation,
-} from 'react-native-proximiio';
-import ProximiioMapbox, {
-  AmenitySource,
-  Feature,
-  GeoJSONSource,
   ProximiioFeatureType,
-  ProximiioMapboxEvents,
+  ProximiioEvents,
   ProximiioMapboxRoute,
   ProximiioRouteEvent,
   ProximiioRouteUpdateType,
+  Constants,
+  AmenitySource,
+  Feature,
+  GeoJSONSource,
   RoutingSource,
   UserLocationSource,
-} from 'react-native-proximiio-mapbox';
+} from 'react-native-proximiio-library';
+
 import RoutePreview from './RoutePreview';
 import {FAB} from 'react-native-paper';
 import RouteNavigation from './RouteNavigation';
@@ -48,7 +47,6 @@ import {RouteProp} from '@react-navigation/native';
 import PreferenceHelper from '../../utils/PreferenceHelper';
 import MapCardView from './MapCardView';
 import {TouchableHighlight} from 'react-native-gesture-handler';
-import constants from 'react-native-proximiio-mapbox/src/constants';
 
 interface Props {
   onOpenSearch: (searchCategory?: SearchCategory) => void;
@@ -121,10 +119,10 @@ export default class MapScreen extends React.Component<Props, State> {
     Proximiio.subscribe(ProximiioEvents.FloorChanged, this.onFloorChange);
     Proximiio.subscribe(ProximiioEvents.EnteredGeofence, this.onGeofenceEntered);
     Proximiio.subscribe(ProximiioEvents.ExitedGeofence, this.onGeofenceExited);
-    ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE, this.onRoute);
-    ProximiioMapbox.subscribe(ProximiioMapboxEvents.ROUTE_UPDATE, this.onRouteUpdate);
-    ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_HAZARD, this.onHazard);
-    ProximiioMapbox.subscribe(ProximiioMapboxEvents.ON_SEGMENT, this.onSegment);
+    Proximiio.subscribe(ProximiioEvents.ROUTE, this.onRoute);
+    Proximiio.subscribe(ProximiioEvents.ROUTE_UPDATE, this.onRouteUpdate);
+    Proximiio.subscribe(ProximiioEvents.ON_HAZARD, this.onHazard);
+    Proximiio.subscribe(ProximiioEvents.ON_SEGMENT, this.onSegment);
     BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
     AppState.addEventListener('change', this.onAppStateChange);
   }
@@ -141,10 +139,10 @@ export default class MapScreen extends React.Component<Props, State> {
   componentWillUnmount() {
     Proximiio.unsubscribe(ProximiioEvents.PositionUpdated, this.onPositionUpdate);
     Proximiio.unsubscribe(ProximiioEvents.FloorChanged, this.onFloorChange);
-    ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ROUTE, this.onRoute);
-    ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ROUTE_UPDATE, this.onRouteUpdate);
-    ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ON_HAZARD, this.onHazard);
-    ProximiioMapbox.unsubscribe(ProximiioMapboxEvents.ON_SEGMENT, this.onSegment);
+    Proximiio.unsubscribe(ProximiioEvents.ROUTE, this.onRoute);
+    Proximiio.unsubscribe(ProximiioEvents.ROUTE_UPDATE, this.onRouteUpdate);
+    Proximiio.unsubscribe(ProximiioEvents.ON_HAZARD, this.onHazard);
+    Proximiio.unsubscribe(ProximiioEvents.ON_SEGMENT, this.onSegment);
     BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
     AppState.removeEventListener('change', this.onAppStateChange);
   }
@@ -202,7 +200,7 @@ export default class MapScreen extends React.Component<Props, State> {
         style={StyleSheet.absoluteFillObject}
         scrollEnabled={true}
         compassEnabled={false}
-        styleURL={ProximiioMapbox.styleURL}
+        styleURL={Proximiio.styleURL}
         onRegionWillChange={this.onRegionWillChange}
         onDidFinishLoadingMap={() => this.setState({mapLoaded: true})}>
         <MapboxGL.Camera
@@ -221,7 +219,7 @@ export default class MapScreen extends React.Component<Props, State> {
             <GeoJSONSource
               level={this.state.mapLevel}
               onPress={this.onMapPress}>
-                <RoutingSource level={this.state.mapLevel} aboveLayerID={constants.LAYER_POLYGONS_ABOVE_PATHS}/>
+                <RoutingSource level={this.state.mapLevel} aboveLayerID={Constants.LAYER_POLYGONS_ABOVE_PATHS}/>
                 <UserLocationSource
                   showHeadingIndicator={this.state.followUserHeading}
                   onAccuracyChanged={(accuracy) => console.log('accuracy: ', accuracy)}
@@ -255,7 +253,7 @@ export default class MapScreen extends React.Component<Props, State> {
       return null;
     }
     return (
-      <MapCardView style={styles.calculationRow} onClosePressed={() => ProximiioMapbox.route.cancel()}>
+      <MapCardView style={styles.calculationRow} onClosePressed={() => Proximiio.route.cancel()}>
         <ActivityIndicator
           size="large"
           color={Colors.primary}
@@ -406,7 +404,7 @@ export default class MapScreen extends React.Component<Props, State> {
   private onMapPress = (event: Feature[]) => {
     let pois = event.filter((it) => it.properties.type === 'poi');
     if (pois.length > 0) {
-      ProximiioMapbox.route.cancel();
+      Proximiio.route.cancel();
       // this.props.onOpenPoi(pois[0]);
       PreferenceHelper.routeFindWithPreferences(pois[0].id);
     }
@@ -485,7 +483,7 @@ export default class MapScreen extends React.Component<Props, State> {
       if (routeEndedEventTypes.includes(this.state.routeUpdate.eventType)) {
         this.clearRoute();
       } else {
-        ProximiioMapbox.route.cancel();
+        Proximiio.route.cancel();
       }
       return true;
     } else {

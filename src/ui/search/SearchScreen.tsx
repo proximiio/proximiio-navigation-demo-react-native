@@ -12,8 +12,8 @@ import CardView from '../../utils/CardView';
 import ProximiioMapbox, {
   Amenity,
   Feature,
-  ProximiioMapboxEvents,
-} from 'react-native-proximiio-mapbox';
+  ProximiioEvents,
+} from 'react-native-proximiio-library';
 import {SearchCategory} from '../../utils/SearchCategories';
 import SearchEmptyItem from './SearchEmptyItem';
 import {IconButton} from 'react-native-paper';
@@ -72,7 +72,7 @@ export default class SearchScreen extends React.Component<Props, State> {
     if (this.props.route && this.props.route.params && this.props.route.params.searchCategory) {
       this.state.featureCategoryFilter = this.props.route.params.searchCategory;
     }
-    this.featureSubscription = ProximiioMapbox.subscribe(ProximiioMapboxEvents.FEATURES_CHANGED, () => this.loadAmenitiesAndFeatures());
+    this.featureSubscription = ProximiioMapbox.subscribe(ProximiioEvents.FEATURES_CHANGED, () => this.loadAmenitiesAndFeatures());
   }
 
   componentWillUnmount() {

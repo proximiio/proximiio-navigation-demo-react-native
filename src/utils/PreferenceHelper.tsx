@@ -2,7 +2,7 @@ import DefaultPreference from 'react-native-default-preference';
 import ProximiioMapbox, {
   ProximiioWayfindingOptions,
   ProximiioRouteConfiguration, Feature,
-} from 'react-native-proximiio-mapbox';
+} from 'react-native-proximiio-library';
 import {
   MetersUnitConversion,
   StepUnitConversion,

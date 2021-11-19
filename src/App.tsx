@@ -2,20 +2,21 @@ import * as React from 'react';
 import {
   ActivityIndicator,
   Image,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import Proximiio, {NotificationMode} from 'react-native-proximiio';
+import Proximiio, {NotificationMode} from 'react-native-proximiio-library';
 import {Colors} from './Style';
 import PreferenceHelper from './utils/PreferenceHelper';
 import {LEVEL_OVERRIDE_MAP, PROXIMIIO_TOKEN} from './utils/Constants';
 import ProximiioMapbox, {
-  ProximiioMapboxEvents,
+  ProximiioEvents,
   ProximiioMapboxSyncStatus,
-} from 'react-native-proximiio-mapbox';
+} from 'react-native-proximiio-library';
 import i18n from 'i18next';
 import MapScreen from './ui/map/MapScreen';
 import PreferenceScreen from './ui/preferences/PreferenceScreen';
@@ -181,7 +182,7 @@ export default class App extends React.Component<Props, State> {
   private async initProximiio() {
     // Proximi.io mapbox library sync listener
     this.syncListener = ProximiioMapbox.subscribe(
-      ProximiioMapboxEvents.SYNC_STATUS,
+      ProximiioEvents.SYNC_STATUS,
       (status: ProximiioMapboxSyncStatus) => {
         if (
           status === ProximiioMapboxSyncStatus.INITIAL_ERROR ||
@@ -196,7 +197,13 @@ export default class App extends React.Component<Props, State> {
     Proximiio.setNotificationMode(NotificationMode.Enabled);
     // Authorize libraries with token
     await Proximiio.authorize(PROXIMIIO_TOKEN);
-    Proximiio.setPdr(true, 4);
+
+    if (Platform.OS === 'ios') {
+      Proximiio.setSimulation(true, 0.7);
+    } else {
+      Proximiio.setPdr(true, 4);
+    }
+
     Proximiio.setSnapToRoute(true, 20);
     await ProximiioMapbox.authorize(PROXIMIIO_TOKEN);
     ProximiioMapbox.setRerouteEnabled(true);

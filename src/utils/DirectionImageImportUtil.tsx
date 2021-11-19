@@ -1,4 +1,4 @@
-import {RouteStepSymbol} from 'react-native-proximiio-mapbox';
+import {RouteStepSymbol} from 'react-native-proximiio-library';
 
 /**
  * Helper function to select appropriate image for direction

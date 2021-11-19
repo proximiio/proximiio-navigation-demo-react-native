@@ -14,7 +14,7 @@ import ProximiioMapbox, {
   Feature,
   ProximiioMapboxRoute,
   RouteStepDescriptor,
-} from 'react-native-proximiio-mapbox';
+} from 'react-native-proximiio-library';
 import {SliderBox} from 'react-native-image-slider-box';
 import importDirectionImage from '../../utils/DirectionImageImportUtil';
 import {Colors} from '../../Style';

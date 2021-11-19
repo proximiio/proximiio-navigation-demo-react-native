@@ -1,4 +1,4 @@
-import {ProximiioUnitConversion} from 'react-native-proximiio-mapbox';
+import {ProximiioUnitConversion} from 'react-native-proximiio-library';
 import PreferenceHelper, {DistanceUnitOption, Preference} from "./PreferenceHelper";
 import i18n from "i18next";
 

@@ -11,7 +11,7 @@ import i18n from 'i18next';
 import WebView from 'react-native-webview';
 import RoundedButton from '../../utils/RoundedButton';
 import {Colors, Shadow} from '../../Style';
-import Proximiio from 'react-native-proximiio';
+import Proximiio from 'react-native-proximiio-library';
 
 interface Props {
   route?: Route;

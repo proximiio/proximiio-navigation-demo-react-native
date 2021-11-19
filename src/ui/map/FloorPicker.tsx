@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   StyleProp,
 } from 'react-native';
-import Proximiio, {ProximiioEvents} from 'react-native-proximiio';
+import Proximiio, {ProximiioEvents} from 'react-native-proximiio-library';
 import {Colors, Shadow} from '../../Style';
 import i18n from 'i18next';
 import {LEVEL_OVERRIDE_MAP} from '../../utils/Constants';

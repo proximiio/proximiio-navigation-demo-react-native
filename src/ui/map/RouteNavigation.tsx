@@ -7,7 +7,7 @@ import ProximiioMapbox, {
   ProximiioRouteEvent,
   ProximiioRouteUpdateType,
   RouteStepSymbol,
-} from 'react-native-proximiio-mapbox';
+} from 'react-native-proximiio-library';
 import i18n from 'i18next';
 import MapCardView from './MapCardView';
 

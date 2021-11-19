@@ -1,6 +1,20 @@
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/proximiio/proximiio-specs.git'
+
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
 use_frameworks!
+
+$RNMBGL_Use_SPM = {
+  url: "https://github.com/maplibre/maplibre-gl-native-distribution",
+  requirement: {
+    kind: "upToNextMajorVersion",
+    minimumVersion: "5.12.0"
+  },
+  product_name: "Mapbox"
+}
+$RNMGL_USE_MAPLIBRE = true
 
 # uncomment STATIC_LIBRARIES to compensate for missing archs when building on M1
 STATIC_LIBRARIES = [
@@ -11,7 +25,7 @@ STATIC_LIBRARIES = [
   'RNVectorIcons',
   'RNCMaskedView',
   'RNDefaultPreference',
-  'react-native-proximiio'
+  'react-native-proximiio-library'
 ]
 
 platform :ios, '13.0'
@@ -20,6 +34,8 @@ target 'RnDemoApp' do
   config = use_native_modules!
 
   use_react_native!(:path => config["reactNativePath"])
+
+  pod 'ProximiioMapbox', :git => 'https://github.com/proximiio/proximiio-mapbox-ios-pod.git', :branch => 'maplibre'
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'

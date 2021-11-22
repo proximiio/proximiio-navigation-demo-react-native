@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,6 +18,10 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* RnDemoAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* RnDemoAppTests.m */; };
 		59D31472C0D21EA7307812FC /* Pods_RnDemoApp_tvOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3D53E94092972E6D2F88C63 /* Pods_RnDemoApp_tvOS.framework */; };
+		61004C01274BE9B100357D3F /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = 47063A3D7D9B5C8796B0117C /* Mapbox */; };
+		61004C02274BE9B100357D3F /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = 506F7A76C60CE2DDF5EC61CF /* Mapbox */; };
+		61004C03274BE9B100357D3F /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = EDE3AE351555DB33FEEEB667 /* Mapbox */; };
+		61004C04274BE9B100357D3F /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = 9A974E65FE9EBCD7705DE871 /* Mapbox */; };
 		612728432677A36F00C208E7 /* Dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612728422677A36F00C208E7 /* Dummy.swift */; };
 		6F8C6093BCBC0601028E576C /* Pods_RnDemoApp_RnDemoAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30EDF7C6B1A1A045890477CB /* Pods_RnDemoApp_RnDemoAppTests.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -95,6 +99,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F8C6093BCBC0601028E576C /* Pods_RnDemoApp_RnDemoAppTests.framework in Frameworks */,
+				61004C02274BE9B100357D3F /* Mapbox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +108,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0A6EE3D9F721950E62D981E6 /* Pods_RnDemoApp.framework in Frameworks */,
+				61004C01274BE9B100357D3F /* Mapbox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,6 +117,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				59D31472C0D21EA7307812FC /* Pods_RnDemoApp_tvOS.framework in Frameworks */,
+				61004C03274BE9B100357D3F /* Mapbox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +126,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0FFF23CDFCC968FC84906CCF /* Pods_RnDemoApp_tvOSTests.framework in Frameworks */,
+				61004C04274BE9B100357D3F /* Mapbox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,7 +273,7 @@
 			);
 			name = RnDemoAppTests;
 			packageProductDependencies = (
-				506F7A76C60CE2DDF5EC61CF /* SwiftPackageProductDependency */,
+				506F7A76C60CE2DDF5EC61CF /* Mapbox */,
 			);
 			productName = RnDemoAppTests;
 			productReference = 00E356EE1AD99517003FC87E /* RnDemoAppTests.xctest */;
@@ -290,7 +298,7 @@
 			);
 			name = RnDemoApp;
 			packageProductDependencies = (
-				47063A3D7D9B5C8796B0117C /* SwiftPackageProductDependency */,
+				47063A3D7D9B5C8796B0117C /* Mapbox */,
 			);
 			productName = RnDemoApp;
 			productReference = 13B07F961A680F5B00A75B9A /* RnDemoApp.app */;
@@ -313,7 +321,7 @@
 			);
 			name = "RnDemoApp-tvOS";
 			packageProductDependencies = (
-				EDE3AE351555DB33FEEEB667 /* SwiftPackageProductDependency */,
+				EDE3AE351555DB33FEEEB667 /* Mapbox */,
 			);
 			productName = "RnDemoApp-tvOS";
 			productReference = 2D02E47B1E0B4A5D006451C7 /* RnDemoApp-tvOS.app */;
@@ -335,7 +343,7 @@
 			);
 			name = "RnDemoApp-tvOSTests";
 			packageProductDependencies = (
-				9A974E65FE9EBCD7705DE871 /* SwiftPackageProductDependency */,
+				9A974E65FE9EBCD7705DE871 /* Mapbox */,
 			);
 			productName = "RnDemoApp-tvOSTests";
 			productReference = 2D02E4901E0B4A5D006451C7 /* RnDemoApp-tvOSTests.xctest */;
@@ -378,7 +386,7 @@
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			packageReferences = (
-				CAF3AD926D54226BA5AEB037 /* RemoteSwiftPackageReference */,
+				CAF3AD926D54226BA5AEB037 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */,
 			);
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
@@ -650,7 +658,6 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/yoga.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/glog.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_webview.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -923,7 +930,11 @@
 				);
 				INFOPLIST_FILE = RnDemoAppTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -944,7 +955,11 @@
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = RnDemoAppTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -967,7 +982,10 @@
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = RnDemoApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -994,7 +1012,10 @@
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = RnDemoApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1023,7 +1044,10 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "RnDemoApp-tvOS/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1051,7 +1075,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "RnDemoApp-tvOS/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1078,7 +1105,11 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "RnDemoApp-tvOSTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1105,7 +1136,11 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "RnDemoApp-tvOSTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1170,7 +1205,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
@@ -1226,7 +1264,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
@@ -1290,35 +1331,35 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		CAF3AD926D54226BA5AEB037 /* RemoteSwiftPackageReference */ = {
+		CAF3AD926D54226BA5AEB037 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/maplibre/maplibre-gl-native-distribution";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.12.0;
+				kind = exactVersion;
+				version = 5.11.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		47063A3D7D9B5C8796B0117C /* SwiftPackageProductDependency */ = {
+		47063A3D7D9B5C8796B0117C /* Mapbox */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = CAF3AD926D54226BA5AEB037 /* RemoteSwiftPackageReference */;
+			package = CAF3AD926D54226BA5AEB037 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
 			productName = Mapbox;
 		};
-		506F7A76C60CE2DDF5EC61CF /* SwiftPackageProductDependency */ = {
+		506F7A76C60CE2DDF5EC61CF /* Mapbox */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = CAF3AD926D54226BA5AEB037 /* RemoteSwiftPackageReference */;
+			package = CAF3AD926D54226BA5AEB037 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
 			productName = Mapbox;
 		};
-		9A974E65FE9EBCD7705DE871 /* SwiftPackageProductDependency */ = {
+		9A974E65FE9EBCD7705DE871 /* Mapbox */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = CAF3AD926D54226BA5AEB037 /* RemoteSwiftPackageReference */;
+			package = CAF3AD926D54226BA5AEB037 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
 			productName = Mapbox;
 		};
-		EDE3AE351555DB33FEEEB667 /* SwiftPackageProductDependency */ = {
+		EDE3AE351555DB33FEEEB667 /* Mapbox */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = CAF3AD926D54226BA5AEB037 /* RemoteSwiftPackageReference */;
+			package = CAF3AD926D54226BA5AEB037 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
 			productName = Mapbox;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -10,7 +10,7 @@ $RNMBGL_Use_SPM = {
   url: "https://github.com/maplibre/maplibre-gl-native-distribution",
   requirement: {
     kind: "upToNextMajorVersion",
-    minimumVersion: "5.12.0"
+    version: "5.11.0"
   },
   product_name: "Mapbox"
 }
@@ -46,6 +46,8 @@ target 'RnDemoApp' do
   end
   
   pre_install do |installer|
+    $RNMBGL.pre_install(installer)
+    
     installer.pod_targets.each do |pod|
       if STATIC_LIBRARIES.include?(pod.name)
         def pod.build_type

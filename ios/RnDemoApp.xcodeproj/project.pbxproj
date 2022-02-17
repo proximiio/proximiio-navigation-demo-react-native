@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -19,6 +19,10 @@
 		2DCD954D1E0B4F2C00145EB5 /* RnDemoAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* RnDemoAppTests.m */; };
 		59D31472C0D21EA7307812FC /* Pods_RnDemoApp_tvOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3D53E94092972E6D2F88C63 /* Pods_RnDemoApp_tvOS.framework */; };
 		612728432677A36F00C208E7 /* Dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612728422677A36F00C208E7 /* Dummy.swift */; };
+		6172995A27BC0C0100668A37 /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = B5DD1E159F39A29E6622C4C2 /* Mapbox */; };
+		6172995B27BC0C0100668A37 /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = 14AA4C5562409E6D80C6DEA6 /* Mapbox */; };
+		6172995C27BC0C0100668A37 /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = 6A83ACCDF66C38AE1014B6E2 /* Mapbox */; };
+		6172995D27BC0C0100668A37 /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = 7F4B6B0BF950D8C77656AD88 /* Mapbox */; };
 		6F8C6093BCBC0601028E576C /* Pods_RnDemoApp_RnDemoAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30EDF7C6B1A1A045890477CB /* Pods_RnDemoApp_RnDemoAppTests.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -95,6 +99,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F8C6093BCBC0601028E576C /* Pods_RnDemoApp_RnDemoAppTests.framework in Frameworks */,
+				6172995B27BC0C0100668A37 /* Mapbox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +108,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0A6EE3D9F721950E62D981E6 /* Pods_RnDemoApp.framework in Frameworks */,
+				6172995A27BC0C0100668A37 /* Mapbox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,6 +117,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				59D31472C0D21EA7307812FC /* Pods_RnDemoApp_tvOS.framework in Frameworks */,
+				6172995C27BC0C0100668A37 /* Mapbox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +126,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0FFF23CDFCC968FC84906CCF /* Pods_RnDemoApp_tvOSTests.framework in Frameworks */,
+				6172995D27BC0C0100668A37 /* Mapbox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +272,9 @@
 				00E356F51AD99517003FC87E /* PBXTargetDependency */,
 			);
 			name = RnDemoAppTests;
+			packageProductDependencies = (
+				14AA4C5562409E6D80C6DEA6 /* Mapbox */,
+			);
 			productName = RnDemoAppTests;
 			productReference = 00E356EE1AD99517003FC87E /* RnDemoAppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -286,6 +297,9 @@
 			dependencies = (
 			);
 			name = RnDemoApp;
+			packageProductDependencies = (
+				B5DD1E159F39A29E6622C4C2 /* Mapbox */,
+			);
 			productName = RnDemoApp;
 			productReference = 13B07F961A680F5B00A75B9A /* RnDemoApp.app */;
 			productType = "com.apple.product-type.application";
@@ -306,6 +320,9 @@
 			dependencies = (
 			);
 			name = "RnDemoApp-tvOS";
+			packageProductDependencies = (
+				6A83ACCDF66C38AE1014B6E2 /* Mapbox */,
+			);
 			productName = "RnDemoApp-tvOS";
 			productReference = 2D02E47B1E0B4A5D006451C7 /* RnDemoApp-tvOS.app */;
 			productType = "com.apple.product-type.application";
@@ -325,6 +342,9 @@
 				2D02E4921E0B4A5D006451C7 /* PBXTargetDependency */,
 			);
 			name = "RnDemoApp-tvOSTests";
+			packageProductDependencies = (
+				7F4B6B0BF950D8C77656AD88 /* Mapbox */,
+			);
 			productName = "RnDemoApp-tvOSTests";
 			productReference = 2D02E4901E0B4A5D006451C7 /* RnDemoApp-tvOSTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -365,6 +385,9 @@
 				Base,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
+			packageReferences = (
+				E3B161FF756A6035B30650B5 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */,
+			);
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -476,10 +499,9 @@
 				"${BUILT_PRODUCTS_DIR}/DoubleConversion/DoubleConversion.framework",
 				"${BUILT_PRODUCTS_DIR}/FBReactNativeSpec/FBReactNativeSpec.framework",
 				"${BUILT_PRODUCTS_DIR}/GRMustache.swift/Mustache.framework",
-				"${PODS_ROOT}/Mapbox-iOS-SDK/dynamic/Mapbox.framework",
 				"${BUILT_PRODUCTS_DIR}/MapboxMobileEvents/MapboxMobileEvents.framework",
 				"${PODS_ROOT}/Proximiio/Pod/Proximiio.framework",
-				"${PODS_ROOT}/ProximiioMapbox/Pod/ProximiioMapbox.framework",
+				"${PODS_ROOT}/ProximiioMapLibre/Pod/ProximiioMapLibre.framework",
 				"${PODS_ROOT}/ProximiioProcessor/ProximiioProcessor.framework",
 				"${BUILT_PRODUCTS_DIR}/RCT-Folly/folly.framework",
 				"${BUILT_PRODUCTS_DIR}/RCTTypeSafety/RCTTypeSafety.framework",
@@ -507,6 +529,7 @@
 				"${BUILT_PRODUCTS_DIR}/glog/glog.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-proximiio-mapbox/react_native_proximiio_mapbox.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-webview/react_native_webview.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ProximiioMapView/Mapbox.framework/Mapbox",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -517,10 +540,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DoubleConversion.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBReactNativeSpec.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mustache.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapboxMobileEvents.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Proximiio.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioMapbox.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioMapLibre.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioProcessor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/folly.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTTypeSafety.framework",
@@ -548,6 +570,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/glog.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_proximiio_mapbox.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_webview.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -568,10 +591,9 @@
 				"${BUILT_PRODUCTS_DIR}/DoubleConversion/DoubleConversion.framework",
 				"${BUILT_PRODUCTS_DIR}/FBReactNativeSpec/FBReactNativeSpec.framework",
 				"${BUILT_PRODUCTS_DIR}/GRMustache.swift/Mustache.framework",
-				"${PODS_ROOT}/Mapbox-iOS-SDK/dynamic/Mapbox.framework",
 				"${BUILT_PRODUCTS_DIR}/MapboxMobileEvents/MapboxMobileEvents.framework",
 				"${PODS_ROOT}/Proximiio/Pod/Proximiio.framework",
-				"${PODS_ROOT}/ProximiioMapbox/Pod/ProximiioMapbox.framework",
+				"${PODS_ROOT}/ProximiioMapLibre/Pod/ProximiioMapLibre.framework",
 				"${PODS_ROOT}/ProximiioProcessor/ProximiioProcessor.framework",
 				"${BUILT_PRODUCTS_DIR}/RCT-Folly/folly.framework",
 				"${BUILT_PRODUCTS_DIR}/RCTTypeSafety/RCTTypeSafety.framework",
@@ -609,10 +631,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DoubleConversion.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBReactNativeSpec.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mustache.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mapbox.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapboxMobileEvents.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Proximiio.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioMapbox.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioMapLibre.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioProcessor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/folly.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTTypeSafety.framework",
@@ -912,7 +933,11 @@
 				);
 				INFOPLIST_FILE = RnDemoAppTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -933,7 +958,11 @@
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = RnDemoAppTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -956,7 +985,10 @@
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = RnDemoApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -983,7 +1015,10 @@
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = RnDemoApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -1012,7 +1047,10 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "RnDemoApp-tvOS/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1040,7 +1078,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "RnDemoApp-tvOS/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1067,7 +1108,11 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "RnDemoApp-tvOSTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1094,7 +1139,11 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "RnDemoApp-tvOSTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1159,7 +1208,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
@@ -1215,7 +1267,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
-				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					/usr/lib/swift,
+					"$(inherited)",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
@@ -1277,6 +1332,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E3B161FF756A6035B30650B5 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/maplibre/maplibre-gl-native-distribution";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		14AA4C5562409E6D80C6DEA6 /* Mapbox */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E3B161FF756A6035B30650B5 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
+			productName = Mapbox;
+		};
+		6A83ACCDF66C38AE1014B6E2 /* Mapbox */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E3B161FF756A6035B30650B5 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
+			productName = Mapbox;
+		};
+		7F4B6B0BF950D8C77656AD88 /* Mapbox */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E3B161FF756A6035B30650B5 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
+			productName = Mapbox;
+		};
+		B5DD1E159F39A29E6622C4C2 /* Mapbox */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E3B161FF756A6035B30650B5 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
+			productName = Mapbox;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
 }

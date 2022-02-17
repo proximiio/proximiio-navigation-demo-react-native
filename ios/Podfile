@@ -2,6 +2,9 @@ require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 use_frameworks!
 
+$RNMBGL_Use_SPM = true
+$RNMGL_USE_MAPLIBRE = true
+
 # uncomment STATIC_LIBRARIES to compensate for missing archs when building on M1
 STATIC_LIBRARIES = [
   'RNScreens',
@@ -17,8 +20,9 @@ STATIC_LIBRARIES = [
 platform :ios, '13.0'
 
 target 'RnDemoApp' do
+  $RNMGL_USE_MAPLIBRE = true
   config = use_native_modules!
-
+  
   use_react_native!(:path => config["reactNativePath"])
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
@@ -30,6 +34,7 @@ target 'RnDemoApp' do
   end
   
   pre_install do |installer|
+    $RNMBGL.pre_install(installer)
     installer.pod_targets.each do |pod|
       if STATIC_LIBRARIES.include?(pod.name)
         def pod.build_type
@@ -37,7 +42,6 @@ target 'RnDemoApp' do
         end
       end
     end
-    $RNMBGL.pre_install(installer)
   end
 
   post_install do |installer|

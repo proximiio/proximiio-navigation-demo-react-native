@@ -6,14 +6,7 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 use_frameworks!
 
-$RNMBGL_Use_SPM = {
-  url: "https://github.com/maplibre/maplibre-gl-native-distribution",
-  requirement: {
-    kind: "upToNextMajorVersion",
-    version: "5.11.0"
-  },
-  product_name: "Mapbox"
-}
+$RNMBGL_Use_SPM = true
 $RNMGL_USE_MAPLIBRE = true
 
 # uncomment STATIC_LIBRARIES to compensate for missing archs when building on M1
@@ -34,8 +27,6 @@ target 'RnDemoApp' do
   config = use_native_modules!
 
   use_react_native!(:path => config["reactNativePath"])
-
-  pod 'ProximiioMapbox', :git => 'https://github.com/proximiio/proximiio-mapbox-ios-pod.git', :branch => 'maplibre'
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'

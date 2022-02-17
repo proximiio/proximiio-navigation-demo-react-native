@@ -18,11 +18,11 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* RnDemoAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* RnDemoAppTests.m */; };
 		59D31472C0D21EA7307812FC /* Pods_RnDemoApp_tvOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3D53E94092972E6D2F88C63 /* Pods_RnDemoApp_tvOS.framework */; };
-		61004C01274BE9B100357D3F /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = 47063A3D7D9B5C8796B0117C /* Mapbox */; };
 		61004C02274BE9B100357D3F /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = 506F7A76C60CE2DDF5EC61CF /* Mapbox */; };
 		61004C03274BE9B100357D3F /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = EDE3AE351555DB33FEEEB667 /* Mapbox */; };
 		61004C04274BE9B100357D3F /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = 9A974E65FE9EBCD7705DE871 /* Mapbox */; };
 		612728432677A36F00C208E7 /* Dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612728422677A36F00C208E7 /* Dummy.swift */; };
+		61FC5F8227BEA58E00A9617F /* Mapbox in Frameworks */ = {isa = PBXBuildFile; productRef = 9726856BB86BAFB62838CC77 /* Mapbox */; };
 		6F8C6093BCBC0601028E576C /* Pods_RnDemoApp_RnDemoAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30EDF7C6B1A1A045890477CB /* Pods_RnDemoApp_RnDemoAppTests.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -108,7 +108,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0A6EE3D9F721950E62D981E6 /* Pods_RnDemoApp.framework in Frameworks */,
-				61004C01274BE9B100357D3F /* Mapbox in Frameworks */,
+				61FC5F8227BEA58E00A9617F /* Mapbox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,7 +298,7 @@
 			);
 			name = RnDemoApp;
 			packageProductDependencies = (
-				47063A3D7D9B5C8796B0117C /* Mapbox */,
+				9726856BB86BAFB62838CC77 /* Mapbox */,
 			);
 			productName = RnDemoApp;
 			productReference = 13B07F961A680F5B00A75B9A /* RnDemoApp.app */;
@@ -501,7 +501,7 @@
 				"${BUILT_PRODUCTS_DIR}/GRMustache.swift/Mustache.framework",
 				"${BUILT_PRODUCTS_DIR}/MapboxMobileEvents/MapboxMobileEvents.framework",
 				"${PODS_ROOT}/Proximiio/Pod/Proximiio.framework",
-				"${PODS_ROOT}/ProximiioMapbox/Pod/ProximiioMapbox.framework",
+				"${PODS_ROOT}/ProximiioMapLibre/Pod/ProximiioMapLibre.framework",
 				"${PODS_ROOT}/ProximiioProcessor/ProximiioProcessor.framework",
 				"${BUILT_PRODUCTS_DIR}/RCT-Folly/folly.framework",
 				"${BUILT_PRODUCTS_DIR}/RCTTypeSafety/RCTTypeSafety.framework",
@@ -528,7 +528,7 @@
 				"${BUILT_PRODUCTS_DIR}/Yoga/yoga.framework",
 				"${BUILT_PRODUCTS_DIR}/glog/glog.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-webview/react_native_webview.framework",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Mapbox/Mapbox.framework/Mapbox",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ProximiioMapView/Mapbox.framework/Mapbox",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -541,7 +541,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mustache.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapboxMobileEvents.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Proximiio.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioMapbox.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioMapLibre.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioProcessor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/folly.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTTypeSafety.framework",
@@ -591,7 +591,7 @@
 				"${BUILT_PRODUCTS_DIR}/GRMustache.swift/Mustache.framework",
 				"${BUILT_PRODUCTS_DIR}/MapboxMobileEvents/MapboxMobileEvents.framework",
 				"${PODS_ROOT}/Proximiio/Pod/Proximiio.framework",
-				"${PODS_ROOT}/ProximiioMapbox/Pod/ProximiioMapbox.framework",
+				"${PODS_ROOT}/ProximiioMapLibre/Pod/ProximiioMapLibre.framework",
 				"${PODS_ROOT}/ProximiioProcessor/ProximiioProcessor.framework",
 				"${BUILT_PRODUCTS_DIR}/RCT-Folly/folly.framework",
 				"${BUILT_PRODUCTS_DIR}/RCTTypeSafety/RCTTypeSafety.framework",
@@ -618,7 +618,6 @@
 				"${BUILT_PRODUCTS_DIR}/Yoga/yoga.framework",
 				"${BUILT_PRODUCTS_DIR}/glog/glog.framework",
 				"${BUILT_PRODUCTS_DIR}/react-native-webview/react_native_webview.framework",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Mapbox/Mapbox.framework/Mapbox",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -631,7 +630,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Mustache.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapboxMobileEvents.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Proximiio.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioMapbox.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioMapLibre.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProximiioProcessor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/folly.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTTypeSafety.framework",
@@ -1336,18 +1335,18 @@
 			repositoryURL = "https://github.com/maplibre/maplibre-gl-native-distribution";
 			requirement = {
 				kind = exactVersion;
-				version = 5.11.0;
+				version = 5.12.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		47063A3D7D9B5C8796B0117C /* Mapbox */ = {
+		506F7A76C60CE2DDF5EC61CF /* Mapbox */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CAF3AD926D54226BA5AEB037 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
 			productName = Mapbox;
 		};
-		506F7A76C60CE2DDF5EC61CF /* Mapbox */ = {
+		9726856BB86BAFB62838CC77 /* Mapbox */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CAF3AD926D54226BA5AEB037 /* XCRemoteSwiftPackageReference "maplibre-gl-native-distribution" */;
 			productName = Mapbox;

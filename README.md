@@ -10,9 +10,10 @@ cd ios
 pod install
 ```
 
-If "pod install" command ends with following error:
-"None of your spec sources contain a spec satisfying the dependency: `ProximiioMapbox (= 5.1.8)`"
-please run "pod repo update" followed by "pod install"
+### Apple M1 Users
+
+Its necessary to run both terminal with "pod install" and the XCode in Rosetta Mode
+(right click on /Applications/XCode and /Applications/Utilities/Terminal and enable "Open Using Rosettta")
 
 ## Configuration
 

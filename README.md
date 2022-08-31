@@ -31,5 +31,5 @@ yarn start ios
 
 Run Android version using following command:
 ```
-yarn start ios
+yarn start android
 ```

@@ -1,9 +1,9 @@
 PODS:
-  - Alamofire (5.5.0)
+  - Alamofire (5.6.4)
   - boost (1.76.0)
-  - BVLinearGradient (2.5.6):
-    - React
-  - CrystDBCipher (0.1.11):
+  - BVLinearGradient (2.6.2):
+    - React-Core
+  - CrystDBCipher (0.1.12):
     - SQLCipher
   - DarklyEventSource (4.1.1)
   - DoubleConversion (1.1.6)
@@ -19,10 +19,10 @@ PODS:
   - glog (0.3.5)
   - GRMustache.swift (4.0.1)
   - MapboxMobileEvents (0.10.2)
-  - Proximiio (5.2.19):
+  - Proximiio (5.2.29):
     - CrystDBCipher
     - DarklyEventSource
-  - ProximiioMapLibre (5.8.0):
+  - ProximiioMapLibre (5.31.0):
     - Alamofire
     - GRMustache.swift
     - Proximiio
@@ -30,7 +30,7 @@ PODS:
     - SwiftyJSON
   - ProximiioMapView (5.12.2):
     - MapboxMobileEvents (= 0.10.2)
-  - ProximiioProcessor (0.3.0):
+  - ProximiioProcessor (0.22.0):
     - Proximiio
     - SwiftyJSON
   - RCT-Folly (2021.06.28.00-v2):
@@ -244,17 +244,17 @@ PODS:
   - react-native-mapbox-gl/StaticLibraryFixer (8.5.0):
     - React
     - React-Core
-  - react-native-proximiio (5.2.1):
-    - Proximiio (= 5.2.19)
-    - ProximiioProcessor (= 0.3.0)
+  - react-native-proximiio (5.2.8):
+    - Proximiio (= 5.2.29)
+    - ProximiioProcessor (= 0.22.0)
     - React
-  - react-native-proximiio-mapbox (5.2.2):
-    - ProximiioMapLibre (= 5.8.0)
-    - ProximiioProcessor (= 0.3.0)
+  - react-native-proximiio-mapbox (5.2.15):
+    - ProximiioMapLibre (= 5.31.0)
+    - ProximiioProcessor (= 0.22.0)
     - React
   - react-native-safe-area-context (3.4.1):
     - React-Core
-  - react-native-webview (11.17.2):
+  - react-native-webview (11.26.1):
     - React-Core
   - React-perflogger (0.67.3)
   - React-RCTActionSheet (0.67.3):
@@ -321,21 +321,21 @@ PODS:
     - React-jsi (= 0.67.3)
     - React-logger (= 0.67.3)
     - React-perflogger (= 0.67.3)
-  - RNCAsyncStorage (1.16.1):
+  - RNCAsyncStorage (1.17.11):
     - React-Core
-  - RNDefaultPreference (1.4.3):
-    - React
-  - RNGestureHandler (2.2.0):
+  - RNDefaultPreference (1.4.4):
     - React-Core
-  - RNScreens (3.12.0):
+  - RNGestureHandler (2.9.0):
+    - React-Core
+  - RNScreens (3.19.0):
     - React-Core
     - React-RCTImage
-  - RNVectorIcons (9.1.0):
+  - RNVectorIcons (9.2.0):
     - React-Core
-  - SQLCipher (4.5.0):
-    - SQLCipher/standard (= 4.5.0)
-  - SQLCipher/common (4.5.0)
-  - SQLCipher/standard (4.5.0):
+  - SQLCipher (4.5.2):
+    - SQLCipher/standard (= 4.5.2)
+  - SQLCipher/common (4.5.2)
+  - SQLCipher/standard (4.5.2):
     - SQLCipher/common
   - SwiftyJSON (5.0.1)
   - Yoga (1.14.0)
@@ -488,10 +488,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  Alamofire: 1c4fb5369c3fe93d2857c780d8bbe09f06f97e7c
+  Alamofire: 4e95d97098eacb88856099c4fc79b526a299e48c
   boost: a7c83b31436843459a1961bfd74b96033dc77234
-  BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
-  CrystDBCipher: 0b2f8e78df7a6f373c384a1671f8efd54af16974
+  BVLinearGradient: 34a999fda29036898a09c6a6b728b0b4189e1a44
+  CrystDBCipher: 5aa287d612edbc1e596bb90f5aeeedd3a13b7e7a
   DarklyEventSource: 6df384dcdb211d2b6bfbbe93a3148bd25567dd61
   DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
   FBLazyVector: 808f741ddb0896a20e5b98cc665f5b3413b072e2
@@ -500,10 +500,10 @@ SPEC CHECKSUMS:
   glog: 85ecdd10ee8d8ec362ef519a6a45ff9aa27b2e85
   GRMustache.swift: a6436504284b22b4b05daf5f46f77bd3fe00a9a2
   MapboxMobileEvents: 2bc0ca2eedb627b73cf403258dce2b2fa98074a6
-  Proximiio: 3ccdeffb609280d57751489247cc95f20fc77419
-  ProximiioMapLibre: 1cd8a96703a9684e2dfc0a533ecb5fbe03baf5e6
+  Proximiio: c9dd655f726394f492dbd86daa995f0f7a2df211
+  ProximiioMapLibre: df9b111e751c4212706ade3cea8e40a4091a6a8d
   ProximiioMapView: 60540edc88a1a3b7d7fddedd577bfe12ac9ce163
-  ProximiioProcessor: 319d54994b47a11a573ccf4466065b15517aa9b2
+  ProximiioProcessor: da96a06dcde27321c4dc0cf86c2214cbe9b0e8ce
   RCT-Folly: 803a9cfd78114b2ec0f140cfa6fa2a6bafb2d685
   RCTRequired: 3c77b683474faf23920fbefc71c4e13af21470c0
   RCTTypeSafety: 720b1841260dac692444c2822b27403178da8b28
@@ -518,10 +518,10 @@ SPEC CHECKSUMS:
   React-logger: 1e10789cb84f99288479ba5f20822ce43ced6ffe
   react-native-compass-heading: f3a8fcfcd578b26ab97283e5c0fb0f02a764013e
   react-native-mapbox-gl: 9fc139bea0119fd862c93df0adba1849b053e435
-  react-native-proximiio: 28661bd0c7db3bc2c4be7960150e08b9add15a8f
-  react-native-proximiio-mapbox: 8d3aa5462182e54b72d842ba140357767b965bc4
+  react-native-proximiio: 143cdcd3b8bc5bada15d0d81499f3b0467863918
+  react-native-proximiio-mapbox: 0546a7bd354c7d68f5437c9e3d3befbcfedee00f
   react-native-safe-area-context: 9e40fb181dac02619414ba1294d6c2a807056ab9
-  react-native-webview: 380c1a03ec94b7ed764dac8db1e7c9952d08c93a
+  react-native-webview: 9f111dfbcfc826084d6c507f569e5e03342ee1c1
   React-perflogger: 93d3f142d6d9a46e635f09ba0518027215a41098
   React-RCTActionSheet: 87327c3722203cc79cf79d02fb83e7332aeedd18
   React-RCTAnimation: 009c87c018d50e0b38692699405ebe631ff4872d
@@ -534,15 +534,15 @@ SPEC CHECKSUMS:
   React-RCTVibration: d0361f15ea978958fab7ffb6960f475b5063d83f
   React-runtimeexecutor: af1946623656f9c5fd64ca6f36f3863516193446
   ReactCommon: 650e33cde4fb7d36781cd3143f5276da0abb2f96
-  RNCAsyncStorage: b49b4e38a1548d03b74b30e558a1d18465b94be7
-  RNDefaultPreference: 2f8d6d54230edbd78708ada8d63bb275e5a8415b
-  RNGestureHandler: bf572f552ea324acd5b5464b8d30755b2d8c1de6
-  RNScreens: 2559f98b0835103cbef3b26ba77fa61d4bb37ae7
-  RNVectorIcons: 7923e585eaeb139b9f4531d25a125a1500162a0b
-  SQLCipher: 98dc22f27c0b1790d39e710d440f22a466ebdb59
+  RNCAsyncStorage: 8616bd5a58af409453ea4e1b246521bb76578d60
+  RNDefaultPreference: 08bdb06cfa9188d5da97d4642dac745218d7fb31
+  RNGestureHandler: 071d7a9ad81e8b83fe7663b303d132406a7d8f39
+  RNScreens: ea4cd3a853063cda19a4e3c28d2e52180c80f4eb
+  RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
+  SQLCipher: f5b4857434158b571a3ed3b10b3b43cd18ef5f67
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
   Yoga: 90dcd029e45d8a7c1ff059e8b3c6612ff409061a
 
-PODFILE CHECKSUM: 5ec709a2ee162f108ae1ac033fa67f4a01b34dd3
+PODFILE CHECKSUM: 4ba70850c998dfbc285dce78cb3154746eb339fe
 
 COCOAPODS: 1.11.2
